@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Sun'sCreate（サンズクリエイト）の業務システム制作。予約・訪問サービス、建物設備の点検報告、パン屋の事前注文など、小さな事業の現場の仕事をシステムにします。">
+<meta charset="utf-8">
+<title>Sun'sCreate 業務システム制作</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500;700&display=swap">
+<style>
+/* Layout: 点検票の紙面（方眼の地・墨色・安全色の黄）。ヒーロー→事例（課題→作ったもの→画面）→こだわり→対応業種→進め方→相談 */
+:root{
+  --paper:#f7f8f6; --card:#ffffff; --ink:#1d2327; --sub:#55606a; --rule:#d9dee2;
+  --signal:#f2c200; --signal-ink:#1d2327; --steel:#2f5d7c; --grid:rgba(47,93,124,.07);
+  --display:"Dela Gothic One","BIZ UDPGothic","Hiragino Kaku Gothic ProN",sans-serif;
+  --body:"BIZ UDPGothic","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  --mono:"M PLUS 1 Code","BIZ UDPGothic",monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#15191c;--card:#1d2226;--ink:#e9edf0;--sub:#a4afb8;--rule:#323a40;--signal:#f2c200;--signal-ink:#15191c;--steel:#8db8d6;--grid:rgba(141,184,214,.06);color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#15191c;--card:#1d2226;--ink:#e9edf0;--sub:#a4afb8;--rule:#323a40;--signal:#f2c200;--signal-ink:#15191c;--steel:#8db8d6;--grid:rgba(141,184,214,.06);color-scheme:dark}
+
+img{max-width:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.85 var(--body);letter-spacing:.02em;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+section{padding-block:72px}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.35}
+h2{font:400 clamp(26px,3.6vw,36px)/1.35 var(--display);letter-spacing:.04em;margin-bottom:14px}
+h3{font-size:20px;font-weight:700}
+p{margin:0}
+.lead{color:var(--sub);max-width:38em}
+.tag{display:inline-block;font:700 13px var(--mono);letter-spacing:.12em;color:var(--steel);margin-bottom:10px}
+a{color:var(--steel)}
+:focus-visible{outline:3px solid var(--signal);outline-offset:3px}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--paper);border-bottom:1px solid var(--rule)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:11;background:var(--paper)}
+.hbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
+.brand{font:400 20px var(--display);letter-spacing:.06em;text-decoration:none;color:var(--ink)}
+.brand small{font:700 12px var(--body);color:var(--sub);margin-left:8px;letter-spacing:.04em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:4px;border:2px solid var(--ink);background:var(--signal);color:var(--signal-ink);font:700 17px var(--body);text-decoration:none;cursor:pointer}
+.btn:hover{filter:brightness(1.05)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.sm{min-height:42px;padding:0 16px;font-size:15px}
+
+/* hero */
+.hero{padding-block:72px 56px}
+.hero .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+.hero .grid>*{min-width:0}
+.hero h1{font:400 clamp(32px,5vw,54px)/1.3 var(--display);letter-spacing:.03em}
+.hero h1 .nb{display:inline-block}
+.hero h1 mark{background:linear-gradient(transparent 62%,var(--signal) 62%);color:inherit;padding:0 2px}
+.hero .sub{margin-top:20px;font-size:18px;max-width:30em}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.proof{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px;font:500 14px var(--mono);color:var(--sub)}
+.proof b{color:var(--ink)}
+.shot{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:8px;background:var(--card);box-shadow:0 18px 40px rgba(20,30,40,.14)}
+.hero-figs{position:relative}
+.hero-figs .phone{position:absolute;right:-6px;bottom:-34px;width:34%;border-radius:14px;border:3px solid var(--ink)}
+.hero-figs figcaption{font-size:13px;color:var(--sub);margin-top:10px}
+
+/* 事例 */
+.case-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px;margin-bottom:28px}
+.spec{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--ink);background:var(--card)}
+.spec>div{padding:18px 20px;border-right:1px solid var(--rule);min-width:0}
+.spec>div:last-child{border-right:0}
+.spec dt{font:700 13px var(--mono);letter-spacing:.1em;color:var(--steel);margin-bottom:6px}
+.spec dd{margin:0}
+.spec ul{margin:0;padding-left:1.1em}
+.feat{display:grid;grid-template-columns:repeat(2,1fr);gap:40px 36px;margin-top:48px}
+.feat>figure{margin:0;min-width:0;display:grid;gap:12px;align-content:start}
+.feat .who{font:700 13px var(--mono);letter-spacing:.1em;background:var(--ink);color:var(--paper);padding:2px 10px;justify-self:start}
+.feat p{color:var(--sub);font-size:16px}
+.mobiles{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:48px}
+.mobiles figure{margin:0;min-width:0;display:grid;gap:8px;align-content:start}
+.mobiles img{border-radius:14px;border:3px solid var(--ink);width:100%;height:auto;display:block}
+.mobiles figcaption{font-size:14px;color:var(--sub)}
+.mobiles figcaption b{display:block;color:var(--ink);font-size:15px}
+.calc{margin-top:40px;border-left:6px solid var(--signal);background:var(--card);padding:18px 22px;display:grid;gap:6px}
+.calc .n{font:700 34px var(--mono);font-variant-numeric:tabular-nums}
+.calc small{color:var(--sub);font-size:14px}
+
+/* こだわり */
+.points{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.point{background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--steel);padding:20px;min-width:0;display:grid;gap:8px;align-content:start}
+.point ul{margin:0;padding-left:1.1em;color:var(--sub);font-size:15px;display:grid;gap:4px}
+
+/* 対応業種 */
+.fields{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.field{border:2px solid var(--ink);padding:20px;background:var(--card);min-width:0;display:grid;gap:8px;align-content:start}
+.field.main{background:var(--signal);color:var(--signal-ink);border-color:var(--signal)}
+.field.main p{color:var(--signal-ink)}
+.field p{color:var(--sub);font-size:15px}
+
+/* 進め方 */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:s;border:2px solid var(--ink);background:var(--card)}
+.steps li{counter-increment:s;padding:20px;border-right:1px solid var(--rule);min-width:0}
+.steps li:last-child{border-right:0}
+.steps li::before{content:"STEP " counter(s);display:block;font:700 13px var(--mono);letter-spacing:.12em;color:var(--steel);margin-bottom:6px}
+.steps b{display:block;font-size:18px}
+.steps span{color:var(--sub);font-size:15px}
+
+/* 相談 */
+.contact{background:var(--ink);color:var(--paper)}
+.contact h2{color:var(--paper)}
+.contact .lead{color:color-mix(in srgb,var(--paper) 78%,transparent)}
+.cbox{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;margin-top:24px}
+.tel{font:700 clamp(22px,4vw,36px) var(--mono);overflow-wrap:anywhere;letter-spacing:.06em;font-variant-numeric:tabular-nums;user-select:all}
+.contact .btn{border-color:var(--signal)}
+.contact .btn.ghost{color:var(--paper);border-color:var(--paper)}
+.contact small{display:block;margin-top:14px;color:color-mix(in srgb,var(--paper) 70%,transparent);font-size:14px}
+footer{padding-block:28px;font-size:14px;color:var(--sub)}
+
+@media (max-width:860px){
+  .hero .grid,.feat{grid-template-columns:1fr}
+  .hero-figs .phone{width:30%;bottom:-20px;right:0}
+  .spec,.points,.fields{grid-template-columns:1fr}
+  .spec>div{border-right:0;border-bottom:1px solid var(--rule)}.spec>div:last-child{border-bottom:0}
+  .mobiles{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}.steps li{border-bottom:1px solid var(--rule)}
+  section{padding-block:56px}
+}
+@media (max-width:480px){.hdr-cta{display:none}.steps{grid-template-columns:1fr}.steps li{border-right:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="wrap hbar">
+  <a class="brand" href="#top">Sun'sCreate<small>業務システム制作</small></a>
+  <a class="btn sm hdr-cta" href="#contact">相談する</a>
+</div></header>
+
+<main id="top">
+<section class="hero"><div class="wrap grid">
+  <div>
+    <p class="tag">小さな事業の「現場の仕事」をシステムに</p>
+    <h1><span class="nb">電話とメモで</span><span class="nb">回している</span><span class="nb">仕事を、</span><mark class="nb">予約から精算まで</mark><span class="nb">一つの仕組みに。</span></h1>
+    <p class="sub">予約の受付、担当の割り振り、当日の作業チェック、売上とスタッフへの支払いまで。建物設備管理の現場で働く代表が、自分の事業で使うつもりで作っています。</p>
+    <div class="ctas">
+      <a class="btn" href="https://goenya-demo.vercel.app/" target="_blank" rel="noopener">事例のデモを触ってみる</a>
+      <a class="btn ghost" href="#contact">相談する（無料）</a>
+    </div>
+    <p class="proof"><span>画面 <b>3種類</b>（管理・スタッフ・お客様）</span><span>予定の単位 <b>15分</b></span><span>スマホ対応</span></p>
+  </div>
+  <figure class="hero-figs" style="margin:0">
+    <img class="shot" src="img/admin.jpg" width="1280" height="800" alt="管理画面のホーム。今日の訪問、未対応の受付、今月の売上と粗利が並んでいる">
+    <img class="shot phone" src="img/staff_offer.jpg" width="390" height="780" alt="スタッフのスマホ画面。新しい依頼の日時と訪問先が表示され、受諾・辞退を選べる">
+    <figcaption>事例「ご縁屋」の管理画面とスタッフのスマホ画面（架空のデータ）</figcaption>
+  </figure>
+</div></section>
+
+<section id="case" style="background:var(--card);border-block:1px solid var(--rule)"><div class="wrap">
+  <div class="case-head">
+    <div><p class="tag">CASE 01 ／ 訪問サービス業</p>
+      <h2>高齢者向け 暮らしのお手伝い「ご縁屋」</h2>
+      <p class="lead">川崎市宮前区で、電球の交換やスマホの設定などを1回60分で行う訪問サービスです。代表一人で始め、業務委託のスタッフを増やしていく前提で作りました。</p></div>
+    <a class="btn ghost" href="https://goenya-demo.vercel.app/" target="_blank" rel="noopener">デモを開く</a>
+  </div>
+  <dl class="spec">
+    <div><dt>課題</dt><dd><ul><li>予約が電話中心で、日程の調整に時間がかかる</li><li>スタッフが増えると誰がいつ空いているか分からない</li><li>お客様の家に入る仕事なので、安全と信頼の記録が要る</li></ul></dd></div>
+    <div><dt>作ったもの</dt><dd><ul><li>空き時間だけを表示する予約ページ</li><li>依頼の自動振り分け（近さ・空き・件数の偏り）</li><li>スタッフ用のスマホ画面と開始・完了チェック</li><li>売上・粗利・スタッフへの振込額の自動計算</li></ul></dd></div>
+    <div><dt>つないだもの</dt><dd><ul><li>Googleカレンダー（代表・スタッフ個人）</li><li>チャット（写真・PDFを添付）</li><li>業務委託契約書・誓約書・接客マニュアル</li></ul></dd></div>
+  </dl>
+
+  <div class="feat">
+    <figure><span class="who">管理画面</span><img class="shot" src="img/sched.jpg" width="1280" height="800" alt="スタッフごとの1日のスケジュール。15分きざみで空きと訪問予定が並ぶ" loading="lazy">
+      <h3>全員の予定を15分単位で一画面に</h3><p>勤務時間、休み、私用の予定、移動時間を考えて空きを出します。私用の予定は「埋まっている」ことだけを共有し、内容は表示しません。</p></figure>
+    <figure><span class="who">管理画面</span><img class="shot" src="img/sales.jpg" width="1280" height="800" alt="売上画面。月額プランと単発の売上、スタッフ報酬、粗利、スタッフごとの振込額" loading="lazy">
+      <h3>売上と、スタッフへの振込額まで自動で</h3><p>完了した訪問から報酬を計算し、現金で預かった代金を差し引いた振込額を出します。月額プランの入金確認もここで行います。</p></figure>
+  </div>
+
+  <div class="mobiles">
+    <figure><img src="img/staff_offer.jpg" width="390" height="780" alt="スタッフ画面の依頼カード" loading="lazy"><figcaption><b>スタッフ：依頼を受ける</b>日時・訪問先・移動の目安を見て、受諾か辞退を選ぶ</figcaption></figure>
+    <figure><img src="img/staff_check.jpg" width="390" height="780" alt="スタッフ画面の訪問カードと開始前チェック" loading="lazy"><figcaption><b>スタッフ：当日の訪問</b>身だしなみとボディカメラONを確認してから開始</figcaption></figure>
+    <figure><img src="img/customer.jpg" width="390" height="780" alt="お客様の予約確認画面。伺うスタッフの名前が表示されている" loading="lazy"><figcaption><b>お客様：予約の確認</b>名前と電話番号だけで、伺う人と日時が分かる</figcaption></figure>
+    <figure><img src="img/site.jpg" width="390" height="780" alt="お客様向けサイトのトップ" loading="lazy"><figcaption><b>お客様：予約ページ</b>高齢の方でも読める大きな文字と段階表示</figcaption></figure>
+  </div>
+
+  <div class="calc">
+    <span class="tag" style="margin:0">試算</span>
+    <p>月80件の訪問で、日程調整の電話が1件10分かかる場合</p>
+    <p class="n">約13時間／月</p>
+    <small>予約ページと自動振り分けで、この調整時間の多くを減らせる見込みです。実際の運用データではなく、条件をおいた計算です。</small>
+  </div>
+</div></section>
+
+<section id="case2"><div class="wrap">
+  <div class="case-head">
+    <div><p class="tag">CASE 02 ／ 建物設備管理業</p>
+      <h2>点検の記録から報告書まで「設備点検報告システム」</h2>
+      <p class="lead">代表が本業の貯水槽清掃・増圧ポンプ点検・排水管洗浄で使うために作ったシステムです。現場でスマホに入力すると、自社書式の報告書がPDFでできあがります。</p></div>
+  </div>
+  <dl class="spec">
+    <div><dt>課題</dt><dd><ul><li>現場のメモを、事務所で報告書に書き写していた</li><li>写真の貼り付けと並べ替えに時間がかかる</li><li>次回点検の時期や、入居者向けのお知らせを手で管理していた</li></ul></dd></div>
+    <div><dt>作ったもの</dt><dd><ul><li>点検項目を押して選ぶスマホ入力</li><li>写真を自動で並べた報告書PDF（A4）</li><li>断水・作業のお知らせPDF（掲示用）</li><li>部屋ごとの実施結果から実施率を自動集計</li></ul></dd></div>
+    <div><dt>つないだもの</dt><dd><ul><li>Googleスプレッドシート（報告書の書式）</li><li>Googleカレンダー（予定・祝日）</li><li>freee（見積書の下書き）</li><li>次回点検のお知らせメール</li></ul></dd></div>
+  </dl>
+  <div class="feat">
+    <figure><span class="who">予定</span><img class="shot" src="img/setsubi_cal.jpg" width="1280" height="800" alt="月表示の予定表。点検の予定と祝日が種類ごとの色で並んでいる" loading="lazy">
+      <h3>点検の予定をGoogleカレンダーと一つに</h3><p>システムで登録した予定はGoogleカレンダーにも入り、カレンダー側で動かした予定もこちらに戻ります。普段の予定と祝日も同じ画面で見られます。</p></figure>
+    <figure style="align-content:center"><span class="who">流れ</span>
+      <h3>入力から書類までを一続きに</h3>
+      <p>現場で項目を「良・要注意・否」で押す → 「否」は改善提案に自動で入る → ボタン一つで報告書PDF → 改善提案から見積書の下書き（外注分は利益を上乗せ） → 次回の点検時期が近づくとメールで知らせる。</p>
+      <p>報告書の書式は、元のスプレッドシートを差し替えるだけで変えられます。</p></figure>
+  </div>
+  <div class="mobiles">
+    <figure><img src="img/setsubi_list.jpg" width="390" height="780" alt="点検の一覧と、次回点検の予定" loading="lazy"><figcaption><b>点検の一覧</b>次回の点検時期が近い物件を上に表示</figcaption></figure>
+    <figure><img src="img/setsubi_tank.jpg" width="390" height="780" alt="貯水槽の点検表。項目ごとに○△×－を押して選ぶ" loading="lazy"><figcaption><b>点検表の入力</b>項目を押して選ぶだけ。まとめて「○」にもできる</figcaption></figure>
+    <figure><img src="img/setsubi_drain.jpg" width="390" height="780" alt="排水管洗浄の部屋ごとの実施結果" loading="lazy"><figcaption><b>部屋ごとの結果</b>実施・未実施・空室を押すと戸数と実施率を自動計算</figcaption></figure>
+    <figure><img src="img/setsubi_notice.jpg" width="390" height="780" alt="断水のお知らせを作る画面" loading="lazy"><figcaption><b>お知らせを作る</b>予定から建物名と時間が入り、掲示用PDFを作成</figcaption></figure>
+  </div>
+  <p class="lead" style="margin-top:20px;font-size:14px">画面の建物名・住所・管理会社はすべて架空です。</p>
+</div></section>
+
+<section id="case3" style="background:var(--card);border-block:1px solid var(--rule)"><div class="wrap">
+  <div class="case-head">
+    <div><p class="tag">CASE 03 ／ 小さなお店（パン屋）</p>
+      <h2>並ばずに受け取れる「事前注文・事前決済」</h2>
+      <p class="lead">人気のパン屋のレジ前の行列を減らすために考えた仕組みです。お客様はネットで受け取り時間とパンを選んで先に支払い、お店では受付番号を伝えて受け取るだけ。架空のお店で作ったデモです。</p></div>
+    <a class="btn ghost" href="https://soranoko-pan-demo.vercel.app/" target="_blank" rel="noopener">デモを開く</a>
+  </div>
+  <dl class="spec">
+    <div><dt>課題</dt><dd><ul><li>朝と昼にレジ前へ行列ができ、買わずに帰るお客様がいる</li><li>電話の取り置きは聞き間違いや受け取り忘れが起きやすい</li><li>何をいくつ焼けばよいか、予約分が見えない</li></ul></dd></div>
+    <div><dt>作ったもの</dt><dd><ul><li>15分ごとの受け取り枠（1枠の上限つき）</li><li>焼き上がり数から残りを出す商品ページ</li><li>受付番号とQRコードの発行</li><li>受け渡し・仕込み数・売り切れの管理画面</li></ul></dd></div>
+    <div><dt>本番でつなぐもの</dt><dd><ul><li>決済サービス（クレジットカード・PayPayなど）</li><li>注文確認のメール・LINE通知</li><li>Googleカレンダーやレジの売上集計</li></ul></dd></div>
+  </dl>
+  <div class="feat">
+    <figure><span class="who">お客様</span><img class="shot" src="img/pan_desk.jpg" width="1280" height="800" alt="パン屋の注文ページ。受け取る時間を選ぶ枠と、パンの選択が並んでいる" loading="lazy">
+      <h3>いちばん早い受け取り時間を最初から選択</h3><p>選ぶ手間を減らすため、注文できるいちばん早い時間を最初から選んでおきます。満員の時間と売り切れのパンは、最初から押せません。</p></figure>
+    <figure><span class="who">お店</span><img class="shot" src="img/pan_desk_store.jpg" width="1280" height="800" alt="お店の管理画面。受け取り時間順の注文と、準備OKのボタン" loading="lazy">
+      <h3>受け取り時間の順に、袋詰めと受け渡し</h3><p>「準備OK」「受け渡し済」を押すだけ。時間を過ぎた注文には印が付きます。予約分を商品ごとに集計し、焼く数を決める目安にできます。</p></figure>
+  </div>
+  <div class="mobiles">
+    <figure><img src="img/pan_items.jpg" width="390" height="780" alt="スマホでパンを選ぶ画面" loading="lazy"><figcaption><b>パンを選ぶ</b>残りの数とアレルギー表示つき</figcaption></figure>
+    <figure><img src="img/pan_confirm.jpg" width="390" height="780" alt="お名前と支払い方法を選ぶ画面" loading="lazy"><figcaption><b>確認・お支払い</b>入力は名前と電話番号だけ</figcaption></figure>
+    <figure><img src="img/pan_done.jpg" width="390" height="780" alt="受付番号とQRコード" loading="lazy"><figcaption><b>受付番号</b>お店では番号かQRを見せるだけ</figcaption></figure>
+    <figure><img src="img/pan_bake.jpg" width="390" height="780" alt="商品ごとの予約数の集計" loading="lazy"><figcaption><b>仕込み数</b>予約分と店頭に出せる数を自動で計算</figcaption></figure>
+  </div>
+  <div class="calc">
+    <span class="tag" style="margin:0">試算</span>
+    <p>ネット注文が1日40件、レジでの会計が1件あたり1分30秒かかる場合</p>
+    <p class="n">約60分／日</p>
+    <small>受け取りだけになれば、この会計の時間の多くがレジから外れる見込みです。実際の運用データではなく、条件をおいた計算です。</small>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="tag">DESIGN</p>
+  <h2>使う人に合わせた作り込み</h2>
+  <p class="lead" style="margin-bottom:28px">画面の見た目より、現場で迷わないこと・間違えないことを優先しています。</p>
+  <div class="points">
+    <div class="point"><h3>年配の方が使える</h3><ul><li>大きな文字と、1段ずつ進む入力</li><li>電話番号や住所の打ち間違いをその場で知らせる</li><li>選べない時間は最初から押せない</li></ul></div>
+    <div class="point"><h3>個人情報を出しすぎない</h3><ul><li>予約の確認は、名前と電話番号を鍵にして暗号化</li><li>カレンダーの予定の中身は表示しない</li><li>管理・スタッフ画面はパスワードで保護</li></ul></div>
+    <div class="point"><h3>現場の安全と記録</h3><ul><li>開始前・完了時のチェックを押さないと進めない</li><li>鍵・火の元・電気の確認、当日精算の記録</li><li>受付を消すと、予定・売上・カレンダーまで連動して消える</li></ul></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <p class="tag">FIELDS</p>
+  <h2>こんな事業に向いています</h2>
+  <p class="lead" style="margin-bottom:28px">「人が現場に行く」「予約と担当を割り振る」「作業を記録して請求する」仕事なら、同じ仕組みを合わせて作れます。</p>
+  <div class="fields">
+    <div class="field main"><h3>訪問・出張サービス</h3><p>家事代行、清掃、出張修理、介護保険外のサービスなど。予約、担当の割り振り、報酬計算。</p></div>
+    <div class="field"><h3>点検・清掃・設備の仕事</h3><p>設備点検、清掃、メンテナンスなど。現場の記録、写真つき報告書、見積書、次回の予定管理。</p></div>
+    <div class="field"><h3>パン屋・弁当・惣菜など食べ物の店</h3><p>事前注文と事前決済、受け取り時間の枠、売り切れの表示、予約分の仕込み数の集計。</p></div>
+    <div class="field"><h3>予約制の小さな店</h3><p>教室、整体、修理受付など。空き枠の公開、予約の確認、顧客カルテ、売上の管理。</p></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <p class="tag">PROCESS</p>
+  <h2>進め方</h2>
+  <ol class="steps" style="margin-top:24px">
+    <li><b>お話を聞く</b><span>今の仕事の流れと、困っていることを伺います。</span></li>
+    <li><b>触れる試作</b><span>実際に操作できる画面を作り、使い心地を確かめてもらいます。</span></li>
+    <li><b>現場で試す</b><span>少人数で使い、つまずく所を直します。</span></li>
+    <li><b>本番の運用</b><span>運用開始後の追加や修正にも対応します。</span></li>
+  </ol>
+</div></section>
+
+<section class="contact" id="contact"><div class="wrap">
+  <h2>まずは、今の仕事の流れを聞かせてください</h2>
+  <p class="lead">相談は無料です。「この作業だけシステムにしたい」という小さなご相談も歓迎します。</p>
+  <div class="cbox">
+    <span class="tel" id="tel">sunscreate@scky.fun</span>
+    <button class="btn" type="button" id="copy">アドレスをコピー</button>
+    <a class="btn ghost" href="https://goenya-demo.vercel.app/" target="_blank" rel="noopener">先にデモを見る</a>
+  </div>
+  <p class="lead" style="margin-top:14px">メールに「今の仕事の流れ」と「困っていること」を書いて送ってください。内容を確認して、メールでご返信します。</p>
+  <small>Sun'sCreate（代表 山田 和矢）／インボイス登録事業者<br>〒154-0004 東京都世田谷区太子堂4丁目18番15号 TASUKI PRIME SANGENJAYA 3F-3</small>
+</div></section>
+</main>
+<footer><div class="wrap">© Sun'sCreate　事例の画面に出てくる人物・住所・電話番号はすべて架空です。</div></footer>
+<script>
+document.getElementById("copy").addEventListener("click",async e=>{const b=e.currentTarget;
+  try{await navigator.clipboard.writeText("sunscreate@scky.fun");b.textContent="コピーしました"}
+  catch(x){const r=document.createRange();r.selectNodeContents(document.getElementById("tel"));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="アドレスを選択しました"}});
+</script>
+</body>
+</html>
