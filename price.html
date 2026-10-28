@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<title>料金 | Sun'sCreate 業務システム制作</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500;700&display=swap">
+<style>
+/* Layout: 点検票の紙面（方眼の地・墨色・安全色の黄）。ヒーロー→事例（課題→作ったもの→画面）→こだわり→対応業種→進め方→相談 */
+:root{
+  --paper:#f7f8f6; --card:#ffffff; --ink:#1d2327; --sub:#55606a; --rule:#d9dee2;
+  --signal:#f2c200; --signal-ink:#1d2327; --steel:#2f5d7c; --grid:rgba(47,93,124,.07);
+  --display:"Dela Gothic One","BIZ UDPGothic","Hiragino Kaku Gothic ProN",sans-serif;
+  --body:"BIZ UDPGothic","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  --mono:"M PLUS 1 Code","BIZ UDPGothic",monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#15191c;--card:#1d2226;--ink:#e9edf0;--sub:#a4afb8;--rule:#323a40;--signal:#f2c200;--signal-ink:#15191c;--steel:#8db8d6;--grid:rgba(141,184,214,.06);color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#15191c;--card:#1d2226;--ink:#e9edf0;--sub:#a4afb8;--rule:#323a40;--signal:#f2c200;--signal-ink:#15191c;--steel:#8db8d6;--grid:rgba(141,184,214,.06);color-scheme:dark}
+
+img{max-width:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.85 var(--body);letter-spacing:.02em;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+section{padding-block:72px}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.35}
+h2{font:400 clamp(26px,3.6vw,36px)/1.35 var(--display);letter-spacing:.04em;margin-bottom:14px}
+h3{font-size:20px;font-weight:700}
+p{margin:0}
+.lead{color:var(--sub);max-width:38em}
+.tag{display:inline-block;font:700 13px var(--mono);letter-spacing:.12em;color:var(--steel);margin-bottom:10px}
+a{color:var(--steel)}
+:focus-visible{outline:3px solid var(--signal);outline-offset:3px}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--paper);border-bottom:1px solid var(--rule)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:11;background:var(--paper)}
+.hbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:12px}
+.brand{font:400 20px var(--display);letter-spacing:.06em;text-decoration:none;color:var(--ink)}
+.brand small{font:700 12px var(--body);color:var(--sub);margin-left:8px;letter-spacing:.04em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:4px;border:2px solid var(--ink);background:var(--signal);color:var(--signal-ink);font:700 17px var(--body);text-decoration:none;cursor:pointer}
+.btn:hover{filter:brightness(1.05)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.sm{min-height:42px;padding:0 16px;font-size:15px}
+
+/* hero */
+.hero{padding-block:72px 56px}
+.hero .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+.hero .grid>*{min-width:0}
+.hero h1{font:400 clamp(32px,5vw,54px)/1.3 var(--display);letter-spacing:.03em}
+.hero h1 .nb{display:inline-block}
+.hero h1 mark{background:linear-gradient(transparent 62%,var(--signal) 62%);color:inherit;padding:0 2px}
+.hero .sub{margin-top:20px;font-size:18px;max-width:30em}
+.hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.proof{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px;font:500 14px var(--mono);color:var(--sub)}
+.proof b{color:var(--ink)}
+.shot{display:block;width:100%;height:auto;border:1px solid var(--rule);border-radius:8px;background:var(--card);box-shadow:0 18px 40px rgba(20,30,40,.14)}
+.hero-figs{position:relative}
+.hero-figs .phone{position:absolute;right:-6px;bottom:-34px;width:34%;border-radius:14px;border:3px solid var(--ink)}
+.hero-figs figcaption{font-size:13px;color:var(--sub);margin-top:10px}
+
+/* 事例 */
+.case-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px;margin-bottom:28px}
+.spec{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2px solid var(--ink);background:var(--card)}
+.spec>div{padding:18px 20px;border-right:1px solid var(--rule);min-width:0}
+.spec>div:last-child{border-right:0}
+.spec dt{font:700 13px var(--mono);letter-spacing:.1em;color:var(--steel);margin-bottom:6px}
+.spec dd{margin:0}
+.spec ul{margin:0;padding-left:1.1em}
+.feat{display:grid;grid-template-columns:repeat(2,1fr);gap:40px 36px;margin-top:48px}
+.feat>figure{margin:0;min-width:0;display:grid;gap:12px;align-content:start}
+.feat .who{font:700 13px var(--mono);letter-spacing:.1em;background:var(--ink);color:var(--paper);padding:2px 10px;justify-self:start}
+.feat p{color:var(--sub);font-size:16px}
+.mobiles{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:48px}
+.mobiles figure{margin:0;min-width:0;display:grid;gap:8px;align-content:start}
+.mobiles img{border-radius:14px;border:3px solid var(--ink);width:100%;height:auto;display:block}
+.mobiles figcaption{font-size:14px;color:var(--sub)}
+.mobiles figcaption b{display:block;color:var(--ink);font-size:15px}
+.calc{margin-top:40px;border-left:6px solid var(--signal);background:var(--card);padding:18px 22px;display:grid;gap:6px}
+.calc .n{font:700 34px var(--mono);font-variant-numeric:tabular-nums}
+.calc small{color:var(--sub);font-size:14px}
+
+/* こだわり */
+.points{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.point{background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--steel);padding:20px;min-width:0;display:grid;gap:8px;align-content:start}
+.point ul{margin:0;padding-left:1.1em;color:var(--sub);font-size:15px;display:grid;gap:4px}
+
+/* 対応業種 */
+.fields{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.field{border:2px solid var(--ink);padding:20px;background:var(--card);min-width:0;display:grid;gap:8px;align-content:start}
+.field.main{background:var(--signal);color:var(--signal-ink);border-color:var(--signal)}
+.field.main p{color:var(--signal-ink)}
+.field p{color:var(--sub);font-size:15px}
+
+/* 進め方 */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:s;border:2px solid var(--ink);background:var(--card)}
+.steps li{counter-increment:s;padding:20px;border-right:1px solid var(--rule);min-width:0}
+.steps li:last-child{border-right:0}
+.steps li::before{content:"STEP " counter(s);display:block;font:700 13px var(--mono);letter-spacing:.12em;color:var(--steel);margin-bottom:6px}
+.steps b{display:block;font-size:18px}
+.steps span{color:var(--sub);font-size:15px}
+
+/* 相談 */
+.contact{background:var(--ink);color:var(--paper)}
+.contact h2{color:var(--paper)}
+.contact .lead{color:color-mix(in srgb,var(--paper) 78%,transparent)}
+.cbox{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;margin-top:24px}
+.tel{font:700 clamp(22px,4vw,36px) var(--mono);overflow-wrap:anywhere;letter-spacing:.06em;font-variant-numeric:tabular-nums;user-select:all}
+.contact .btn{border-color:var(--signal)}
+.contact .btn.ghost{color:var(--paper);border-color:var(--paper)}
+.contact small{display:block;margin-top:14px;color:color-mix(in srgb,var(--paper) 70%,transparent);font-size:14px}
+footer{padding-block:28px;font-size:14px;color:var(--sub)}
+
+@media (max-width:860px){
+  .hero .grid,.feat{grid-template-columns:1fr}
+  .hero-figs .phone{width:30%;bottom:-20px;right:0}
+  .spec,.points,.fields{grid-template-columns:1fr}
+  .spec>div{border-right:0;border-bottom:1px solid var(--rule)}.spec>div:last-child{border-bottom:0}
+  .mobiles{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr}.steps li{border-bottom:1px solid var(--rule)}
+  section{padding-block:56px}
+}
+@media (max-width:480px){.hdr-cta{display:none}.steps{grid-template-columns:1fr}.steps li{border-right:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* 料金 */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+.plan{background:var(--card);border:2px solid var(--rule);border-radius:8px;padding:22px 20px;display:grid;gap:10px;align-content:start;min-width:0;position:relative}
+.plan.rec{border-color:var(--ink);box-shadow:0 14px 30px rgba(20,30,40,.12)}
+.plan .rib{position:absolute;top:-14px;left:18px;background:var(--signal);color:var(--signal-ink);font:700 13px var(--body);padding:2px 12px;border-radius:4px;border:2px solid var(--ink)}
+.plan h3{font-size:22px}
+.plan .yen{font:700 clamp(30px,4vw,40px)/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.plan .yen small{font:700 15px var(--body);margin-left:2px}
+.plan .yen span{display:block;font:400 13px var(--body);color:var(--sub);margin-top:4px}
+.plan dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:15px}
+.plan dt{color:var(--sub)}.plan dd{margin:0;font-weight:700}
+.plan .ex{font-size:14px;color:var(--sub);border-top:1px dashed var(--rule);padding-top:10px}
+.plan ul{margin:0;padding-left:1.1em;font-size:15px;display:grid;gap:3px}
+.pnote{margin-top:16px;font-size:14px;color:var(--sub)}
+.fit{display:inline-block;margin-top:14px;font:700 14px var(--body);background:var(--signal);color:var(--signal-ink);padding:2px 10px;border-radius:4px}
+.addtbl{width:100%;border-collapse:collapse;background:var(--card);border:2px solid var(--ink)}
+.addtbl th,.addtbl td{padding:12px 14px;border-bottom:1px solid var(--rule);text-align:left;font-size:15px;vertical-align:top}
+.addtbl th{background:var(--paper);font-size:13px;letter-spacing:.06em}
+.addtbl td.n{white-space:nowrap;font:700 16px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.ex3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.excase{background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--steel);padding:18px;display:grid;gap:8px;align-content:start;min-width:0}
+.excase .rows{display:grid;gap:4px;font-size:15px}
+.excase .rows div{display:flex;justify-content:space-between;gap:10px}
+.excase .rows b{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.excase .tot{border-top:2px solid var(--ink);padding-top:6px;font-weight:700}
+.excase .mon{font-size:14px;color:var(--sub)}
+.flow{list-style:none;margin:0;padding:0;display:grid;gap:0;border:2px solid var(--ink);background:var(--card)}
+.flow li{display:grid;grid-template-columns:120px 1fr auto;gap:14px;padding:14px 18px;border-bottom:1px solid var(--rule);align-items:center}
+.flow li:last-child{border-bottom:0}
+.flow .wk{font:700 13px var(--mono);color:var(--steel)}
+.flow .pay{font:700 13px var(--body);background:var(--signal);color:var(--signal-ink);padding:2px 10px;border-radius:4px;white-space:nowrap}
+.faq{display:grid;gap:10px}
+.faq details{background:var(--card);border:1px solid var(--rule);padding:14px 18px}
+.faq summary{font-weight:700;cursor:pointer}
+.faq p{margin-top:8px;color:var(--sub);font-size:15px}
+@media (max-width:860px){.plans,.ex3{grid-template-columns:1fr}.plan .rib{left:14px}.flow li{grid-template-columns:1fr;gap:4px}}
+.lnkp{font-weight:700;color:var(--ink);padding:8px}
+</style>
+</head>
+<body>
+<header><div class="wrap hbar">
+  <a class="brand" href="index.html">Sun'sCreate<small>業務システム制作</small></a>
+  <span style="display:flex;gap:8px;align-items:center"><a class="lnkp" href="index.html#case">事例</a><a class="btn sm hdr-cta" href="index.html#contact">相談する</a></span>
+</div></header>
+<main>
+<section class="hero" style="padding-bottom:24px"><div class="wrap">
+  <p class="tag">PRICE</p>
+  <h1 style="font-size:clamp(30px,4.6vw,46px)">料金と、<span class="nb">お支払いの流れ</span></h1>
+  <p class="sub">最初のお見積もりで総額の上限をお伝えします。ご相談なしに金額が増えることはありません。金額はすべて税込です。</p>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <h2>3つのプラン</h2>
+  <p class="lead" style="margin-bottom:30px">「今いちばん手間がかかっている作業」がいくつあるかで選んでください。迷ったら、無料相談でいっしょに決めます。</p>
+  <div class="plans">
+    <div class="plan"><h3>ライト</h3><p class="yen">33万円<small>〜</small><span>1つの作業をシステムに</span></p>
+      <dl><dt>期間</dt><dd>約1か月</dd><dt>保守</dt><dd>月5,500円</dd><dt>画面数</dt><dd>2〜3画面</dd></dl>
+      <ul><li>今の作業の聞き取り</li><li>触れる試作</li><li>スマホ・パソコン対応</li><li>使い方の説明</li><li>修正2回まで</li></ul>
+      <p class="ex">こんな方に：電話の予約を、ネットの受付に置きかえたい／手書きの報告書を、スマホ入力のPDFにしたい</p></div>
+    <div class="plan rec"><span class="rib">おすすめ</span><h3>スタンダード</h3><p class="yen">66万円<small>〜</small><span>2〜3の作業をつないで一つに</span></p>
+      <dl><dt>期間</dt><dd>1〜2か月</dd><dt>保守</dt><dd>月11,000円</dd><dt>画面数</dt><dd>4〜6画面</dd></dl>
+      <ul><li>ライトの内容すべて</li><li>お客様側とお店側の両方の画面</li><li>集計（売上・件数・仕込み数など）</li><li>現場で試す期間つき</li></ul>
+      <p class="ex">こんな方に：注文を受けて、準備して、渡すまでを一つにしたい／点検の入力から報告書と予定表までつなげたい</p></div>
+    <div class="plan"><h3>しっかり</h3><p class="yen">110万円<small>〜</small><span>事業の流れをまるごと</span></p>
+      <dl><dt>期間</dt><dd>2〜3か月</dd><dt>保守</dt><dd>月22,000円</dd><dt>画面数</dt><dd>7画面〜</dd></dl>
+      <ul><li>スタンダードの内容すべて</li><li>スタッフ用の画面と権限の分け方</li><li>担当の割り振りや報酬の計算</li><li>運用開始後1か月の立ち会いサポート</li></ul>
+      <p class="ex">こんな方に：予約・担当決め・現場・売上・スタッフへの支払いまで、まとめて仕組みにしたい</p></div>
+  </div>
+  <p class="pnote">期間は、確認や修正の時間を含めた余裕のある目安です。内容によっては、もっと早くお渡しできます。</p>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <h2>事例で見ると、いくら？</h2>
+  <p class="lead" style="margin-bottom:24px">このサイトの3つの事例を、実際に頼んだ場合の金額にしてみました。</p>
+  <div class="ex3">
+    <div class="excase"><span class="tag" style="margin:0">CASE 03 ／ パン屋</span><h3>事前注文・事前決済</h3>
+      <div class="rows"><div><span>スタンダード</span><b>66万円</b></div><div><span>決済の連携（カード・PayPayなど）</span><b>8.8万円</b></div><div class="tot"><span>初期費用</span><b>74.8万円</b></div></div>
+      <p class="mon">毎月：保守11,000円＋決済手数料（決済会社へ直接。売上の3〜4%程度）</p></div>
+    <div class="excase"><span class="tag" style="margin:0">CASE 02 ／ 設備点検</span><h3>点検入力・報告書・予定表</h3>
+      <div class="rows"><div><span>スタンダード</span><b>66万円</b></div><div><span>報告書の書式 2種類</span><b>6.6万円</b></div><div><span>Googleカレンダーの連携</span><b>5.5万円</b></div><div class="tot"><span>初期費用</span><b>78.1万円</b></div></div>
+      <p class="mon">毎月：保守11,000円（Googleのサービスは無料の範囲で動きます）</p></div>
+    <div class="excase"><span class="tag" style="margin:0">CASE 01 ／ 訪問サービス</span><h3>予約・割り振り・精算</h3>
+      <div class="rows"><div><span>しっかり</span><b>110万円</b></div><div><span>Googleカレンダーの連携</span><b>5.5万円</b></div><div><span>LINEへの通知</span><b>5.5万円</b></div><div class="tot"><span>初期費用</span><b>121万円</b></div></div>
+      <p class="mon">毎月：保守22,000円</p></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <h2>追加できるもの</h2>
+  <p class="lead" style="margin-bottom:20px">必要なものだけ足せます。お見積もりには、この一覧の金額でそのまま入れます。</p>
+  <div style="overflow-x:auto"><table class="addtbl"><thead><tr><th>内容</th><th>どんなとき</th><th style="text-align:right">金額</th></tr></thead><tbody>
+    <tr><td>連携（通知・予定）</td><td>Googleカレンダー、メール通知、LINEへの通知など（1つごと）</td><td class="n">5.5万円〜</td></tr>
+    <tr><td>連携（お金・会計）</td><td>カード・PayPayなどの決済、freeeなどの会計ソフト（1つごと）</td><td class="n">8.8万円〜</td></tr>
+    <tr><td>帳票・書式</td><td>報告書・見積書・お知らせなどを、今お使いの書式に合わせる（1種類ごと）</td><td class="n">3.3万円〜</td></tr>
+    <tr><td>画面の追加</td><td>プランの画面数より多く必要なとき（1画面ごと）</td><td class="n">3.3万円〜</td></tr>
+    <tr><td>今のデータの移しかえ</td><td>Excelや紙の台帳から、お客様・物件などを取り込む</td><td class="n">3.3万円〜</td></tr>
+    <tr><td>保守の範囲外の修正</td><td>機能の追加や、大きめの変更</td><td class="n">6,600円／時間</td></tr>
+    <tr><td>実費</td><td>決済手数料、ドメイン代、有料サービスの利用料など</td><td class="n">そのまま</td></tr>
+  </tbody></table></div>
+  <p class="pnote">実費は、こちらで上乗せせずにそのままご請求するか、お客様と各社の直接契約にします。</p>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <h2>毎月の保守でしていること</h2>
+  <div class="points" style="margin-top:20px">
+    <div class="point"><h3>動き続けるように</h3><ul><li>不具合の修正</li><li>月1回の動作の点検</li><li>つないでいるサービスの仕様変更への対応</li></ul></div>
+    <div class="point"><h3>小さな変更はおまかせ</h3><ul><li>文言・金額・営業時間などの変更</li><li>月1時間まで含みます</li><li>使い方の質問（メール）</li></ul></div>
+    <div class="point"><h3>付けなくても使えます</h3><ul><li>保守なしでもお使いいただけます</li><li>その場合の修正は1時間6,600円</li><li>あとから保守を始めることもできます</li></ul></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <h2>進め方とお支払い</h2>
+  <p class="lead" style="margin-bottom:20px">スタンダードの場合の目安です。お支払いは2回に分けます。</p>
+  <ol class="flow">
+    <li><span class="wk">はじめ</span><span><b>無料相談</b><br>今の仕事の流れと、困っていることを伺います（オンライン可）。</span><span class="pay">0円</span></li>
+    <li><span class="wk">1〜2週間</span><span><b>触れる試作をお見せする</b><br>実際に操作できる画面で、使い心地を確かめていただきます。</span><span class="pay">0円</span></li>
+    <li><span class="wk">試作のあと</span><span><b>お見積もり・ご契約</b><br>総額の上限を決めて、ご契約です。</span><span class="pay">着手金 50%</span></li>
+    <li><span class="wk">2〜5週間</span><span><b>制作</b><br>途中の画面も見ていただきながら作ります。</span><span></span></li>
+    <li><span class="wk">1〜2週間</span><span><b>現場で試す</b><br>実際に使っていただき、つまずく所を直します（修正2回まで）。</span><span></span></li>
+    <li><span class="wk">納品</span><span><b>お渡し・使い方の説明</b><br>説明書もお渡しします。</span><span class="pay">残り 50%</span></li>
+    <li><span class="wk">そのあと</span><span><b>運用と保守</b><br>保守をご契約の場合は、毎月のお支払いです。</span><span class="pay">月額</span></li>
+  </ol>
+  <p class="pnote">お支払いは銀行振込です。適格請求書（インボイス）を発行します。</p>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <h2>よくあるご質問</h2>
+  <div class="faq" style="margin-top:18px">
+    <details><summary>見積もりより高くなることはありますか？</summary><p>ご契約のときに決めた上限は超えません。途中で機能を足したくなった場合は、先に金額をお伝えし、ご了承をいただいてから進めます。</p></details>
+    <details><summary>もっと早く作ってもらえますか？</summary><p>内容によっては早くお渡しできます。表示している期間は、確認や修正の時間を含めた余裕のある目安です。お急ぎの場合はご相談ください。</p></details>
+    <details><summary>補助金は使えますか？</summary><p>小規模事業者持続化補助金などの申請に使える見積書をお出しします。採択されるかどうかはお約束できませんので、申請の時期とあわせてご相談ください。</p></details>
+    <details><summary>どのプランか分かりません</summary><p>無料相談で今の作業の流れを伺い、いちばん合うプランをご提案します。決まった仕組みで足りる場合は、既製のサービスをおすすめすることもあります。</p></details>
+  </div>
+</div></section>
+
+<section class="contact" id="contact"><div class="wrap">
+  <h2>まずは無料相談から</h2>
+  <p class="lead">「この作業だけシステムにしたら、いくら？」という小さなご相談も歓迎します。</p>
+  <div class="cbox">
+    <span class="tel" id="tel">sunscreate@scky.fun</span>
+    <button class="btn" type="button" id="copy">アドレスをコピー</button>
+    <a class="btn ghost" href="index.html#case">事例を見る</a>
+  </div>
+  <small>Sun'sCreate（代表 山田 和矢）／インボイス登録事業者</small>
+</div></section>
+</main>
+<footer><div class="wrap">© Sun'sCreate　金額はすべて税込です。内容により変わる場合は、お見積もりの時点でお伝えします。</div></footer>
+<script>
+document.getElementById("copy").addEventListener("click",async e=>{const b=e.currentTarget;
+  try{await navigator.clipboard.writeText("sunscreate@scky.fun");b.textContent="コピーしました"}
+  catch(x){const r=document.createRange();r.selectNodeContents(document.getElementById("tel"));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="アドレスを選択しました"}});
+</script>
+</body>
+</html>

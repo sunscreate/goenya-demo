@@ -125,12 +125,50 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
 }
 @media (max-width:480px){.hdr-cta{display:none}.steps{grid-template-columns:1fr}.steps li{border-right:0}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* 料金 */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+.plan{background:var(--card);border:2px solid var(--rule);border-radius:8px;padding:22px 20px;display:grid;gap:10px;align-content:start;min-width:0;position:relative}
+.plan.rec{border-color:var(--ink);box-shadow:0 14px 30px rgba(20,30,40,.12)}
+.plan .rib{position:absolute;top:-14px;left:18px;background:var(--signal);color:var(--signal-ink);font:700 13px var(--body);padding:2px 12px;border-radius:4px;border:2px solid var(--ink)}
+.plan h3{font-size:22px}
+.plan .yen{font:700 clamp(30px,4vw,40px)/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.plan .yen small{font:700 15px var(--body);margin-left:2px}
+.plan .yen span{display:block;font:400 13px var(--body);color:var(--sub);margin-top:4px}
+.plan dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:15px}
+.plan dt{color:var(--sub)}.plan dd{margin:0;font-weight:700}
+.plan .ex{font-size:14px;color:var(--sub);border-top:1px dashed var(--rule);padding-top:10px}
+.plan ul{margin:0;padding-left:1.1em;font-size:15px;display:grid;gap:3px}
+.pnote{margin-top:16px;font-size:14px;color:var(--sub)}
+.fit{display:inline-block;margin-top:14px;font:700 14px var(--body);background:var(--signal);color:var(--signal-ink);padding:2px 10px;border-radius:4px}
+.addtbl{width:100%;border-collapse:collapse;background:var(--card);border:2px solid var(--ink)}
+.addtbl th,.addtbl td{padding:12px 14px;border-bottom:1px solid var(--rule);text-align:left;font-size:15px;vertical-align:top}
+.addtbl th{background:var(--paper);font-size:13px;letter-spacing:.06em}
+.addtbl td.n{white-space:nowrap;font:700 16px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.ex3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.excase{background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--steel);padding:18px;display:grid;gap:8px;align-content:start;min-width:0}
+.excase .rows{display:grid;gap:4px;font-size:15px}
+.excase .rows div{display:flex;justify-content:space-between;gap:10px}
+.excase .rows b{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.excase .tot{border-top:2px solid var(--ink);padding-top:6px;font-weight:700}
+.excase .mon{font-size:14px;color:var(--sub)}
+.flow{list-style:none;margin:0;padding:0;display:grid;gap:0;border:2px solid var(--ink);background:var(--card)}
+.flow li{display:grid;grid-template-columns:120px 1fr auto;gap:14px;padding:14px 18px;border-bottom:1px solid var(--rule);align-items:center}
+.flow li:last-child{border-bottom:0}
+.flow .wk{font:700 13px var(--mono);color:var(--steel)}
+.flow .pay{font:700 13px var(--body);background:var(--signal);color:var(--signal-ink);padding:2px 10px;border-radius:4px;white-space:nowrap}
+.faq{display:grid;gap:10px}
+.faq details{background:var(--card);border:1px solid var(--rule);padding:14px 18px}
+.faq summary{font-weight:700;cursor:pointer}
+.faq p{margin-top:8px;color:var(--sub);font-size:15px}
+@media (max-width:860px){.plans,.ex3{grid-template-columns:1fr}.plan .rib{left:14px}.flow li{grid-template-columns:1fr;gap:4px}}
+.lnkp{font-weight:700;color:var(--ink);padding:8px}
 </style>
 </head>
 <body>
 <header><div class="wrap hbar">
   <a class="brand" href="#top">Sun'sCreate<small>業務システム制作</small></a>
-  <a class="btn sm hdr-cta" href="#contact">相談する</a>
+  <span style="display:flex;gap:8px;align-items:center"><a class="lnkp" href="price.html">料金</a><a class="btn sm hdr-cta" href="#contact">相談する</a></span>
 </div></header>
 
 <main id="top">
@@ -159,6 +197,7 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
       <p class="lead">川崎市宮前区で、電球の交換やスマホの設定などを1回60分で行う訪問サービスです。代表一人で始め、業務委託のスタッフを増やしていく前提で作りました。</p></div>
     <a class="btn ghost" href="https://goenya-demo.vercel.app/" target="_blank" rel="noopener">デモを開く</a>
   </div>
+  <p class="fit" style="margin:0 0 18px">この事例の料金のめやす：しっかり＋連携2つ（121万円〜）</p>
   <dl class="spec">
     <div><dt>課題</dt><dd><ul><li>予約が電話中心で、日程の調整に時間がかかる</li><li>スタッフが増えると誰がいつ空いているか分からない</li><li>お客様の家に入る仕事なので、安全と信頼の記録が要る</li></ul></dd></div>
     <div><dt>作ったもの</dt><dd><ul><li>空き時間だけを表示する予約ページ</li><li>依頼の自動振り分け（近さ・空き・件数の偏り）</li><li>スタッフ用のスマホ画面と開始・完了チェック</li><li>売上・粗利・スタッフへの振込額の自動計算</li></ul></dd></div>
@@ -191,6 +230,7 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
   <div class="case-head">
     <div><p class="tag">CASE 02 ／ 建物設備管理業</p>
       <h2>点検の記録から報告書まで「設備点検報告システム」</h2>
+      <p class="fit" style="margin:0 0 10px">この事例の料金のめやす：スタンダード（66万円〜）</p>
       <p class="lead">代表が本業の貯水槽清掃・増圧ポンプ点検・排水管洗浄で使うために作ったシステムです。現場でスマホに入力すると、自社書式の報告書がPDFでできあがります。</p></div>
   </div>
   <dl class="spec">
@@ -222,6 +262,7 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
       <p class="lead">人気のパン屋のレジ前の行列を減らすために考えた仕組みです。お客様はネットで受け取り時間とパンを選んで先に支払い、お店では受付番号を伝えて受け取るだけ。架空のお店で作ったデモです。</p></div>
     <a class="btn ghost" href="https://soranoko-pan-demo.vercel.app/" target="_blank" rel="noopener">デモを開く</a>
   </div>
+  <p class="fit" style="margin:0 0 18px">この事例の料金のめやす：スタンダード＋決済の連携（74.8万円〜）</p>
   <dl class="spec">
     <div><dt>課題</dt><dd><ul><li>朝と昼にレジ前へ行列ができ、買わずに帰るお客様がいる</li><li>電話の取り置きは聞き間違いや受け取り忘れが起きやすい</li><li>何をいくつ焼けばよいか、予約分が見えない</li></ul></dd></div>
     <div><dt>作ったもの</dt><dd><ul><li>15分ごとの受け取り枠（1枠の上限つき）</li><li>焼き上がり数から残りを出す商品ページ</li><li>受付番号とQRコードの発行</li><li>受け渡し・仕込み数・売り切れの管理画面</li></ul></dd></div>
@@ -268,6 +309,19 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
     <div class="field"><h3>パン屋・弁当・惣菜など食べ物の店</h3><p>事前注文と事前決済、受け取り時間の枠、売り切れの表示、予約分の仕込み数の集計。</p></div>
     <div class="field"><h3>予約制の小さな店</h3><p>教室、整体、修理受付など。空き枠の公開、予約の確認、顧客カルテ、売上の管理。</p></div>
   </div>
+</div></section>
+
+<section id="price" style="padding-top:0"><div class="wrap">
+  <p class="tag">PRICE</p>
+  <h2>料金のめやす</h2>
+  <p class="lead" style="margin-bottom:30px">初めにお見積もりで総額の上限をお伝えし、ご相談なしに増えることはありません。金額はすべて税込です。</p>
+  <div class="plans">
+    <div class="plan"><h3>ライト</h3><p class="yen">33万円<small>〜</small><span>1つの作業をシステムに</span></p><dl><dt>期間</dt><dd>約1か月</dd><dt>保守</dt><dd>月5,500円</dd></dl><p class="ex">例：予約の受付だけ／報告書のPDF作成だけ</p></div>
+    <div class="plan rec"><span class="rib">おすすめ</span><h3>スタンダード</h3><p class="yen">66万円<small>〜</small><span>2〜3の作業をつないで一つに</span></p><dl><dt>期間</dt><dd>1〜2か月</dd><dt>保守</dt><dd>月11,000円</dd></dl><p class="ex">例：事前注文＋お店の管理画面／点検の入力＋報告書＋予定表</p></div>
+    <div class="plan"><h3>しっかり</h3><p class="yen">110万円<small>〜</small><span>事業の流れをまるごと</span></p><dl><dt>期間</dt><dd>2〜3か月</dd><dt>保守</dt><dd>月22,000円</dd></dl><p class="ex">例：予約・担当の割り振り・スタッフ画面・売上と精算</p></div>
+  </div>
+  <p class="pnote">決済サービスやLINE通知などをつなぐ場合は、追加料金の一覧からお選びいただけます。</p>
+  <p style="margin-top:18px"><a class="btn" href="price.html">料金をくわしく見る</a></p>
 </div></section>
 
 <section style="padding-top:0"><div class="wrap">
