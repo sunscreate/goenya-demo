@@ -162,9 +162,30 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
 .faq p{margin-top:8px;color:var(--sub);font-size:15px}
 @media (max-width:860px){.plans,.ex3{grid-template-columns:1fr}.plan .rib{left:14px}.flow li{grid-template-columns:1fr;gap:4px}}
 .lnkp{font-weight:700;color:var(--ink);padding:8px}
+
+/* 相談フォーム */
+.cform{margin-top:24px;display:grid;gap:16px;max-width:760px}
+.cg2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cform label{display:grid;gap:6px;font-weight:700;font-size:15px;color:var(--paper)}
+.cform .req,.cform .opt{display:inline-block;margin-left:8px;font-size:12px;font-weight:700;padding:0 8px;border-radius:3px;vertical-align:1px}
+.cform .req{background:var(--signal);color:var(--signal-ink)}.cform .opt{border:1px solid color-mix(in srgb,var(--paper) 50%,transparent);color:color-mix(in srgb,var(--paper) 80%,transparent)}
+.cform input,.cform select,.cform textarea{box-sizing:border-box;font:16px/1.6 var(--body);color:#1d2327;background:#fff;border:2px solid #fff;border-radius:4px;padding:12px 14px;width:100%;min-width:0}
+.cform textarea{resize:vertical;min-height:150px}
+.cform input:focus,.cform select:focus,.cform textarea:focus{outline:3px solid var(--signal);outline-offset:1px}
+.cform [aria-invalid="true"]{border-color:#f97066}
+.cform .ferr{font-weight:400;font-size:13px;color:#fda29b;min-height:0}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.cnote{font-size:14px;color:color-mix(in srgb,var(--paper) 75%,transparent)}
+.cmsg{font-weight:700}.cmsg.err{color:#fda29b}
+.cdone{margin-top:24px;background:color-mix(in srgb,var(--paper) 10%,transparent);border:2px solid var(--signal);padding:20px 22px;max-width:760px}
+.cdone h3{color:var(--paper);margin-bottom:6px}
+.calt{margin-top:18px;font-size:14px;color:color-mix(in srgb,var(--paper) 70%,transparent)}
+.calt b{font-family:var(--mono);color:var(--paper);user-select:all}
+@media (max-width:640px){.cg2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+<script>try{if("scrollRestoration" in history)history.scrollRestoration="manual"}catch(e){}if(!location.hash)window.scrollTo(0,0);addEventListener("load",function(){if(!location.hash)window.scrollTo(0,0)});addEventListener("pageshow",function(){if(!location.hash)window.scrollTo(0,0)});</script>
 <header><div class="wrap hbar">
   <a class="brand" href="index.html">Sun'sCreate<small>業務システム制作</small></a>
   <span style="display:flex;gap:8px;align-items:center"><a class="lnkp" href="index.html#case">事例</a><a class="btn sm hdr-cta" href="index.html#contact">相談する</a></span>
@@ -265,19 +286,43 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
 <section class="contact" id="contact"><div class="wrap">
   <h2>まずは無料相談から</h2>
   <p class="lead">「この作業だけシステムにしたら、いくら？」という小さなご相談も歓迎します。</p>
-  <div class="cbox">
-    <span class="tel" id="tel">sunscreate@scky.fun</span>
-    <button class="btn" type="button" id="copy">アドレスをコピー</button>
-    <a class="btn ghost" href="index.html#case">事例を見る</a>
-  </div>
+  <form class="cform" id="cf" novalidate>
+    <div class="cg2">
+      <label><span class="lt">お名前<span class="req">必須</span></span><input name="name" autocomplete="name" maxlength="80" required><span class="ferr" id="e_name"></span></label>
+      <label><span class="lt">会社名・屋号<span class="opt">任意</span></span><input name="company" autocomplete="organization" maxlength="120"></label>
+      <label><span class="lt">返信先のメールアドレス<span class="req">必須</span></span><input name="email" type="email" autocomplete="email" inputmode="email" maxlength="200" required><span class="ferr" id="e_email"></span></label>
+      <label><span class="lt">電話番号<span class="opt">任意</span></span><input name="tel" type="tel" autocomplete="tel" inputmode="tel" maxlength="30"></label>
+    </div>
+    <label><span class="lt">気になるプラン</span><select name="plan"><option>まだ決めていない</option><option>ライト</option><option>スタンダード</option><option>しっかり</option><option>まず無料の試作を見てみたい</option></select></label>
+    <label><span class="lt">ご相談の内容<span class="req">必須</span></span><textarea name="message" maxlength="4000" required placeholder="例）パン屋をしています。お昼にレジ前で行列ができるので、ネットで先に注文と支払いを受けられるようにしたいです。"></textarea><span class="ferr" id="e_message"></span></label>
+    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <p class="cnote">「今の仕事の流れ」と「困っていること」を書いていただくと、試作のご提案が早くなります。いただいた情報は、このご相談への返信とご連絡のためだけに使います。</p>
+    <div><button class="btn" type="submit" id="cfb">無料で相談する</button></div>
+    <p class="cmsg" id="cfm" role="status" aria-live="polite"></p>
+  </form>
+  <p class="calt">メールで直接送っていただくこともできます：<b>sunscreate@scky.fun</b></p>
   <small>Sun'sCreate（代表 山田 和矢）／インボイス登録事業者</small>
 </div></section>
 </main>
 <footer><div class="wrap">© Sun'sCreate　金額はすべて税込です。内容により変わる場合は、お見積もりの時点でお伝えします。</div></footer>
 <script>
-document.getElementById("copy").addEventListener("click",async e=>{const b=e.currentTarget;
-  try{await navigator.clipboard.writeText("sunscreate@scky.fun");b.textContent="コピーしました"}
-  catch(x){const r=document.createRange();r.selectNodeContents(document.getElementById("tel"));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="アドレスを選択しました"}});
+/* 相談フォーム：Google Apps Script（Sun'sCreate 相談フォーム受付）へ送る */
+(function(){const ENDPOINT="https://script.google.com/macros/s/AKfycbw2Fl9A6acrwcXZrFOzFonlSR02ghRS8kTtlTzKcoHceM3bVUxKz6PGs-rhunHRIV7Y/exec",f=document.getElementById("cf");if(!f)return;const t0=Date.now();
+  const show=(k,m)=>{const e=document.getElementById("e_"+k),i=f.elements[k];if(e)e.textContent=m||"";if(i)i.setAttribute("aria-invalid",m?"true":"false")};
+  const okMail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  f.elements.email.addEventListener("blur",()=>{const v=f.elements.email.value.trim();show("email",v&&!okMail(v)?"メールアドレスの形を確かめてください（例 info@example.jp）":"")});
+  ["name","email","message"].forEach(k=>f.elements[k].addEventListener("input",()=>{if(f.elements[k].value.trim()&&(k!=="email"||okMail(f.elements[k].value.trim())))show(k,"")}));
+  f.addEventListener("submit",async e=>{e.preventDefault();const g=k=>f.elements[k].value.trim(),m=document.getElementById("cfm"),b=document.getElementById("cfb");
+    const errs={name:g("name")?"":"お名前を入れてください",email:!g("email")?"返信先のメールアドレスを入れてください":okMail(g("email"))?"":"メールアドレスの形を確かめてください（例 info@example.jp）",message:g("message")?"":"ご相談の内容を入れてください"};
+    Object.keys(errs).forEach(k=>show(k,errs[k]));const first=Object.keys(errs).find(k=>errs[k]);if(first){f.elements[first].focus();m.textContent="";return}
+    b.disabled=true;b.textContent="送信しています…";m.className="cmsg";m.textContent="";
+    const d={name:g("name"),company:g("company"),email:g("email"),tel:g("tel"),plan:f.elements.plan.value,message:g("message"),website:f.elements.website.value,elapsed:Date.now()-t0,page:location.pathname.split("/").pop()||"index.html"};
+    try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(d)});const j=await r.json();
+      if(!j.ok)throw new Error(j.error||"送信できませんでした");
+      f.outerHTML='<div class="cdone" tabindex="-1" id="cfd"><h3>ご相談を受け付けました</h3><p>'+d.name.replace(/[&<>"]/g,"")+' 様、ありがとうございます。受付のメールを '+d.email.replace(/[&<>"]/g,"")+' にお送りしました。内容を確認して、メールでご返信します。</p><p class="cnote" style="margin-top:8px">受付のメールが届かない場合は、迷惑メールのフォルダもご確認ください。</p></div>';
+      document.getElementById("cfd").focus()}
+    catch(x){m.className="cmsg err";m.textContent=(x.message||"送信できませんでした")+"　お手数ですが、時間をおいてもう一度お試しいただくか、sunscreate@scky.fun へメールでお送りください。";b.disabled=false;b.textContent="無料で相談する"}});
+})();
 </script>
 </body>
 </html>
