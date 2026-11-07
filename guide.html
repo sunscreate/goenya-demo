@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>その場レポ 使い方ガイド</title>
+<style>
+:root{
+  --sig:#F2C200; --sig-soft:#FFF6CC; --ink:#1F2328; --sub:#5B6470; --line:#E3E6EA;
+  --bg:#FAFAF7; --card:#FFFFFF; --ok:#2A7D4F; --steel:#2F5D7C; --ng:#B3261E;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.75 -apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;letter-spacing:.01em}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px 72px}
+header.hero{background:var(--ink);color:#fff;padding:28px 16px 22px}
+.hero .wrap{padding-bottom:0}
+.hero .tag{display:inline-block;background:var(--sig);color:var(--ink);font-weight:700;font-size:13px;border-radius:99px;padding:2px 10px}
+.hero h1{font-size:28px;line-height:1.35;margin:10px 0 6px}
+.hero p{margin:0;color:#D7DBE0;font-size:16px}
+
+nav.toc{position:sticky;top:0;z-index:5;background:rgba(250,250,247,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav.toc .row{max-width:720px;margin:0 auto;display:flex;gap:8px;overflow-x:auto;padding:10px 16px;scrollbar-width:none}
+nav.toc .row::-webkit-scrollbar{display:none}
+nav.toc a{flex:none;text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:14px;font-weight:600}
+nav.toc a:active{background:var(--sig-soft)}
+
+h2{font-size:22px;line-height:1.4;margin:40px 0 4px;scroll-margin-top:64px;display:flex;align-items:center;gap:10px}
+h2 .no{flex:none;width:34px;height:34px;border-radius:50%;background:var(--sig);display:grid;place-items:center;font-size:17px}
+.lead{color:var(--sub);margin:0 0 14px;font-size:16px}
+h3{font-size:18px;margin:22px 0 8px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.start{border:2px solid var(--sig);background:var(--sig-soft)}
+.start h2{margin-top:0}
+
+ol.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+ol.steps>li{counter-increment:s;position:relative;padding:0 0 16px 46px}
+ol.steps>li:last-child{padding-bottom:0}
+ol.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+ol.steps>li::after{content:"";position:absolute;left:15px;top:36px;bottom:4px;width:2px;background:var(--line)}
+ol.steps>li:last-child::after{display:none}
+ol.steps b{font-weight:700}
+.where{display:block;color:var(--sub);font-size:14px;margin-top:2px}
+
+/* アプリのボタンと同じ見た目の目印 */
+.btn{display:inline-block;font-size:15px;font-weight:700;line-height:1.3;border-radius:99px;padding:5px 12px;margin:2px 1px;vertical-align:baseline}
+.btn.main{background:var(--sig);color:var(--ink)}
+.btn.sub{background:#fff;color:var(--steel);border:1.5px solid #B9C4CF}
+.btn.tab{background:#EEF1F4;color:var(--ink);border-radius:8px}
+.btn.tab::before{content:"▢ ";color:var(--sub);font-weight:400}
+
+.tip,.warn{border-radius:12px;padding:12px 14px;margin:12px 0;font-size:16px}
+.tip{background:#EAF4EE;border-left:5px solid var(--ok)}
+.warn{background:#FDECEA;border-left:5px solid var(--ng)}
+.tip strong,.warn strong{display:block;margin-bottom:2px}
+
+/* 画面のたとえ絵 */
+.phone{border:2px solid var(--ink);border-radius:22px;padding:12px 12px 10px;max-width:300px;margin:14px auto;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+.phone .bar{font-weight:700;font-size:15px;border-bottom:1px solid var(--line);padding:0 0 8px;margin-bottom:10px}
+.phone .item{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0;font-size:14px}
+.phone .item small{display:block;color:var(--sub);font-size:12px}
+.phone .tabs{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:8px;margin-top:10px;font-size:11px;color:var(--sub)}
+.phone .tabs span.on{color:var(--ink);font-weight:700}
+.phone .fab{display:block;text-align:center;margin-top:10px}
+.cap{text-align:center;color:var(--sub);font-size:13px;margin-top:-6px}
+
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0}
+.flow .arrow{color:var(--sub);font-weight:700}
+
+details{background:#fff;border:1px solid var(--line);border-radius:12px;margin:10px 0;padding:0 14px}
+summary{cursor:pointer;font-weight:700;padding:13px 0;list-style:none;position:relative;padding-right:24px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"＋";position:absolute;right:0;top:12px;color:var(--sub)}
+details[open] summary::after{content:"－"}
+details p,details ol{margin:0 0 14px}
+
+.where-data{display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:560px){.where-data{grid-template-columns:1fr 1fr}}
+.where-data .card{margin:0}
+.where-data h4{margin:0 0 4px;font-size:16px}
+.where-data p{margin:0;font-size:15px;color:var(--sub)}
+
+footer{color:var(--sub);font-size:13px;text-align:center;margin-top:48px}
+a{color:var(--steel)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag">はじめての方へ</span>
+    <h1>その場レポ<br>使い方ガイド</h1>
+    <p>現場でスマホに入力 → その場で報告書のPDFができあがります。<br>この順に読めば、今日から使えます。</p>
+  </div>
+</header>
+
+<nav class="toc" aria-label="目次">
+  <div class="row">
+    <a href="#first">最初に1回</a>
+    <a href="#prop">物件</a>
+    <a href="#doc">書類を作る</a>
+    <a href="#pdf">PDFにする</a>
+    <a href="#cal">予定</a>
+    <a href="#notice">お知らせ</a>
+    <a href="#types">書式を増やす</a>
+    <a href="#diagram">概要図</a>
+    <a href="#tips">入力のコツ</a>
+    <a href="#faq">困ったとき</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- 全体の流れ -->
+  <div class="card" style="margin-top:18px">
+    <h3 style="margin-top:0">ふだんの流れは、この4つだけ</h3>
+    <div class="flow">
+      <span class="btn tab">予定</span><span class="arrow">→</span>
+      <span class="btn main">点検を始める</span><span class="arrow">→</span>
+      <span class="btn main">保存する</span><span class="arrow">→</span>
+      <span class="btn main">報告書を作る</span>
+    </div>
+    <p style="margin:0;color:var(--sub);font-size:15px">予定を入れていないときは、<span class="btn tab">書類</span>の <span class="btn main">＋ 新しい書類作成</span> から始めます。</p>
+  </div>
+
+  <!-- 1 -->
+  <section class="card start" id="first">
+    <h2><span class="no">1</span>最初に1回だけ</h2>
+    <p class="lead">5分で終わります。2回目からは不要です。</p>
+    <ol class="steps">
+      <li>下の <span class="btn tab">設定</span> を開き、<b>「あなたの情報」</b>に点検責任者・会社名・電話番号を入れます。
+        <span class="where">新しい書類やお知らせに、最初から入るようになります。</span></li>
+      <li><span class="btn main">Googleとつないで、新しい台帳を作る</span> を押し、自分のGoogleアカウントを選びます。
+        <span class="where">入力したデータと報告書が、あなたのGoogleドライブに保存されます。別のスマホやパソコンでも同じデータが見られます。</span></li>
+      <li>貯水槽清掃をする方は、<b>「許可証」</b>で許可証の写真を選びます。
+        <span class="where">貯水槽の報告書に毎回自動で入ります。</span></li>
+    </ol>
+    <div class="tip"><strong>2台目のスマホやパソコンでは</strong>同じGoogleアカウントで <span class="btn sub">Googleとつないで、この台帳を使う</span> を押すだけです。</div>
+  </section>
+
+  <!-- 2 -->
+  <section id="prop">
+    <h2><span class="no">2</span>物件を登録する</h2>
+    <p class="lead">一度登録すると、書類を作るたびに建物名・住所・管理会社などが自動で入ります。</p>
+    <div class="card">
+      <ol class="steps">
+        <li><span class="btn tab">物件</span> → <span class="btn main">物件を登録</span></li>
+        <li>建物名・所在地・管理会社などを入れます。<span class="where">わかる所だけでOK。あとから足せます。</span></li>
+        <li>ポンプの<b>定格値</b>（圧力・電流など）を入れておくと、点検のときに<b>良・否を自動で判定</b>します。</li>
+        <li><span class="btn main">保存する</span></li>
+      </ol>
+    </div>
+    <div class="tip"><strong>社内メモ</strong>キーボックスの番号など、報告書に出したくないことは「社内メモ」へ。報告書には一切出ません。</div>
+  </section>
+
+  <!-- 3 -->
+  <section id="doc">
+    <h2><span class="no">3</span>現場で書類を作る</h2>
+    <p class="lead">点検しながら、上から順に埋めていくだけです。</p>
+
+    <div class="phone" aria-hidden="true">
+      <div class="bar">書類</div>
+      <div class="item">増圧ポンプ点検<small>サンプルマンション　11月10日</small></div>
+      <div class="item">貯水槽清掃・給水設備点検<small>グリーンハイツ南館　11月3日</small></div>
+      <span class="fab"><span class="btn main">＋ 新しい書類作成</span></span>
+      <div class="tabs"><span class="on">書類</span><span>予定</span><span>告知書類</span><span>物件</span><span>設定</span></div>
+    </div>
+    <p class="cap">（画面のイメージ。物件名は例です）</p>
+
+    <div class="card">
+      <ol class="steps">
+        <li><span class="btn tab">書類</span> → <span class="btn main">＋ 新しい書類作成</span> → 作業の種類を選びます。
+          <span class="where">増圧ポンプ／貯水槽・給水設備／排水管洗浄、または追加した書式。</span></li>
+        <li>いちばん上の<b>「物件」</b>で建物を選びます。<span class="where">住所や管理会社が自動で入ります。</span></li>
+        <li>点検項目を選んでいきます。全部問題ないときは <span class="btn sub">まとめて「良」にする</span> が便利です。</li>
+        <li>下の方で <span class="btn main">写真を撮る</span> か <span class="btn sub">写真を選ぶ</span>。撮影場所・工程・コメントも選べます。</li>
+        <li>最後に画面下の <span class="btn main">保存する</span>。</li>
+      </ol>
+    </div>
+    <div class="warn"><strong>「保存する」を忘れずに</strong>保存せずに戻ろうとすると、確認が出ます。写真を入れたあとも必ず押してください。</div>
+  </section>
+
+  <!-- 4 -->
+  <section id="pdf">
+    <h2><span class="no">4</span>報告書（PDF）にする</h2>
+    <p class="lead">書類の画面のいちばん下、<b>「報告書」</b>の欄で操作します。</p>
+    <div class="card">
+      <ol class="steps">
+        <li><span class="btn main">報告書を作る</span> を押します。<span class="where">いつもの書式どおりの報告書とPDFが、Googleドライブに出来ます。</span></li>
+        <li><span class="btn sub">見る（確認）</span> で、いつでも中身を確かめられます。</li>
+        <li><span class="btn sub">PDFをスマホに保存</span> で、メールやLINEで送ったり、ファイルに保存したりできます。</li>
+      </ol>
+    </div>
+    <h3>あとから直したいとき</h3>
+    <div class="flow">
+      <span>書類を直す</span><span class="arrow">→</span>
+      <span class="btn main">保存する</span><span class="arrow">→</span>
+      <span class="btn main">更新</span>
+    </div>
+    <div class="tip"><strong>パソコンで手直ししても大丈夫</strong>Googleドライブの報告書を直接直しても、「更新」で消えません。アプリで変えた所だけが書き換わります。</div>
+  </section>
+
+  <!-- 5 -->
+  <section id="cal">
+    <h2><span class="no">5</span>予定を入れる</h2>
+    <p class="lead">Googleカレンダーと同じ予定になります。当日はそこから点検を始められます。</p>
+    <div class="card">
+      <ol class="steps">
+        <li><span class="btn tab">予定</span> → はじめてのときは <span class="btn main">Googleカレンダーとつなぐ</span></li>
+        <li><span class="btn main">予定を登録</span> → 作業の種類・物件・日時を入れて <span class="btn main">保存してカレンダーに入れる</span></li>
+        <li>当日、予定を開いて <span class="btn main">点検を始める</span>。<span class="where">物件・日付・時間が入った書類がすぐ開きます。</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section id="notice">
+    <h2><span class="no">6</span>住民向けのお知らせを作る</h2>
+    <p class="lead">断水や作業のお知らせを、掲示用の紙として作れます。</p>
+    <div class="card">
+      <ol class="steps">
+        <li><span class="btn tab">告知書類</span> → 作るお知らせ（排水管洗浄作業／増圧ポンプ点検／貯水槽清掃作業に伴う断水）を押します。</li>
+        <li>日付・時間・物件を入れて <span class="btn main">お知らせを作る</span></li>
+        <li><span class="btn sub">保存・共有</span> で印刷・送信します。</li>
+      </ol>
+    </div>
+    <div class="tip"><strong>前回をそのまま使う</strong>一覧の「…」から「これを元に作る」で、前のお知らせを写して直せます。</div>
+  </section>
+
+  <!-- 7 -->
+  <section id="types">
+    <h2><span class="no">7</span>管理会社の書式を増やす</h2>
+    <p class="lead">管理会社から指定のExcel書式がある場合、その書式のまま報告書を作れるようにできます。</p>
+    <div class="card">
+      <h3 style="margin-top:0">パソコンでやる（おすすめ）</h3>
+      <ol class="steps">
+        <li>パソコンで <a href="https://sonoba-repo.vercel.app/?p=types">sonoba-repo.vercel.app/?p=types</a> を開きます。<span class="where">アプリの <span class="btn tab">設定</span> →「書類の種類を増やす」にも、このアドレスがあります。</span></li>
+        <li><span class="btn main">Excelを選ぶ</span> で、管理会社の書式ファイルを選びます。</li>
+        <li>名前を確かめて保存。スマホの <span class="btn main">＋ 新しい書類作成</span> に新しい種類が出てきます。</li>
+      </ol>
+    </div>
+    <p style="font-size:15px;color:var(--sub)">スマホにExcelファイルがあれば、スマホの <span class="btn tab">設定</span> →「書類の種類を増やす」からも同じことができます。</p>
+  </section>
+
+  <!-- 8 -->
+  <section id="diagram">
+    <h2><span class="no">8</span>対象設備概要図を入れる</h2>
+    <p class="lead">系統図・平面図の入った「概要図」を、物件ごとに報告書へ入れられます。</p>
+    <div class="card">
+      <ol class="steps">
+        <li><span class="btn tab">物件</span> → 物件を開く</li>
+        <li>「対象設備概要図」の <span class="btn sub">Excelから概要図を入れる</span> → 図の入ったExcelを選びます。</li>
+        <li>次に作る報告書から、図・丸印・表がそのまま入ります。作った報告書は <span class="btn main">更新</span> で入ります。</li>
+      </ol>
+    </div>
+    <div class="tip"><strong>概要図を入れていない物件</strong>は、報告書に概要図のページが出ません。</div>
+  </section>
+
+  <!-- 9 -->
+  <section id="tips">
+    <h2><span class="no">9</span>入力が速くなるコツ</h2>
+    <div class="card">
+      <ol class="steps">
+        <li><b>一度入れた社名・宛名は選ぶだけ。</b>欄の右の ▼ から選べます。いらない候補は × で消せます。</li>
+        <li><b>写真の撮影場所・工程</b>も前に使ったものから選べます。<span class="btn sub">✎ 選択肢を整理する</span> で並びを整えられます。</li>
+        <li><b>画面を下に引っ張る</b>と、ほかのスマホで入れた分も取り込みます。</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section id="faq">
+    <h2><span class="no">10</span>困ったとき</h2>
+
+    <details>
+      <summary>「Googleにつなぐ」と出た</summary>
+      <p>しばらく使わないと、Googleとのつながりが切れることがあります。表示の <span class="btn sub">つなぐ</span> を押して、同じアカウントを選べば元どおりです。入力したデータは消えていません。</p>
+    </details>
+
+    <details>
+      <summary>ほかのスマホやパソコンと内容が合わない</summary>
+      <p>画面を下に引っ張るか、<span class="btn tab">設定</span> → <span class="btn main">今すぐ同期</span> を押してください。両方で同じGoogleアカウントにつながっているかも確かめてください。</p>
+    </details>
+
+    <details>
+      <summary>直したのに報告書が変わらない</summary>
+      <p>書類の画面で <span class="btn main">保存する</span> → <span class="btn main">更新</span> の順に押してください。保存しないまま更新すると、前の内容のままになります。</p>
+    </details>
+
+    <details>
+      <summary>写真が報告書に入らない</summary>
+      <p>写真を入れたあと <span class="btn main">保存する</span> を押したか確かめて、もう一度 <span class="btn main">更新</span> を押してください。写真が多いと少し時間がかかります。</p>
+    </details>
+
+    <details>
+      <summary>新しい書式が「新しい書類作成」に出てこない</summary>
+      <p>画面を下に引っ張って同期してください。それでも出ないときは、<span class="btn tab">設定</span> →「書類の種類を増やす」に入っているか確かめてください。</p>
+    </details>
+
+    <details>
+      <summary>アプリの見た目が前と違う／古い気がする</summary>
+      <p>新しい版が出ると、開き直したときに自動で入れ替わります。<span class="btn tab">設定</span> のいちばん下に「アプリの版」が出ています。</p>
+    </details>
+
+    <h3>データはどこにある？</h3>
+    <div class="where-data">
+      <div class="card"><h4>📱 スマホの中</h4><p>入力した書類・物件・写真。電波がない現場でも使えます。</p></div>
+      <div class="card"><h4>☁️ あなたのGoogleドライブ</h4><p>「その場レポ 報告書」「その場レポ 写真」フォルダと台帳。ほかの人には見えません。</p></div>
+    </div>
+  </section>
+
+  <footer>その場レポ 使い方ガイド ／ 例として出している物件名は架空のものです</footer>
+</main>
+</body>
+</html>
