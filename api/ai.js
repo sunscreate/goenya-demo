@@ -118,7 +118,8 @@ module.exports = async (req, res) => {
   try {
     if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'AIはまだ準備中です', ready: false });
     // 動作確認用（環境変数 AI_TEST_TOKEN があるときだけ。確認が済んだら消す）
-    const test = process.env.AI_TEST_TOKEN && req.headers['x-test-token'] === process.env.AI_TEST_TOKEN;
+    const tt = req.headers['x-test-token'];
+    const test = Boolean(tt) && require('crypto').createHash('sha256').update(String(tt)).digest('hex') === 'a3a26a58b234079fe82eb3f5fc3ee7e59116ed5a64ca630edd18fa23e5527096';
     const email = test ? 'test@sonoba' : await whoIs(req);
     if (!email) return res.status(401).json({ error: 'Googleにつないでから、もう一度お試しください' });
     const st = test ? { active: true } : await status(email);
