@@ -1,11 +1,11 @@
 {
     "name": "その場レポ",
     "short_name": "その場レポ",
-    "start_url": ".",
+    "start_url": "/",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FAFAF7",
+    "theme_color": "#1F2328",
+    "description": "現場でスマホに入力して、その場で点検報告書のPDFを作るアプリ",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
@@ -31,5 +31,8 @@
             "type": "image/png",
             "purpose": "maskable"
         }
-    ]
+    ],
+    "id": "/",
+    "scope": "/",
+    "lang": "ja"
 }

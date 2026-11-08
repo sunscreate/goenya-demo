@@ -98,6 +98,7 @@ a{color:var(--steel)}
 
 <nav class="toc" aria-label="目次">
   <div class="row">
+    <a href="#home">ホーム画面に置く</a>
     <a href="#first">最初に1回</a>
     <a href="#prop">物件</a>
     <a href="#doc">書類を作る</a>
@@ -107,6 +108,7 @@ a{color:var(--steel)}
     <a href="#types">書式を増やす</a>
     <a href="#diagram">概要図</a>
     <a href="#tips">入力のコツ</a>
+    <a href="#plan">料金</a>
     <a href="#faq">困ったとき</a>
   </div>
 </nav>
@@ -124,6 +126,28 @@ a{color:var(--steel)}
     </div>
     <p style="margin:0;color:var(--sub);font-size:15px">予定を入れていないときは、<span class="btn tab">書類</span>の <span class="btn main">＋ 新しい書類作成</span> から始めます。</p>
   </div>
+
+  <!-- 0 -->
+  <section id="home">
+    <h2><span class="no">0</span>ホーム画面にアイコンを置く</h2>
+    <p class="lead">ブラウザで開いたら、まずホーム画面に置きます。次からはアイコンを押すだけで、アプリと同じように全画面で使えます。</p>
+    <div class="card">
+      <h3 style="margin-top:0">iPhone・iPad（Safari）</h3>
+      <ol class="steps">
+        <li>Safari で <b>sonoba-repo.vercel.app</b> を開きます。</li>
+        <li>画面の下（iPadは上）の <b>共有ボタン［□↑］</b> を押します。</li>
+        <li><b>「ホーム画面に追加」</b> → 右上の <b>「追加」</b>。<span class="where">見つからないときは、共有の画面を下へスクロールします。</span></li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Android（Chrome）</h3>
+      <ol class="steps">
+        <li>Chrome で <b>sonoba-repo.vercel.app</b> を開きます。</li>
+        <li>アプリの中に出る <span class="btn main">ホーム画面に追加する</span> を押します。<span class="where">出ないときは、右上の［⋮］→「ホーム画面に追加」または「アプリをインストール」。</span></li>
+        <li><b>「インストール」</b>（または「追加」）を押します。</li>
+      </ol>
+    </div>
+  </section>
 
   <!-- 1 -->
   <section class="card start" id="first">
@@ -268,6 +292,20 @@ a{color:var(--steel)}
         <li><b>画面を下に引っ張る</b>と、ほかのスマホで入れた分も取り込みます。</li>
       </ol>
     </div>
+  </section>
+
+  <!-- 料金 -->
+  <section id="plan">
+    <h2><span class="no">¥</span>料金（月額プラン）</h2>
+    <p class="lead">入力や見るだけなら無料。報告書の作成・PDFの保存・お知らせの作成は、月額プランで使えます。</p>
+    <div class="card">
+      <ol class="steps">
+        <li><b>月額 300円（税込）</b>。はじめての方は <b>最初の14日間は無料</b> です。</li>
+        <li><span class="btn main">報告書を作る</span> を押したときに出る画面か、<span class="btn tab">設定</span> →「ご利用プラン」の <span class="btn main">14日間 無料で始める</span> から申し込みます。<span class="where">カードの入力はStripeの画面で行います。カード番号は当社には届きません。</span></li>
+        <li>解約は <span class="btn tab">設定</span> →「ご利用プラン」→ <span class="btn sub">お支払い・解約の手続き</span> から、いつでもできます。<span class="where">無料期間中に解約すれば0円です。解約しても、入力した内容や写真は残ります。</span></li>
+      </ol>
+    </div>
+    <p style="font-size:14px;color:var(--sub)"><a href="legal.html#tokusho">特定商取引法に基づく表記</a>　<a href="legal.html#terms">利用規約</a>　<a href="legal.html#privacy">プライバシーポリシー</a></p>
   </section>
 
   <!-- 10 -->

@@ -23,9 +23,11 @@
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="sonoba_repo">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="その場レポ">
+  <meta name="theme-color" content="#1F2328">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
@@ -42,6 +44,14 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
+  <script>
+    // Android（Chrome）の「ホーム画面に追加」をアプリのボタンから出せるように取っておく
+    window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); window.__sonobaInstall = e; });
+    window.sonobaInstall = function () {
+      var e = window.__sonobaInstall; if (!e) return false;
+      e.prompt(); window.__sonobaInstall = null; return true;
+    };
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
