@@ -150,7 +150,9 @@ module.exports = async (req, res) => {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
     const fn = { status, checkout, portal }[body.action];
     if (!fn) return res.status(400).json({ error: 'unknown action' });
-    return res.status(200).json(await fn(email));
+    const out = await fn(email);
+    console.log('sub', body.action, email.replace(/^(.).*@/, '$1***@'), out.error || (out.active === undefined ? 'url' : `active=${out.active} ready=${out.ready}`));
+    return res.status(200).json(out);
   } catch (e) {
     console.error('sub error', e.message, e.stripe?.code);
     return res.status(500).json({ error: '手続きでエラーが起きました。少し待ってからお試しください' });
