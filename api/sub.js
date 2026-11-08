@@ -160,3 +160,4 @@ module.exports = async (req, res) => {
 };
 
 module.exports._test = { form, status, owners };
+module.exports._lib = { whoIs, status }; // AIの関数（ai.js）からも使う
