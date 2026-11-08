@@ -182,13 +182,25 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
 .calt{margin-top:18px;font-size:14px;color:color-mix(in srgb,var(--paper) 70%,transparent)}
 .calt b{font-family:var(--mono);color:var(--paper);user-select:all}
 @media (max-width:640px){.cg2{grid-template-columns:1fr}}
+/* ===== 共通ナビ（全ページ） ===== */
+.nav{display:flex;align-items:center;gap:2px}
+.nav a.lnkp{text-decoration:none;border-radius:4px}
+.nav a.lnkp:hover{background:var(--grid)}
+.nav a[aria-current="page"]{box-shadow:inset 0 -3px 0 var(--signal)}
+@media (max-width:700px){
+  .hbar{flex-wrap:wrap;row-gap:4px;padding-block:8px}
+  .nav{order:3;width:100%;overflow-x:auto;scrollbar-width:none;margin-inline:-8px}
+  .nav a.lnkp{white-space:nowrap;padding:6px 8px;font-size:15px}
+}
+
 </style>
 </head>
 <body>
 <script>try{if("scrollRestoration" in history)history.scrollRestoration="manual"}catch(e){}if(!location.hash)window.scrollTo(0,0);addEventListener("load",function(){if(!location.hash)window.scrollTo(0,0)});addEventListener("pageshow",function(){if(!location.hash)window.scrollTo(0,0)});</script>
 <header><div class="wrap hbar">
-  <a class="brand" href="index.html">Sun'sCreate<small>業務システム制作</small></a>
-  <span style="display:flex;gap:8px;align-items:center"><a class="lnkp" href="index.html#case">事例</a><a class="btn sm hdr-cta" href="index.html#contact">相談する</a></span>
+  <a class="brand" href="index.html">Sun'sCreate<small>システム・アプリ制作</small></a>
+  <nav class="nav" aria-label="サイト内"><a class="lnkp" href="works.html">制作事例</a><a class="lnkp" href="sonoba.html">自社アプリ</a><a class="lnkp" href="price.html" aria-current="page">料金</a></nav>
+  <a class="btn sm hdr-cta" href="index.html#contact">相談する</a>
 </div></header>
 <main>
 <section class="hero" style="padding-bottom:24px"><div class="wrap">
