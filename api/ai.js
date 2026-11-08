@@ -117,9 +117,11 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   try {
     if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'AIはまだ準備中です', ready: false });
-    const email = await whoIs(req);
+    // 動作確認用（環境変数 AI_TEST_TOKEN があるときだけ。確認が済んだら消す）
+    const test = process.env.AI_TEST_TOKEN && req.headers['x-test-token'] === process.env.AI_TEST_TOKEN;
+    const email = test ? 'test@sonoba' : await whoIs(req);
     if (!email) return res.status(401).json({ error: 'Googleにつないでから、もう一度お試しください' });
-    const st = await status(email);
+    const st = test ? { active: true } : await status(email);
     if (!st.active) return res.status(402).json({ error: '月額プランのお申し込みで使えます', needSub: true });
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
     if (body.action !== 'template') return res.status(400).json({ error: 'unknown action' });
