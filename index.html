@@ -51,6 +51,18 @@
       var e = window.__sonobaInstall; if (!e) return false;
       e.prompt(); window.__sonobaInstall = null; return true;
     };
+    // 「別のGoogleアカウントでつなぐ」：必ずアカウントを選ぶ画面を出す（GoogleのGISを直接呼ぶ）
+    window.sonobaPickAccount = function (cid, scope) {
+      return new Promise(function (ok, ng) {
+        try {
+          google.accounts.oauth2.initTokenClient({
+            client_id: cid, scope: scope, prompt: 'select_account',
+            callback: function (r) { r && r.access_token ? ok(r.access_token) : ng(new Error((r && r.error) || 'canceled')); },
+            error_callback: function (e) { ng(new Error((e && e.type) || 'popup_failed')); }
+          }).requestAccessToken();
+        } catch (e) { ng(e); }
+      });
+    };
   </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
