@@ -28,7 +28,8 @@ Excelの書式の「文字の入ったマス」と「結合したマス」の一
 - 「作成例」「記入例」「見本」のシートや、宛名の「御中」などの決まり文字は、欄にしない。
 - 写真を貼る枠は、ここでは扱わない（別の仕組みで見つける）。
 - 自信がない点だけ、questions に最大3つまで、選択肢付きで聞く（例：「この表の②の列は使いますか？」）。わかるところは聞かない。answers が来ていたら、それに従って仕上げ、questions は空にする。
-- draft は、機械的に見つけた下書き。参考にして、間違いを直し、足りない欄を足す。`;
+- draft は、機械的に見つけた下書き。参考にして、間違いを直し、足りない欄を足す。
+- 答えは必ず save_template を1回呼んで返す。文章だけで答えない。`;
 
 const TOOL = {
   name: 'save_template',
@@ -97,7 +98,7 @@ async function template(body) {
       max_tokens: 16000,
       system: SYSTEM,
       tools: [TOOL],
-      tool_choice: { type: 'tool', name: 'save_template' },
+      tool_choice: { type: 'auto' }, // このモデルは「必ずこの道具」の指定ができないので、指示で必ず使わせる
       messages: [{ role: 'user', content: describe(body) }],
     }),
   });
@@ -107,9 +108,17 @@ async function template(body) {
     e.code = r.status;
     throw e;
   }
-  const t = (j.content || []).find((c) => c.type === 'tool_use');
-  if (!t) throw new Error('AIの答えが読めませんでした');
-  return { result: t.input, usage: j.usage };
+  const t = (j.content || []).find((c) => c.type === 'tool_use' && c.name === 'save_template');
+  if (t) return { result: t.input, usage: j.usage };
+  // 念のため：文章の中のJSONを読む
+  const text = (j.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('\n');
+  const m = text.match(/\{[\s\S]*\}/);
+  if (m) {
+    try {
+      return { result: JSON.parse(m[0]), usage: j.usage };
+    } catch (_) {}
+  }
+  throw new Error('AIの答えが読めませんでした');
 }
 
 module.exports = async (req, res) => {
