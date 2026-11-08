@@ -4,7 +4,7 @@
     "start_url": "/",
     "display": "standalone",
     "background_color": "#FAFAF7",
-    "theme_color": "#1F2328",
+    "theme_color": "#15233F",
     "description": "現場でスマホに入力して、その場で点検報告書のPDFを作るアプリ",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
