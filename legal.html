@@ -22,9 +22,12 @@ tr:last-child th,tr:last-child td{border-bottom:none}
 @media (max-width:520px){th,td{display:block;width:100%}th{border-bottom:none;padding-bottom:2px}}
 ol,ul{padding-left:1.4em}
 .date{color:var(--sub);font-size:14px}
+.backbar{position:sticky;top:0;z-index:10;background:#1F2328;padding:8px 12px}
+.backbar a{display:inline-block;color:#1F2328;background:#F2C200;font-weight:700;font-size:15px;text-decoration:none;border-radius:99px;padding:7px 14px}
 </style>
 </head>
 <body>
+<div class="backbar"><a href="/" onclick="if(history.length>1&&document.referrer.indexOf(location.host)>-1){history.back();return false;}">← アプリに戻る</a></div>
 <div class="wrap">
   <h1>その場レポ</h1>
   <nav>
@@ -101,5 +104,6 @@ ol,ul{padding-left:1.4em}
   <h3>6. お問い合わせ</h3>
   <p>Sun'sCreate（サンズクリエイト）　sunscreate@scky.fun</p>
 </div>
+<p style="text-align:center;margin:24px 0 40px"><a href="/" style="display:inline-block;background:#F2C200;color:#1F2328;font-weight:700;text-decoration:none;border-radius:99px;padding:10px 20px">← アプリに戻る</a></p>
 </body>
 </html>

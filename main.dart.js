@@ -38886,7 +38886,7 @@ return A.f(A.byA(A.d2(A.d(m.window.location.origin)+"/app_build.txt?t="+Date.now
 case 6:o=b
 l=o
 n=B.d.bC(A.tg(A.ta(l.e)).cF(l.w))
-if(o.b===200&&J.b4(n)!==0&&!J.c(n,"20261108002714"))m.window.location.reload()
+if(o.b===200&&J.b4(n)!==0&&!J.c(n,"20261108013357"))m.window.location.reload()
 q=1
 s=5
 break
@@ -132338,7 +132338,7 @@ B.b.J(r,A.b([q,A.hz(B.L,A.b([A.k8(B.aj5,o.w?n:new A.aVD(o),n),new A.iC("\u53f0\u
 m=o.r
 if(m!=null)r.push(new A.aS(B.ds,A.aq(m,n,n,n,B.bN,n,n,n),n))
 s.push(A.em("\u30c7\u30fc\u30bf\u306e\u4fdd\u5b58\u3068\u540c\u671f",r))
-s.push(new A.ct("\u30a2\u30d7\u30ea\u306e\u7248\uff1a20261108002714",n))
+s.push(new A.ct("\u30a2\u30d7\u30ea\u306e\u7248\uff1a20261108013357",n))
 return A.kk(s,B.mz,n,!1)}}
 A.aVq.prototype={
 $0(){var s,r,q=this,p=q.a,o=A.cL(q.b)

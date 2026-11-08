@@ -20,13 +20,13 @@ header.hero{background:var(--ink);color:#fff;padding:28px 16px 22px}
 .hero h1{font-size:28px;line-height:1.35;margin:10px 0 6px}
 .hero p{margin:0;color:#D7DBE0;font-size:16px}
 
-nav.toc{position:sticky;top:0;z-index:5;background:rgba(250,250,247,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav.toc{position:sticky;top:54px;z-index:5;background:rgba(250,250,247,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
 nav.toc .row{max-width:720px;margin:0 auto;display:flex;gap:8px;overflow-x:auto;padding:10px 16px;scrollbar-width:none}
 nav.toc .row::-webkit-scrollbar{display:none}
 nav.toc a{flex:none;text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:14px;font-weight:600}
 nav.toc a:active{background:var(--sig-soft)}
 
-h2{font-size:22px;line-height:1.4;margin:40px 0 4px;scroll-margin-top:64px;display:flex;align-items:center;gap:10px}
+h2{font-size:22px;line-height:1.4;margin:40px 0 4px;scroll-margin-top:116px;display:flex;align-items:center;gap:10px}
 h2 .no{flex:none;width:34px;height:34px;border-radius:50%;background:var(--sig);display:grid;place-items:center;font-size:17px}
 .lead{color:var(--sub);margin:0 0 14px;font-size:16px}
 h3{font-size:18px;margin:22px 0 8px}
@@ -84,9 +84,12 @@ details p,details ol{margin:0 0 14px}
 
 footer{color:var(--sub);font-size:13px;text-align:center;margin-top:48px}
 a{color:var(--steel)}
+.backbar{position:sticky;top:0;z-index:10;background:#1F2328;padding:8px 12px}
+.backbar a{display:inline-block;color:#1F2328;background:#F2C200;font-weight:700;font-size:15px;text-decoration:none;border-radius:99px;padding:7px 14px}
 </style>
 </head>
 <body>
+<div class="backbar"><a href="/" onclick="if(history.length>1&&document.referrer.indexOf(location.host)>-1){history.back();return false;}">← アプリに戻る</a></div>
 
 <header class="hero">
   <div class="wrap">
@@ -352,5 +355,6 @@ a{color:var(--steel)}
 
   <footer>その場レポ 使い方ガイド ／ 例として出している物件名は架空のものです</footer>
 </main>
+<p style="text-align:center;margin:24px 0 40px"><a href="/" style="display:inline-block;background:#F2C200;color:#1F2328;font-weight:700;text-decoration:none;border-radius:99px;padding:10px 20px">← アプリに戻る</a></p>
 </body>
 </html>
