@@ -1,5 +1,6 @@
 // その場レポ AI（Claude）で、Excelの書式から記入欄を見分ける
 // POST /api/ai  { action: "template", name, sheets:[{name, cells:[[A1, 文字]], merges:[A1:B2], rows, cols}], draft, answers }
+//               { action: "notice", name, sheets:[…], draft:{sheet, cells:{欄:セル}} }  お知らせ（掲示物）の記入欄
 // Authorization: Bearer <Googleのアクセストークン>
 //
 // 必要な環境変数（Vercelの設定に入れる）
@@ -72,6 +73,36 @@ const TOOL = {
   },
 };
 
+// ───── お知らせ（掲示物）の書式 ─────
+const NOTICE_FIELDS = {
+  building: '建物名・物件名', date: '作業日・施工日・日時（日付を書くマス）', time: '断水時間・点検時間（時間を書くマス）',
+  workTime: '施工時間・作業時間（断水時間とは別に作業の時間を書くマスがあるとき）', content: '作業内容', range: '対象範囲・断水範囲・作業場所',
+  mgmtCompany: '管理会社', company: '施工事業者・作業会社', person: '担当者', tel: '電話番号・連絡先', note: '備考',
+};
+const N_SYSTEM = `あなたは、建物の設備工事・点検の「お知らせ」（住民向けの掲示物）のExcel書式を読み解く担当です。
+書式の「文字の入ったマス」と「結合したマス」の一覧から、次の項目を書き込むマスを見つけて、save_notice で返します。
+項目：${Object.entries(NOTICE_FIELDS).map(([k, v]) => `${k}（${v}）`).join('、')}
+
+決まり：
+- cell は、値を書き込むマス（見出しの右や下の空いているマス。結合していれば結合の左上）。見出しの文字が入ったマス自体には書かない。
+- 「{建物名}」「【日時】」のように記入欄そのものに書いてあれば、そのマス。
+- 書式に無い項目は入れない（無理に作らない）。本文の決まり文句（「平素より…」など）のマスは使わない。
+- sheet は、お知らせが書かれたシートの名前。
+- draft は機械で見つけた下書き。間違いを直し、足りない項目を足す。
+- 答えは必ず save_notice を1回呼んで返す。文章だけで答えない。`;
+const N_TOOL = {
+  name: 'save_notice',
+  description: 'お知らせの書式で、各項目を書き込むマスを保存する',
+  input_schema: {
+    type: 'object',
+    properties: {
+      sheet: { type: 'string' },
+      cells: { type: 'object', properties: Object.fromEntries(Object.keys(NOTICE_FIELDS).map((k) => [k, { type: 'string', description: 'A1形式のセル番地' }])) },
+    },
+    required: ['sheet', 'cells'],
+  },
+};
+
 function describe(body) {
   const lines = [`ファイル名：${body.name || ''}`];
   for (const sh of body.sheets || []) {
@@ -90,14 +121,16 @@ function describe(body) {
 }
 
 async function template(body) {
+  const notice = body.action === 'notice';
+  const tool = notice ? N_TOOL : TOOL;
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({
       model: MODEL(),
-      max_tokens: 16000,
-      system: SYSTEM,
-      tools: [TOOL],
+      max_tokens: notice ? 2000 : 16000,
+      system: notice ? N_SYSTEM : SYSTEM,
+      tools: [tool],
       tool_choice: { type: 'auto' }, // このモデルは「必ずこの道具」の指定ができないので、指示で必ず使わせる
       messages: [{ role: 'user', content: describe(body) }],
     }),
@@ -108,7 +141,7 @@ async function template(body) {
     e.code = r.status;
     throw e;
   }
-  const t = (j.content || []).find((c) => c.type === 'tool_use' && c.name === 'save_template');
+  const t = (j.content || []).find((c) => c.type === 'tool_use' && c.name === tool.name);
   if (t) return { result: t.input, usage: j.usage };
   // 念のため：文章の中のJSONを読む
   const text = (j.content || []).filter((c) => c.type === 'text').map((c) => c.text).join('\n');
@@ -131,9 +164,9 @@ module.exports = async (req, res) => {
     const st = await status(email);
     if (!st.active) return res.status(402).json({ error: '月額プランのお申し込みで使えます', needSub: true });
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
-    if (body.action !== 'template') return res.status(400).json({ error: 'unknown action' });
+    if (body.action !== 'template' && body.action !== 'notice') return res.status(400).json({ error: 'unknown action' });
     const out = await template(body);
-    console.log('ai template', email.replace(/^(.).*@/, '$1***@'), MODEL(), JSON.stringify(out.usage));
+    console.log('ai', body.action, email.replace(/^(.).*@/, '$1***@'), MODEL(), JSON.stringify(out.usage));
     return res.status(200).json(out);
   } catch (e) {
     console.error('ai error', e.code || '', e.message);
@@ -141,4 +174,4 @@ module.exports = async (req, res) => {
   }
 };
 
-module.exports._test = { describe, TOOL };
+module.exports._test = { describe, TOOL, N_TOOL };
