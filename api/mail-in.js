@@ -1,4 +1,4 @@
-// マワリテ：メールの自動取り込み（受信サービス Postmark の Inbound Webhook から呼ばれる）
+// マワリテ：メールの自動取り込み（受信サービス Resend / Postmark の Webhook から呼ばれる）
 // POST /api/mail-in/?key=<MAIL_IN_SECRET>   本文：Postmark の受信JSON
 // 宛先の「+」の後ろ（MailboxHash）が受信箱の合言葉。会社と受信箱の持ち主をそこから決める
 // 環境変数：SUPABASE_SERVICE_KEY（必須）、MAIL_IN_SECRET（省略時は app_secrets の mail_in_secret）（サーバーとして書き込むため）、ANTHROPIC_API_KEY
@@ -9,6 +9,31 @@ const addr = (s) => (String(s || '').match(/<([^>]+)>/)?.[1] || String(s || ''))
 const header = (hs, name) => (hs || []).find((h) => String(h.Name).toLowerCase() === name)?.Value || '';
 const stripHtml = (h) => String(h || '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 
+/** Resend の受信：Webhook には中身がないので、APIで本文と添付を取りに行き、Postmark と同じ形にそろえる */
+async function fromResend(d) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error('RESEND_API_KEY が未設定です');
+  const get = async (u) => { const r = await fetch(`https://api.resend.com${u}`, { headers: { Authorization: `Bearer ${key}` } }); if (!r.ok) throw new Error(`resend ${r.status}`); return r.json(); };
+  const e = await get(`/emails/receiving/${encodeURIComponent(d.email_id)}`);
+  const atts = [];
+  if ((e.attachments || []).length) {
+    const l = await get(`/emails/receiving/${encodeURIComponent(d.email_id)}/attachments?limit=20`);
+    for (const a of l.data || []) {
+      if (!a.download_url || (a.size || 0) > 20 * 1024 * 1024) continue;
+      const r = await fetch(a.download_url);
+      if (r.ok) atts.push({ Name: a.filename, ContentType: a.content_type, Content: Buffer.from(await r.arrayBuffer()).toString('base64') });
+    }
+  }
+  const from = String(e.from || d.from || '');
+  const to = [...(d.received_for || []), ...(e.to || d.to || [])];
+  return {
+    From: from, FromFull: { Email: addr(from), Name: (from.match(/^\s*"?([^"<]+?)"?\s*</) || [])[1] || '' },
+    To: to.join(', '), ToFull: to.map((x) => ({ Email: addr(x) })), CcFull: (e.cc || d.cc || []).map((x) => ({ Email: addr(x) })),
+    Subject: e.subject || d.subject || '', TextBody: e.text || '', HtmlBody: e.html || '', Date: e.created_at || d.created_at,
+    Headers: [{ Name: 'Message-ID', Value: e.message_id || d.message_id || d.email_id }], Attachments: atts,
+  };
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
@@ -18,10 +43,11 @@ module.exports = async (req, res) => {
     const secret = process.env.MAIL_IN_SECRET || (await sb('app_secrets?key=eq.mail_in_secret&select=value', ADMIN))?.[0]?.value;
     const key = String(req.query?.key || '');
     if (!secret || key.length !== secret.length || !require('crypto').timingSafeEqual(Buffer.from(key), Buffer.from(secret))) return res.status(401).json({ error: 'unauthorized' });
-    const p = body(req);
+    let p = body(req);
+    if (p.type === 'email.received' && p.data?.email_id) p = await fromResend(p.data);
     // 合言葉：MailboxHash（Postmark）か、宛先の「+」の後ろ
     const rcpts = [p.OriginalRecipient, p.To, ...(p.ToFull || []).map((x) => x.Email)].filter(Boolean).join(',');
-    const token = String(p.MailboxHash || rcpts.match(/\+([0-9a-f]{32})@/i)?.[1] || '').toLowerCase();
+    const token = String(p.MailboxHash || rcpts.match(/(?:^|[+,\s<])([0-9a-f]{32})@/i)?.[1] || '').toLowerCase();
     if (!/^[0-9a-f]{32}$/.test(token)) return res.status(200).json({ skipped: 'no token' }); // 200 で返す（送り直させない）
     const [box] = await sb(`mail_inboxes?token=eq.${token}&active=eq.true&select=id,company_id,owner_user,received_count`, ADMIN);
     if (!box) return res.status(200).json({ skipped: 'unknown inbox' });
