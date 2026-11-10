@@ -88,7 +88,8 @@ const SYSTEM = `あなたはビルメンテナンス会社の社員につく「A
 - 送信・発注・約束は絶対にしない。作るのは下書きだけ。最後は社員が決める。
 - 渡された情報（タスク・元のメール・顧客・物件・業者・記録・会社の設定）だけを使う。金額・日付・名前を作らない。足りないことは questions に書く。
 - 業者に依頼するときは、対応できる作業（skills）が合う業者を一覧から選び、vendor_ids に入れる。
-- メールは日本のビジネスメールの書き方で、簡潔に。宛名・署名の名前がわからなければ「〇〇様」「（自社名）」のように空けておく。
+- メールは日本のビジネスメールの書き方で、簡潔に。冒頭の名乗りは「# 送る人」の会社名と氏名を使う。宛名がわからなければ「〇〇様」と空けておく。
+- メールの最後の署名（会社名・住所・電話などの線で囲んだ部分）は書かない。システムが会社の署名を自動で付ける。本文は「よろしくお願いいたします。」までにする。
 - 社員から指示があれば、それを最優先で反映する。それまでの記録（すでにやったこと・承認の結果）を踏まえて、次に必要なことだけを出す。
 - 必ず propose の道具で答える。`;
 
@@ -103,17 +104,28 @@ async function propose(token, tid, instruction, me) {
     sb(`companies?id=eq.${t.company_id}&select=name,settings`, token),
     t.property_id ? sb(`orders?property_id=eq.${t.property_id}&status=neq.draft&order=created_at.desc&limit=5&select=work,amount,start_at,status,vendor_id`, token) : Promise.resolve([]),
   ]);
+  // 社内データの目録から、物件名・顧客名で関係しそうなファイル（名前・場所・日付だけ）と、社員が読ませた過去のファイルの中身
+  const kws = [t.properties?.name, t.customers?.name].flatMap((x) => String(x || '').replace(/（.*?）|\(.*?\)/g, ' ').split(/[\s　・、,]+/)).map((w) => w.replace(/[%*,()."]/g, '')).filter((w) => w.length >= 2).slice(0, 6);
+  const [files, read] = await Promise.all([
+    kws.length ? sb(`file_index?company_id=eq.${t.company_id}&or=(${encodeURIComponent(kws.flatMap((w) => [`name.ilike.*${w}*`, `path.ilike.*${w}*`]).join(','))})&order=modified_at.desc.nullslast&limit=15&select=source,path,modified_at`, token).catch(() => []) : Promise.resolve([]),
+    sb(`task_events?task_id=eq.${tid}&type=eq.past_file&order=id.desc&limit=5&select=body,data`, token),
+  ]);
+  let budget = 16000;
+  const readText = read.filter((r) => r.data?.text).map((r) => { const x = String(r.data.text).slice(0, Math.max(0, budget)); budget -= x.length; return `## ${r.body}（更新 ${String(r.data.modified_at || '').slice(0, 10)}）\n${x}`; }).filter((x) => budget > -1000);
   const who = (id) => members.find((m) => m.user_id === id)?.display_name || '（社員）';
   const margin = Number(co?.settings?.margin_rate ?? 20);
   const e = t.emails;
   const content = [
     `# 会社\n${co?.name}（顧客向け見積のマージン率：${margin}%、承認の境目：${co?.settings?.approval?.approver_from ?? 100000}円以上は承認者、${co?.settings?.approval?.admin_from ?? 500000}円以上は管理者）`,
+    `# 送る人（メールの名乗り）\n会社名：${co?.settings?.profile?.name || co?.name}、氏名：${members.find((m) => m.user_id === me.id)?.display_name || '（担当者）'}`,
     co?.settings?.ai_notes ? `# この会社の決まり（必ず守る）\n${co.settings.ai_notes}` : '',
     `# タスク\n件名：${t.title}\n依頼の種類：${KINDS[t.kind] || '（未分類）'}\n内容：${t.body || '（なし）'}\n発生元：${t.source}\n状態：${t.status}\n担当：${who(t.assignee)}\n期限：${t.due || '（なし）'}${t.amount ? `\n金額：${t.amount}円（税抜）` : ''}`,
     t.kind && PLAYBOOK[t.kind] ? `# この種類で先にやること\n${PLAYBOOK[t.kind]}` : '',
     e ? `# 元のメール\n差出人：${e.from_name} <${e.from_addr}>\n件名：${e.subject}\n受信：${e.received_at}\n添付：${(e.attachments || []).map((a) => a.name).join('、') || 'なし'}\n本文：\n${String(e.body || '').slice(0, 8000)}` : '',
     t.customers ? `# 顧客\n${t.customers.name}（担当者：${t.customers.contact_person || '不明'}、電話：${t.customers.phone || '不明'}、メール：${t.customers.email || '不明'}）` : '# 顧客\n（未設定）',
     t.properties ? `# 物件\n${t.properties.name}（住所：${t.properties.address || '不明'}、オートロック：${t.properties.autolock ? 'あり' : 'なし'}）\n建物の情報：${t.properties.building_info || 'なし'}` : '# 物件\n（未設定）',
+    files.length ? `# 社内データの目録にある、関係しそうな過去のファイル（名前・場所だけ。中身はまだ読んでいない）\n${files.map((f) => `- ${String(f.modified_at || '').slice(0, 10)} ${f.source}/${f.path}`).join('\n')}\n（前回の見積書・報告書・請求書が必要なら、どのファイルを読めばよいかを next_steps に書く）` : '',
+    readText.length ? `# 社員が読ませた過去のファイルの中身（前回の金額・作業内容の参考にする。今回の金額として勝手に確定しない）\n${readText.join('\n\n')}` : '',
     past.length ? `# この物件の過去の発注（新しい順）\n${past.map((o) => `- ${o.start_at ? o.start_at.slice(0, 10) : '日程未定'} ${o.work}：${vendors.find((v) => v.id === o.vendor_id)?.name || '業者不明'}（業者id: ${o.vendor_id}）${o.amount}円（税抜）`).join('\n')}` : '',
     `# これまでの記録（古い順）\n${events.map((x) => `- ${x.at.slice(0, 16).replace('T', ' ')} ${x.actor_kind === 'ai' ? 'AI' : who(x.actor)}：${x.type}${x.body ? '「' + x.body.slice(0, 300) + '」' : ''}`).join('\n')}`,
     `# 社内の人\n${members.map((m) => `- ${m.display_name || m.email}（user_id: ${m.user_id}、${m.role}${m.user_id === t.assignee ? '、今の担当' : ''}）`).join('\n')}`,
