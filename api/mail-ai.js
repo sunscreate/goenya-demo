@@ -57,7 +57,8 @@ module.exports = async (req, res) => {
       `# 物件\n${properties.map((p) => `- id:${p.id} ${p.name}（${p.address || '-'}、顧客id:${p.customer_id || '-'}）`).join('\n') || '（なし）'}`,
       `# 協力業者\n${vendors.map((v) => `- id:${v.id} ${v.name}（メール：${v.email || '-'}）`).join('\n') || '（なし）'}`,
     ].join('\n\n');
-    const { out } = await claude(SYSTEM, CLASSIFY, content, 1500);
+    const { out, usage } = await claude(SYSTEM, CLASSIFY, content, 1500);
+    out.usage = usage; // 運営画面の利用量（AIの費用）に使う
 
     // 一覧にないIDは捨てる。差出人のメールアドレスが登録と一致すれば、それを優先
     const from = String(m.from_addr || '').toLowerCase();

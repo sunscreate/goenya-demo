@@ -108,6 +108,7 @@ async function propose(token, tid, instruction, me) {
   const e = t.emails;
   const content = [
     `# 会社\n${co?.name}（顧客向け見積のマージン率：${margin}%、承認の境目：${co?.settings?.approval?.approver_from ?? 100000}円以上は承認者、${co?.settings?.approval?.admin_from ?? 500000}円以上は管理者）`,
+    co?.settings?.ai_notes ? `# この会社の決まり（必ず守る）\n${co.settings.ai_notes}` : '',
     `# タスク\n件名：${t.title}\n依頼の種類：${KINDS[t.kind] || '（未分類）'}\n内容：${t.body || '（なし）'}\n発生元：${t.source}\n状態：${t.status}\n担当：${who(t.assignee)}\n期限：${t.due || '（なし）'}${t.amount ? `\n金額：${t.amount}円（税抜）` : ''}`,
     t.kind && PLAYBOOK[t.kind] ? `# この種類で先にやること\n${PLAYBOOK[t.kind]}` : '',
     e ? `# 元のメール\n差出人：${e.from_name} <${e.from_addr}>\n件名：${e.subject}\n受信：${e.received_at}\n添付：${(e.attachments || []).map((a) => a.name).join('、') || 'なし'}\n本文：\n${String(e.body || '').slice(0, 8000)}` : '',
