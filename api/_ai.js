@@ -45,6 +45,7 @@ const KINDS = {
   report_billing: '完了報告・請求',
   inquiry: '問い合わせ・その他の依頼',
   other: 'その他',
+  contract_work: '定期契約の作業',
 };
 const PLAYBOOK = {
   quote_request: '顧客・物件を特定し、対応できる業者（skills）を候補にして、業者への見積依頼の下書きと、顧客への「承りました」の返信の下書きを作る。',
@@ -54,6 +55,7 @@ const PLAYBOOK = {
   report_billing: '報告書・請求の内容を要約し、確認すべき点（金額・作業内容の食い違い）を挙げ、受領の返信の下書きを作る。',
   inquiry: '要点をまとめ、返信の下書きを作る。必要なら社内のだれに任せるかを提案する。',
   other: '要点をまとめ、必要なら返信の下書きを作る。',
+  contract_work: '定期契約の作業月になった。「この物件の過去の発注」を見て、特に理由がなければ前回と同じ業者を候補にし、業者への作業依頼（日程の候補を聞く）の下書きと、顧客への作業日のご案内の下書きを作る。金額は契約の金額・前回の発注の金額を示す（新しく作らない）。',
 };
 
 const PROPOSE = {
@@ -94,11 +96,12 @@ const SYSTEM = `あなたはビルメンテナンス会社の社員につく「A
 async function propose(token, tid, instruction, me) {
   const [t] = await sb(`tasks?id=eq.${tid}&select=*,customers(name,contact_person,phone,email),properties(name,address,autolock,building_info),emails!tasks_email_id_fkey(from_name,from_addr,subject,received_at,body,attachments)`, token);
   if (!t) throw Object.assign(new Error('タスクが見つかりません'), { code: 404 });
-  const [events, members, vendors, [co]] = await Promise.all([
+  const [events, members, vendors, [co], past] = await Promise.all([
     sb(`task_events?task_id=eq.${tid}&order=id&limit=60&select=at,actor,actor_kind,type,body`, token),
     sb(`memberships?company_id=eq.${t.company_id}&role=neq.vendor&select=user_id,display_name,email,role`, token),
     sb(`vendors?company_id=eq.${t.company_id}&select=id,name,skills,email,phone&limit=200`, token),
     sb(`companies?id=eq.${t.company_id}&select=name,settings`, token),
+    t.property_id ? sb(`orders?property_id=eq.${t.property_id}&status=neq.draft&order=created_at.desc&limit=5&select=work,amount,start_at,status,vendor_id`, token) : Promise.resolve([]),
   ]);
   const who = (id) => members.find((m) => m.user_id === id)?.display_name || '（社員）';
   const margin = Number(co?.settings?.margin_rate ?? 20);
@@ -110,6 +113,7 @@ async function propose(token, tid, instruction, me) {
     e ? `# 元のメール\n差出人：${e.from_name} <${e.from_addr}>\n件名：${e.subject}\n受信：${e.received_at}\n添付：${(e.attachments || []).map((a) => a.name).join('、') || 'なし'}\n本文：\n${String(e.body || '').slice(0, 8000)}` : '',
     t.customers ? `# 顧客\n${t.customers.name}（担当者：${t.customers.contact_person || '不明'}、電話：${t.customers.phone || '不明'}、メール：${t.customers.email || '不明'}）` : '# 顧客\n（未設定）',
     t.properties ? `# 物件\n${t.properties.name}（住所：${t.properties.address || '不明'}、オートロック：${t.properties.autolock ? 'あり' : 'なし'}）\n建物の情報：${t.properties.building_info || 'なし'}` : '# 物件\n（未設定）',
+    past.length ? `# この物件の過去の発注（新しい順）\n${past.map((o) => `- ${o.start_at ? o.start_at.slice(0, 10) : '日程未定'} ${o.work}：${vendors.find((v) => v.id === o.vendor_id)?.name || '業者不明'}（業者id: ${o.vendor_id}）${o.amount}円（税抜）`).join('\n')}` : '',
     `# これまでの記録（古い順）\n${events.map((x) => `- ${x.at.slice(0, 16).replace('T', ' ')} ${x.actor_kind === 'ai' ? 'AI' : who(x.actor)}：${x.type}${x.body ? '「' + x.body.slice(0, 300) + '」' : ''}`).join('\n')}`,
     `# 社内の人\n${members.map((m) => `- ${m.display_name || m.email}（user_id: ${m.user_id}、${m.role}${m.user_id === t.assignee ? '、今の担当' : ''}）`).join('\n')}`,
     `# 協力業者\n${vendors.length ? vendors.map((v) => `- ${v.name}（id: ${v.id}、対応：${(v.skills || []).join('・') || '未登録'}、メール：${v.email || 'なし'}、電話：${v.phone || 'なし'}）`).join('\n') : '（登録なし）'}`,
