@@ -3,10 +3,14 @@ const SB_URL = process.env.SUPABASE_URL || 'https://enwpymkodwogyfegbfsq.supabas
 const SB_KEY = process.env.SUPABASE_KEY || 'sb_publishable_W75onFPkz8MyA4kT1ehrgg_-IG2guYN';
 const MODEL = () => process.env.AI_MODEL || 'claude-sonnet-5-5';
 
+// ADMIN：ログインした人ではなく、サーバーとして読み書きする（メールの自動取り込みだけで使う）
+const ADMIN = Symbol('admin');
+const auth = (token) => (token === ADMIN ? { apikey: process.env.SUPABASE_SERVICE_KEY } : { apikey: SB_KEY, Authorization: `Bearer ${token}` });
+
 async function sb(path, token, init = {}) {
   const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
     ...init,
-    headers: { apikey: SB_KEY, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Prefer: 'return=representation', ...(init.headers || {}) },
+    headers: { ...auth(token), 'Content-Type': 'application/json', Prefer: 'return=representation', ...(init.headers || {}) },
   });
   const t = await r.text();
   if (!r.ok) throw Object.assign(new Error(t || `supabase ${r.status}`), { code: r.status });
@@ -151,4 +155,12 @@ function body(req) {
   return typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
 }
 
-module.exports = { sb, getUser, claude, propose, body, KINDS };
+/** Storage に置く（ADMIN のとき） */
+async function upload(bucket, path, buf, type, token) {
+  const r = await fetch(`${SB_URL}/storage/v1/object/${bucket}/${path.split('/').map(encodeURIComponent).join('/')}`, {
+    method: 'POST', headers: { ...auth(token), 'Content-Type': type || 'application/octet-stream', 'x-upsert': 'true' }, body: buf,
+  });
+  return r.ok;
+}
+
+module.exports = { sb, getUser, claude, propose, body, upload, KINDS, ADMIN };

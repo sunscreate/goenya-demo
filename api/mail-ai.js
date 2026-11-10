@@ -1,6 +1,6 @@
 // マワリテ：取り込んだメールをAIが読み、仕事の依頼ならタスクを作って準備までする
 // POST /api/mail-ai/  { email_id }   Authorization: Bearer <Supabaseのログイン>
-const { sb, getUser, claude, propose, body, KINDS } = require('./_ai');
+const { sb, getUser, claude, propose, body, KINDS, ADMIN } = require('./_ai');
 
 const CLASSIFY = {
   name: 'classify',
@@ -27,24 +27,13 @@ const SYSTEM = `あなたはビルメンテナンス会社の受信メールを�
 - 期限や金額は、メールにはっきり書いてあるときだけ。推測で埋めない。
 - 今日の日付：${new Date().toISOString().slice(0, 10)}`;
 
-module.exports = async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'AIはまだ準備中です（APIキー未設定）' });
-  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  if (!token) return res.status(401).json({ error: 'ログインしてください' });
-  let eid = '';
+/** メールを読んでタスクにし、準備までする。token はログインした人か ADMIN、me は { id }（担当・記録に使う） */
+async function processMail(token, eid, me, force = false) {
+  const [m] = await sb(`emails?id=eq.${eid}&select=*`, token);
+  if (!m) throw Object.assign(new Error('メールが見つかりません'), { code: 404 });
+  if (m.task_id) return { task_id: m.task_id, already: true };
   try {
-    const b = body(req);
-    eid = String(b.email_id || '');
-    if (!/^[0-9a-f-]{36}$/.test(eid)) return res.status(400).json({ error: 'email_id が必要です' });
-    const me = await getUser(token);
-    if (!me?.id) return res.status(401).json({ error: 'ログインが切れました' });
-    const [m] = await sb(`emails?id=eq.${eid}&select=*`, token);
-    if (!m) return res.status(404).json({ error: 'メールが見つかりません' });
-    if (m.task_id) return res.status(200).json({ task_id: m.task_id, already: true });
     await sb(`emails?id=eq.${eid}`, token, { method: 'PATCH', body: JSON.stringify({ status: 'processing' }) });
-
     const cid = m.company_id;
     const [customers, properties, vendors] = await Promise.all([
       sb(`customers?company_id=eq.${cid}&select=id,name,contact_person,email&limit=500`, token),
@@ -73,27 +62,48 @@ module.exports = async (req, res) => {
     if (out.due && !/^\d{4}-\d{2}-\d{2}$/.test(out.due)) delete out.due;
     if (!KINDS[out.kind]) out.kind = 'other';
 
-    if (b.force) out.needs_action = true; // 社員が「タスクにする」を押したとき
+    if (force) out.needs_action = true; // 社員が「タスクにする」を押したとき
     if (!out.needs_action) {
       await sb(`emails?id=eq.${eid}`, token, { method: 'PATCH', body: JSON.stringify({ status: 'ignored', ai: out }) });
-      return res.status(200).json({ ignored: true, ai: out });
+      return { ignored: true, ai: out };
     }
+    const who = m.owner_user || me.id;
     const [t] = await sb('tasks', token, {
       method: 'POST',
       body: JSON.stringify({
         company_id: cid, title: out.title || m.subject || '（件名なし）', body: out.summary || '', source: 'mail', kind: out.kind,
-        assignee: m.owner_user || me.id, created_by: me.id, customer_id: out.customer_id || null, property_id: out.property_id || null,
+        assignee: who, created_by: token === ADMIN ? who : me.id, customer_id: out.customer_id || null, property_id: out.property_id || null,
         due: out.due || null, amount: out.amount ?? null, email_id: eid,
       }),
     });
     await sb(`emails?id=eq.${eid}`, token, { method: 'PATCH', body: JSON.stringify({ status: 'task', ai: out, task_id: t.id }) });
     let prep = null;
     try {
-      prep = await propose(token, t.id, '', me);
+      prep = await propose(token, t.id, '', token === ADMIN ? { id: who } : me);
     } catch (_) { /* 準備に失敗してもタスクは残す。画面から作り直せる */ }
-    return res.status(200).json({ task_id: t.id, ai: out, prepared: !!prep });
+    return { task_id: t.id, ai: out, prepared: !!prep };
   } catch (e) {
-    if (eid) try { await sb(`emails?id=eq.${eid}`, token, { method: 'PATCH', body: JSON.stringify({ status: 'error' }) }); } catch (_) {}
+    try { await sb(`emails?id=eq.${eid}`, token, { method: 'PATCH', body: JSON.stringify({ status: 'error' }) }); } catch (_) {}
+    throw e;
+  }
+}
+
+const handler = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'AIはまだ準備中です（APIキー未設定）' });
+  const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+  if (!token) return res.status(401).json({ error: 'ログインしてください' });
+  try {
+    const b = body(req);
+    const eid = String(b.email_id || '');
+    if (!/^[0-9a-f-]{36}$/.test(eid)) return res.status(400).json({ error: 'email_id が必要です' });
+    const me = await getUser(token);
+    if (!me?.id) return res.status(401).json({ error: 'ログインが切れました' });
+    return res.status(200).json(await processMail(token, eid, me, !!b.force));
+  } catch (e) {
     return res.status([401, 404, 502].includes(e.code) ? e.code : 500).json({ error: String(e.message || e).slice(0, 300) });
   }
 };
+module.exports = handler;
+module.exports.processMail = processMail;
