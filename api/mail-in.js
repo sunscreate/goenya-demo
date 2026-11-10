@@ -9,6 +9,17 @@ const addr = (s) => (String(s || '').match(/<([^>]+)>/)?.[1] || String(s || ''))
 const header = (hs, name) => (hs || []).find((h) => String(h.Name).toLowerCase() === name)?.Value || '';
 const stripHtml = (h) => String(h || '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 
+/** =?UTF-8?B?...?= などの件名を読める文字にする */
+function mime(v) {
+  return String(v || '').replace(/=\?([^?]+)\?([bq])\?([^?]*)\?=\s*/gi, (_, cs, enc, txt) => {
+    try {
+      const buf = enc.toLowerCase() === 'b' ? Buffer.from(txt, 'base64')
+        : Buffer.from(txt.replace(/_/g, ' ').replace(/=([0-9a-f]{2})/gi, (_m, h) => String.fromCharCode(parseInt(h, 16))), 'binary');
+      return new TextDecoder(cs.toLowerCase()).decode(buf);
+    } catch (_) { return txt; }
+  });
+}
+
 /** Resend の受信：Webhook には中身がないので、APIで本文と添付を取りに行き、Postmark と同じ形にそろえる */
 async function fromResend(d) {
   const key = process.env.RESEND_API_KEY;
@@ -25,11 +36,14 @@ async function fromResend(d) {
     }
   }
   const from = String(e.from || d.from || '');
-  const to = [...(d.received_for || []), ...(e.to || d.to || [])];
+  const to = Array.from(new Set([...(d.received_for || []), ...(e.to || d.to || [])].map(addr)));
+  const h = e.headers || {};
+  const hv = (k) => { const x = h[k] ?? h[k.toLowerCase()] ?? Object.entries(h).find(([n]) => n.toLowerCase() === k)?.[1]; return Array.isArray(x) ? x[0] : x; };
+  const subject = mime(e.subject || d.subject || hv('subject') || '');
   return {
-    From: from, FromFull: { Email: addr(from), Name: (from.match(/^\s*"?([^"<]+?)"?\s*</) || [])[1] || '' },
+    From: from, FromFull: { Email: addr(from), Name: mime((from.match(/^\s*"?([^"<]+?)"?\s*</) || [])[1] || '') },
     To: to.join(', '), ToFull: to.map((x) => ({ Email: addr(x) })), CcFull: (e.cc || d.cc || []).map((x) => ({ Email: addr(x) })),
-    Subject: e.subject || d.subject || '', TextBody: e.text || '', HtmlBody: e.html || '', Date: e.created_at || d.created_at,
+    Subject: subject, TextBody: e.text || '', HtmlBody: e.html || '', Date: e.created_at || d.created_at,
     Headers: [{ Name: 'Message-ID', Value: e.message_id || d.message_id || d.email_id }], Attachments: atts,
   };
 }
