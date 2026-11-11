@@ -80,10 +80,10 @@ async function importMessage(acc, token, msgId, runAi = true, folders = null) {
   const m = await graph(token, `/me/messages/${encodeURIComponent(msgId)}?$select=subject,from,toRecipients,ccRecipients,receivedDateTime,body,internetMessageId,hasAttachments,isDraft,parentFolderId`, {
     headers: { Prefer: 'outlook.body-content-type="text"' },
   });
-  if (!m || m.isDraft) return null;
+  if (!m || m.isDraft) return { skip: 'draft' };
   const fs = folders || (await watchFolders(token));
-  if (!fs.includes(m.parentFolderId)) return null; // 送信済み・下書きなどは取り込まない
-  if ((m.from?.emailAddress?.address || '').toLowerCase() === String(acc.ms_email || '').toLowerCase()) return null; // 自分が送ったもの
+  if (!fs.includes(m.parentFolderId)) return { skip: 'folder' }; // 送信済み・下書きなどは取り込まない
+  if ((m.from?.emailAddress?.address || '').toLowerCase() === String(acc.ms_email || '').toLowerCase()) return { skip: 'self' }; // 自分が送ったもの
   const messageId = m.internetMessageId || `graph:${msgId}`;
   const [dup] = await sb(`emails?company_id=eq.${acc.company_id}&message_id=eq.${encodeURIComponent(messageId)}&select=id`, ADMIN);
   if (dup) return { duplicate: true, email_id: dup.id };
@@ -129,7 +129,7 @@ async function syncInbox(acc, maxAi = 5) {
   for (const f of ['inbox', 'junkemail']) {
     // 新しい順に25通を見て、時刻で絞る（$filter は環境によって効かないことがあるため）
     const l = await graph(token, `/me/mailFolders/${f}/messages?$select=id,receivedDateTime,internetMessageId&$top=25&$orderby=receivedDateTime%20desc`).catch((e) => { errs.push(`${f}: ${e.message}`); return null; });
-    listed[f] = (l?.value || []).length;
+    listed[f] = (l?.value || []).map((x) => String(x.receivedDateTime).slice(0, 16));
     const recent = (l?.value || []).filter((x) => new Date(x.receivedDateTime).getTime() >= new Date(since).getTime());
     const mids = recent.map((x) => x.internetMessageId).filter(Boolean);
     const have = mids.length ? new Set((await sb(`emails?company_id=eq.${acc.company_id}&message_id=in.(${mids.map((x) => `"${String(x).replace(/"/g, '')}"`).map(encodeURIComponent).join(',')})&select=message_id`, ADMIN)).map((e) => e.message_id)) : new Set();
@@ -137,7 +137,8 @@ async function syncInbox(acc, maxAi = 5) {
     for (const x of items) {
       try {
         const r = await importMessage(acc, token, x.id, ai < maxAi, folders);
-        if (r && !r.duplicate) { n++; ai++; }
+        if (r?.skip) errs.push(`skip:${r.skip}`);
+        else if (r && !r.duplicate) { n++; ai++; }
       } catch (e) { errs.push(`取り込み: ${e.message}`); }
     }
   }
