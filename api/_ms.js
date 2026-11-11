@@ -75,6 +75,39 @@ async function watchFolders(token) {
   return ids.filter(Boolean);
 }
 
+/**
+ * 「届きませんでした」の知らせ（配信不能・NDR）か。送信はいったん成功に見えても、あとから戻ってくることがある
+ * （例：新しいテナントの送信制限 550 5.7.708）。戻ってきたら、送ったタスクに「送信できなかった」を記録する
+ */
+const BOUNCE_SUBJ = /^\s*(配信不能|配信できませんでした|送信できませんでした|Undeliverable|Undelivered Mail Returned to Sender|Delivery Status Notification \(Failure\)|Mail Delivery (?:Failed|Failure)|Returned mail)\s*[:：]?\s*/i;
+const BOUNCE_FROM = /^(postmaster|mailer-daemon|microsoftexchange[0-9a-f]*)@/i;
+function bounceOf(fromAddr, subject, text) {
+  if (!BOUNCE_SUBJ.test(subject || '') && !BOUNCE_FROM.test(fromAddr || '')) return null;
+  const orig = String(subject || '').replace(BOUNCE_SUBJ, '').trim();
+  const code = (String(text).match(/\b[45]\.\d{1,3}\.\d{1,3}\b[^\n]{0,140}/) || [])[0] || '';
+  const to = (String(text).match(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g) || []).find((a) => !BOUNCE_FROM.test(a)) || '';
+  return { orig, reason: code.trim() || '宛先に届きませんでした', to };
+}
+
+/** 戻ってきたメールを、それを送ったタスクに記録する（同じ知らせは1回だけ）。見つかったらタスクIDを返す */
+async function recordBounce(acc, b, messageId) {
+  if (!b.orig) return null;
+  const since = new Date(Date.now() - 14 * 86400000).toISOString();
+  const [ev] = await sb(`task_events?company_id=eq.${acc.company_id}&type=eq.mail_sent&body=eq.${encodeURIComponent(b.orig)}&at=gte.${since}&order=id.desc&limit=1&select=task_id,data`, ADMIN);
+  if (!ev) return null;
+  const [dup] = await sb(`task_events?task_id=eq.${ev.task_id}&type=eq.mail_failed&data->>message_id=eq.${encodeURIComponent(messageId)}&select=id`, ADMIN);
+  if (dup) return ev.task_id;
+  const to = ev.data?.to || b.to;
+  await sb('task_events', ADMIN, { method: 'POST', body: JSON.stringify({
+    company_id: acc.company_id, task_id: ev.task_id, actor_kind: 'system', type: 'mail_failed',
+    body: `送信したメールが届きませんでした${to ? `（${to}）` : ''}：${b.reason}`.slice(0, 300),
+    data: { to, reason: b.reason, subject: b.orig, message_id: messageId },
+  }) });
+  // 終わったことにしていても、もう一度目に入るように戻す
+  await sb(`tasks?id=eq.${ev.task_id}`, ADMIN, { method: 'PATCH', body: JSON.stringify({ status: 'open', done_at: null, updated_at: new Date().toISOString() }) });
+  return ev.task_id;
+}
+
 /** Outlook のメール1通をマワリテに取り込む（すでにあれば何もしない）。AIの準備まで */
 async function importMessage(acc, token, msgId, runAi = true, folders = null) {
   const m = await graph(token, `/me/messages/${encodeURIComponent(msgId)}?$select=subject,from,toRecipients,ccRecipients,receivedDateTime,body,internetMessageId,hasAttachments,isDraft,parentFolderId`, {
@@ -101,6 +134,10 @@ async function importMessage(acc, token, msgId, runAi = true, folders = null) {
   }
   const ad = (x) => x?.emailAddress?.address || '';
   const text = m.body?.contentType === 'html' ? stripHtml(m.body.content) : String(m.body?.content || '');
+  // 「届きませんでした」の知らせは、送ったタスクに記録する。新しい仕事ではないのでAIは使わない
+  const bounce = bounceOf(ad(m.from).toLowerCase(), m.subject, text);
+  let bouncedTask = null;
+  if (bounce) { bouncedTask = await recordBounce(acc, bounce, messageId); runAi = false; }
   await sb('emails', ADMIN, {
     method: 'POST',
     body: JSON.stringify({
@@ -115,6 +152,7 @@ async function importMessage(acc, token, msgId, runAi = true, folders = null) {
   if (runAi && process.env.ANTHROPIC_API_KEY) {
     try { ai = await processMail(ADMIN, id, { id: acc.user_id }); } catch (e) { ai = { error: String(e.message || e).slice(0, 200) }; }
   }
+  if (bounce) return { email_id: id, bounce: true, task_id: bouncedTask };
   return { email_id: id, ...(ai || {}) };
 }
 
@@ -153,4 +191,4 @@ function later(p) {
   return false;
 }
 
-module.exports = { CLIENT_ID, REDIRECT, SCOPES, AUTH, b64url, tokenRequest, accessToken, graph, ensureSubscription, importMessage, syncInbox, later };
+module.exports = { CLIENT_ID, REDIRECT, SCOPES, AUTH, b64url, tokenRequest, accessToken, graph, ensureSubscription, importMessage, syncInbox, later, bounceOf };
