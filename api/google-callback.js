@@ -2,7 +2,8 @@
 const { sb, ADMIN } = require('./_ai');
 const g = require('./_g');
 
-const back = (res, path, q) => { res.setHeader('Location', `${path}${path.includes('?') ? '&' : '?'}${new URLSearchParams(q)}`); return res.status(302).end(); };
+// 戻り先は、ログインしている画面（mawarite.vercel.app）。Google の戻り先（独自ドメイン）とは別
+const back = (res, path, q) => { res.setHeader('Location', `${g.BASE}${path}${path.includes('?') ? '&' : '?'}${new URLSearchParams(q)}`); return res.status(302).end(); };
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');

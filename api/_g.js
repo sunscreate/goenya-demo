@@ -3,7 +3,9 @@
 const { sb, ADMIN } = require('./_ai');
 
 const BASE = process.env.APP_URL || 'https://mawarite.vercel.app';
-const REDIRECT = `${BASE}/api/google-callback/`;
+// Google の戻り先は、Google に登録した独自ドメイン（vercel.app は Google の承認済みドメインにできないため）
+const G_BASE = process.env.GOOGLE_BASE_URL || 'https://mawarite.scky.fun';
+const REDIRECT = `${G_BASE}/api/google-callback/`;
 const SCOPES = 'openid email https://www.googleapis.com/auth/calendar.events';
 const AUTH = 'https://accounts.google.com/o/oauth2/v2/auth';
 const TOKEN = 'https://oauth2.googleapis.com/token';
@@ -104,4 +106,4 @@ async function syncOrder(orderId) {
   }
 }
 
-module.exports = { REDIRECT, SCOPES, AUTH, configured, tokenRequest, accessToken, eventOf, syncOrder };
+module.exports = { BASE, REDIRECT, SCOPES, AUTH, configured, tokenRequest, accessToken, eventOf, syncOrder };
