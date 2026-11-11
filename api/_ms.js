@@ -62,19 +62,28 @@ async function ensureSubscription(acc, token) {
   const [s] = await sb(`ms_secrets?account_id=eq.${acc.id}&select=client_state`, ADMIN);
   const sub = await graph(token, '/subscriptions', {
     method: 'POST',
-    body: JSON.stringify({ changeType: 'created', notificationUrl: NOTIFY_URL, resource: "me/mailFolders('inbox')/messages", expirationDateTime: exp, clientState: s.client_state }),
+    body: JSON.stringify({ changeType: 'created', notificationUrl: NOTIFY_URL, resource: 'me/messages', expirationDateTime: exp, clientState: s.client_state }),
   });
   await sb(`ms_accounts?id=eq.${acc.id}`, ADMIN, { method: 'PATCH', body: JSON.stringify({ sub_id: sub.id, sub_expires: sub.expirationDateTime, last_error: '' }) });
 }
 
 const stripHtml = (h) => String(h || '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 
+/** 取り込む対象のフォルダ（受信トレイと迷惑メール。初めての相手からのメールは迷惑メールに入りやすい） */
+async function watchFolders(token) {
+  const ids = await Promise.all(['inbox', 'junkemail'].map((f) => graph(token, `/me/mailFolders/${f}?$select=id`).then((x) => x?.id).catch(() => null)));
+  return ids.filter(Boolean);
+}
+
 /** Outlook のメール1通をマワリテに取り込む（すでにあれば何もしない）。AIの準備まで */
-async function importMessage(acc, token, msgId, runAi = true) {
-  const m = await graph(token, `/me/messages/${encodeURIComponent(msgId)}?$select=subject,from,toRecipients,ccRecipients,receivedDateTime,body,internetMessageId,hasAttachments,isDraft`, {
+async function importMessage(acc, token, msgId, runAi = true, folders = null) {
+  const m = await graph(token, `/me/messages/${encodeURIComponent(msgId)}?$select=subject,from,toRecipients,ccRecipients,receivedDateTime,body,internetMessageId,hasAttachments,isDraft,parentFolderId`, {
     headers: { Prefer: 'outlook.body-content-type="text"' },
   });
   if (!m || m.isDraft) return null;
+  const fs = folders || (await watchFolders(token));
+  if (!fs.includes(m.parentFolderId)) return null; // 送信済み・下書きなどは取り込まない
+  if ((m.from?.emailAddress?.address || '').toLowerCase() === String(acc.ms_email || '').toLowerCase()) return null; // 自分が送ったもの
   const messageId = m.internetMessageId || `graph:${msgId}`;
   const [dup] = await sb(`emails?company_id=eq.${acc.company_id}&message_id=eq.${encodeURIComponent(messageId)}&select=id`, ADMIN);
   if (dup) return { duplicate: true, email_id: dup.id };
@@ -113,11 +122,14 @@ async function importMessage(acc, token, msgId, runAi = true) {
 async function syncInbox(acc, maxAi = 5) {
   const token = await accessToken(acc.id);
   const since = new Date(Math.min(Date.now() - 60 * 60 * 1000, acc.last_sync ? new Date(acc.last_sync).getTime() - 60 * 60 * 1000 : Date.now() - 24 * 60 * 60 * 1000)).toISOString();
-  const l = await graph(token, `/me/mailFolders/inbox/messages?$select=id&$top=25&$orderby=receivedDateTime desc&$filter=receivedDateTime ge ${since}`);
+  const folders = await watchFolders(token);
   let n = 0, ai = 0;
-  for (const x of (l?.value || []).reverse()) {
-    const r = await importMessage(acc, token, x.id, ai < maxAi);
-    if (r && !r.duplicate) { n++; ai++; }
+  for (const f of ['inbox', 'junkemail']) {
+    const l = await graph(token, `/me/mailFolders/${f}/messages?$select=id&$top=25&$orderby=receivedDateTime desc&$filter=receivedDateTime ge ${since}`).catch(() => null);
+    for (const x of (l?.value || []).reverse()) {
+      const r = await importMessage(acc, token, x.id, ai < maxAi, folders);
+      if (r && !r.duplicate) { n++; ai++; }
+    }
   }
   await sb(`ms_accounts?id=eq.${acc.id}`, ADMIN, { method: 'PATCH', body: JSON.stringify({ last_sync: new Date().toISOString() }) });
   return { imported: n, token };
