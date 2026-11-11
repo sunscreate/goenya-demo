@@ -129,7 +129,7 @@ async function syncInbox(acc, maxAi = 5) {
   for (const f of ['inbox', 'junkemail']) {
     // 新しい順に25通を見て、時刻で絞る（$filter は環境によって効かないことがあるため）
     const l = await graph(token, `/me/mailFolders/${f}/messages?$select=id,receivedDateTime,internetMessageId&$top=25&$orderby=receivedDateTime%20desc`).catch((e) => { errs.push(`${f}: ${e.message}`); return null; });
-    listed[f] = (l?.value || []).map((x) => String(x.receivedDateTime).slice(0, 16));
+    listed[f] = (l?.value || []).length;
     const recent = (l?.value || []).filter((x) => new Date(x.receivedDateTime).getTime() >= new Date(since).getTime());
     const mids = recent.map((x) => x.internetMessageId).filter(Boolean);
     const have = mids.length ? new Set((await sb(`emails?company_id=eq.${acc.company_id}&message_id=in.(${mids.map((x) => `"${String(x).replace(/"/g, '')}"`).map(encodeURIComponent).join(',')})&select=message_id`, ADMIN)).map((e) => e.message_id)) : new Set();
