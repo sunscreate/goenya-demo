@@ -3,202 +3,133 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="あなたのスマホに、あなただけのアプリを。家計・習いごと・趣味の記録・サークルの出欠など、使い方に合わせて作ります。はじめ9,800円・月980円から（1日約32円）。完成イメージの試作までは無料。">
-<meta property="og:title" content="あなたのアイデアを、あなたのスマホへ。｜Sun'sCreate">
+<meta name="description" content="みんなのアプリじゃなく、自分だけのアプリ。家計・習いごと・趣味の記録・サークルの出欠など、あなたの使い方に合わせて作ります。はじめ9,800円・月980円から。完成イメージの試作までは無料。">
+<meta property="og:title" content="みんなのアプリじゃなく、自分だけのアプリ。｜Sun'sCreate">
 <meta property="og:description" content="はじめ9,800円・月980円から。完成イメージの試作までは無料。">
-<title>あなただけのアプリ、作ります｜Sun'sCreate</title>
+<title>自分だけのアプリ、作ります｜Sun'sCreate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500;700&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
 <link rel="stylesheet" href="site.css">
 <style>
 /* =========================================================
-   個人向けページ：楽しい・わかりやすい・お得
-   ・主役は「自分のスマホに、自分だけのアイコンが並ぶ」絵（自分ごと化：名前を入れると変わる）
-   ・色は明るい4色（サンイエロー・コーラル・ミント・スカイ）。文字は濃い色でコントラストを確保
-   ・金額は「1日あたり」に言い換え、身近なものと並べて小ささを伝える
-   ・選択肢は3つ、真ん中をおすすめに。迷ったら試作（無料）へ
+   個人向けページ（落ち着いた大人のトーン）
+   ・最初の画面で「押すと、自分のホーム画面にアプリが並ぶ」を体験してもらう
+   ・色はアイコンだけに使い、地は静かに（生成り＋墨＋細い線）。影は薄く、角は控えめ
+   ・金額は月額を大きく、1日あたりを添えて小ささを伝える。選択肢は3つ、真ん中をおすすめ
    ========================================================= */
-:root{--sun:#ffc93c;--coral:#ff7a6b;--mint:#2ec4a6;--sky:#4aa3ff;--grape:#8c6cf0;--ink2:#22313d;--cream:#fffaf0}
-.fun{font-family:"M PLUS Rounded 1c",var(--body)}
-body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60,.18) 1.5px,transparent 1.6px);background-size:22px 22px}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body.my{background:var(--paper);background-image:none}}
-.my-hero{padding-block:48px 40px;overflow:hidden}
-.hgrid{display:grid;grid-template-columns:1.05fr .95fr;grid-template-areas:"head phone" "rest phone";column-gap:36px;align-items:center}
-.hgrid .head{grid-area:head;align-self:end}.hgrid .rest{grid-area:rest;align-self:start}.hgrid .ph{grid-area:phone}
-@media (max-width:860px){.hgrid{grid-template-columns:1fr;grid-template-areas:"head" "phone" "rest";row-gap:26px}}
-.kicker{display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--ink);border-radius:99px;padding:4px 14px;font:800 14px "M PLUS Rounded 1c";box-shadow:3px 3px 0 var(--ink)}
-.kicker i{width:10px;height:10px;border-radius:50%;background:var(--coral);display:inline-block;animation:blink 1.6s infinite}
-@keyframes blink{50%{opacity:.25}}
-.my-hero h1{font:400 clamp(34px,5.6vw,60px)/1.22 var(--display);letter-spacing:.02em;margin:18px 0 16px;color:var(--ink)}
-.my-hero h1 .hl{position:relative;white-space:nowrap}
-.my-hero h1 .hl::after{content:"";position:absolute;left:-.05em;right:-.05em;bottom:.06em;height:.36em;background:var(--sun);z-index:-1;border-radius:4px;transform:rotate(-1deg)}
-.my-hero .sub{font-size:18px;color:var(--sub);max-width:32em}
-.namebox{margin-top:22px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:#fff;border:2px dashed var(--line,#d9dee2);border-radius:16px;padding:12px 14px;max-width:460px}
-.namebox label{font:700 14px "M PLUS Rounded 1c"}
-.namebox input{flex:1;min-width:140px;font:700 17px "M PLUS Rounded 1c";border:2px solid var(--ink);border-radius:10px;padding:8px 12px;background:var(--cream)}
-.namebox small{width:100%;color:var(--sub);font-size:12.5px}
-.my-hero .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
-.pricechip{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-top:20px;font-family:"M PLUS Rounded 1c"}
-.pricechip .big{font:800 30px "M PLUS Rounded 1c";color:var(--ink)}
-.pricechip .big small{font-size:16px}
-.pricechip .day{background:var(--mint);color:#fff;border-radius:99px;padding:3px 12px;font-weight:800;font-size:15px}
-.pricechip .free{color:var(--sub);font-size:14px}
+:root{--bg2:#f6f4ef;--ink3:#1f2a33;--sub2:#5f6b74;--line2:#e2ded5;--acc2:#c8553d;--acc2-bg:#f7e9e4;--ok2:#2f7d6b;--ok2-bg:#e6f1ee}
+body.my{background:var(--bg2)}
+.my .h-font{font-family:"Zen Kaku Gothic New",var(--body)}
+.eyebrow{display:inline-block;font:700 12.5px var(--mono);letter-spacing:.16em;color:var(--acc2);margin-bottom:12px}
+.sec-h{font:900 clamp(26px,3.6vw,38px)/1.35 "Zen Kaku Gothic New",var(--body);letter-spacing:.02em;margin:0 0 12px;color:var(--ink3)}
+.lead2{color:var(--sub2);font-size:16.5px;max-width:40em;line-height:1.9}
+.uline{background:linear-gradient(transparent 70%,rgba(200,85,61,.22) 70%)}
 
-/* スマホのホーム画面 */
-.phone{position:relative;justify-self:center;width:min(330px,84vw);aspect-ratio:9/19;border-radius:46px;background:#14181c;padding:12px;box-shadow:0 34px 70px rgba(34,49,61,.28),inset 0 0 0 2px #2b3238;transform:rotate(2deg)}
-.phone::before{content:"";position:absolute;top:22px;left:50%;width:96px;height:26px;margin-left:-48px;background:#14181c;border-radius:99px;z-index:3}
-.screen{position:relative;height:100%;border-radius:36px;overflow:hidden;background:linear-gradient(160deg,#ffd76e 0%,#ff9a8b 45%,#8c6cf0 100%);padding:58px 18px 18px;display:flex;flex-direction:column}
-.sbar{position:absolute;top:16px;left:26px;right:26px;display:flex;justify-content:space-between;font:700 13px var(--mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25)}
-.widget{background:rgba(255,255,255,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:20px;padding:12px 14px;margin-bottom:16px;font-family:"M PLUS Rounded 1c"}
-.widget b{display:block;font-size:13px;color:var(--ink2)}
-.widget span{font-size:20px;font-weight:800;color:var(--ink)}
-.widget small{display:block;font-size:11.5px;color:var(--sub)}
-.apps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px 10px;align-content:start}
-.app{display:flex;flex-direction:column;align-items:center;gap:5px;font:700 10.5px "M PLUS Rounded 1c";color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);text-align:center;line-height:1.25}
-.app .ic{position:relative;width:54px;height:54px;border-radius:15px;display:grid;place-items:center;font-size:27px;box-shadow:0 4px 10px rgba(0,0,0,.18),inset 0 -3px 0 rgba(0,0,0,.08)}
+/* ---------- いちばん上：押すと、ホーム画面に並ぶ ---------- */
+.top{padding-block:48px 56px}
+.top h1{font:900 clamp(28px,4.6vw,56px)/1.3 "Zen Kaku Gothic New",var(--body);letter-spacing:.01em;margin:0 0 16px;color:var(--ink3)}
+.top .intro{display:grid;grid-template-columns:1fr 340px;gap:24px 56px;align-items:end}
+@media (max-width:900px){.top .intro{grid-template-columns:1fr}}
+.top .facts{display:grid;gap:10px;justify-self:start}
+.top .fact{display:flex;align-items:baseline;gap:12px;border-bottom:1px solid var(--line2);padding-bottom:8px}
+.top .fact span{color:var(--sub2);font-size:13.5px;min-width:6.5em}
+.top .fact b{font:700 20px "Zen Kaku Gothic New";color:var(--ink3);font-variant-numeric:tabular-nums}
+.top .fact b small{font-size:13px;font-weight:500;color:var(--sub2);margin-left:6px}
+.top .ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+
+.igrid{display:grid;grid-template-columns:1fr 300px;gap:40px;align-items:start;margin-top:36px}
+.igrid .side{position:sticky;top:86px;display:grid;justify-items:center;gap:12px}
+.igrid .side .cap{font:700 13px "Zen Kaku Gothic New";color:var(--sub2);letter-spacing:.06em}
+@media (max-width:900px){.igrid{grid-template-columns:1fr}.igrid .side{position:static;order:-1}}
+.pick{font:700 14px "Zen Kaku Gothic New";color:var(--ink3);margin:0 0 12px;display:flex;align-items:center;gap:10px}
+.pick::before{content:"";width:24px;height:1px;background:var(--ink3)}
+.ideas2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.ideas2{grid-template-columns:1fr}}
+.idea2{display:grid;grid-template-columns:auto 1fr auto;gap:2px 14px;align-items:center;background:#fff;border:1px solid var(--line2);border-radius:14px;padding:14px 14px;text-align:left;cursor:pointer;font:inherit;color:inherit;transition:border-color .15s,box-shadow .15s,background .15s}
+.idea2:hover{border-color:#c9c3b6;box-shadow:0 6px 18px rgba(31,42,51,.07)}
+.idea2 .ic{grid-row:span 2;width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:22px}
+.idea2 b{font:700 15.5px "Zen Kaku Gothic New";color:var(--ink3)}
+.idea2 p{grid-column:2;font-size:13px;color:var(--sub2);line-height:1.6}
+.idea2 .add{grid-row:1/3;grid-column:3;width:28px;height:28px;border-radius:50%;border:1.5px solid #c9c3b6;display:grid;place-items:center;font:700 16px/1 var(--mono);color:var(--sub2);transition:all .15s}
+.idea2[aria-pressed="true"]{border-color:var(--ok2);background:#fbfdfc}
+.idea2[aria-pressed="true"] .add{background:var(--ok2);border-color:var(--ok2);color:#fff}
+.hint{margin-top:12px;font-size:13.5px;color:var(--sub2);min-height:1.6em}
+
+/* スマホのホーム画面（実物に近づける：落ち着いた壁紙・控えめな影） */
+.phone{position:relative;width:min(300px,78vw);aspect-ratio:9/19.3;border-radius:48px;background:#1b1f23;padding:11px;box-shadow:0 28px 60px rgba(31,42,51,.22),inset 0 0 0 1.5px #3a4148}
+.phone::before{content:"";position:absolute;top:21px;left:50%;width:92px;height:26px;margin-left:-46px;background:#000;border-radius:99px;z-index:3}
+.screen{position:relative;height:100%;border-radius:38px;overflow:hidden;background:radial-gradient(120% 80% at 20% 0%,#e7d3bd 0%,#b9a7a0 40%,#5e6b78 100%);padding:62px 16px 14px;display:flex;flex-direction:column}
+.sbar{position:absolute;top:17px;left:30px;right:30px;display:flex;justify-content:space-between;font:600 13px -apple-system,"Helvetica Neue",sans-serif;color:#fff}
+.apps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 8px;align-content:start}
+.app{display:flex;flex-direction:column;align-items:center;gap:5px;font:500 10.5px -apple-system,"Hiragino Sans",sans-serif;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);text-align:center;line-height:1.2}
+.app .ic{position:relative;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:25px;box-shadow:0 2px 6px rgba(0,0,0,.18)}
 .app .lb{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.app.mine .ic::after{content:"";position:absolute;inset:-4px;border-radius:19px;border:2.5px solid #fff;opacity:.9}
-.app.new{animation:pop .55s cubic-bezier(.2,1.6,.4,1) both}
-.app .dot{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;border-radius:99px;background:var(--coral);color:#fff;font:800 11px/20px var(--mono);text-shadow:none;border:2px solid #fff}
-@keyframes pop{from{transform:scale(0) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
-.dock{margin-top:auto;display:flex;justify-content:space-around;background:rgba(255,255,255,.35);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:24px;padding:10px 6px}
-.dock .ic{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.75);display:grid;place-items:center;font-size:22px}
-.tagbubble{position:absolute;right:-6px;top:40%;background:#fff;border:2px solid var(--ink);border-radius:14px;padding:8px 12px;font:800 13px "M PLUS Rounded 1c";box-shadow:3px 3px 0 var(--ink);transform:rotate(-4deg);z-index:4}
-.tagbubble::after{content:"";position:absolute;left:-10px;top:14px;border:8px solid transparent;border-right-color:var(--ink)}
-@media (max-width:860px){.tagbubble{right:-4px;top:auto;bottom:18%}.phone{width:min(268px,70vw);transform:none}.app .ic{width:46px;height:46px;font-size:23px}.apps{gap:12px 6px}}
+.app.sys .ic{background:rgba(255,255,255,.28)!important;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.app.new{animation:pop .45s cubic-bezier(.2,1.4,.4,1) both}
+.app .dot{position:absolute;top:-5px;right:-5px;min-width:19px;height:19px;border-radius:99px;background:#ff3b30;color:#fff;font:600 11px/19px -apple-system,sans-serif;text-shadow:none}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.dock{margin-top:auto;display:flex;justify-content:space-around;background:rgba(255,255,255,.22);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:26px;padding:10px 6px}
+@media (max-width:560px){.phone{width:min(240px,66vw);aspect-ratio:9/15}.app .ic{width:42px;height:42px;font-size:20px;border-radius:11px}.dock .ic{width:38px;height:38px;font-size:18px}.screen{padding-top:52px}}
+.dock .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:21px;background:rgba(255,255,255,.85)}
 
-/* セクション共通 */
-.sec-h{font:400 clamp(26px,3.8vw,40px)/1.3 var(--display);margin:0 0 12px}
-.lead2{color:var(--sub);font-size:17px;max-width:38em}
-.wave{display:block;width:100%;height:40px}
+/* ---------- 違い ---------- */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px}
+@media (max-width:760px){.vs{grid-template-columns:1fr}}
+.vs .box{border-radius:16px;padding:22px 24px;border:1px solid var(--line2);background:#fff}
+.vs .them{background:transparent;border-style:dashed}
+.vs h3{font:700 17px "Zen Kaku Gothic New";margin:0 0 12px;color:var(--ink3)}
+.vs .them h3{color:var(--sub2)}
+.vs ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.vs li{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.7}
+.vs li::before{flex:none;width:18px;height:18px;border-radius:50%;margin-top:4px}
+.vs .them li{color:var(--sub2)}
+.vs .them li::before{content:"";border:1.5px solid #bdb6a8}
+.vs .us li::before{content:"";background:var(--ok2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.5l2.5 2.5L13 6.5' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat}
 
-/* 市販アプリ vs じぶんアプリ */
-.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:stretch;margin-top:30px}
-@media (max-width:760px){.vs{grid-template-columns:1fr}.vs .mid{transform:rotate(90deg);justify-self:center}}
-.vs .box{border-radius:22px;padding:22px 22px 18px;border:2px solid var(--ink)}
-.vs .them{background:#eef0f2;color:#59636c;border-style:dashed}
-.vs .us{background:#fff;box-shadow:6px 6px 0 var(--mint)}
-.vs h3{font:800 19px "M PLUS Rounded 1c";margin:0 0 10px}
-.vs ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.vs li{display:flex;gap:10px;align-items:flex-start;font-size:15.5px}
-.vs li::before{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:800 13px var(--mono);margin-top:2px}
-.vs .them li::before{content:"×";background:#cfd4d8;color:#fff}
-.vs .us li::before{content:"✓";background:var(--mint);color:#fff}
-.vs .mid{align-self:center;font:400 30px var(--display);color:var(--coral)}
-
-/* アイデア：押すとホーム画面に置ける */
-.igrid{display:grid;grid-template-columns:1fr 290px;gap:32px;align-items:start;margin-top:26px}
-.igrid .side{position:sticky;top:86px;display:grid;justify-items:center;gap:10px}
-.igrid .side .cap{font:800 14px "M PLUS Rounded 1c";color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:99px;padding:4px 14px;box-shadow:3px 3px 0 var(--ink)}
-.phone.sm{width:270px;transform:rotate(-1.5deg)}
-.phone.sm .widget{display:none}
-.phone.sm .screen{padding-top:64px}
-@media (max-width:860px){.igrid{grid-template-columns:1fr}.igrid .side{position:static;order:-1}.phone.sm{width:min(240px,64vw);transform:none}}
-.ideas2{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
-.idea2{position:relative;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;background:#fff;border:2px solid var(--ink);border-radius:20px;padding:16px 16px 14px;text-align:left;cursor:pointer;font:inherit;color:inherit;box-shadow:4px 4px 0 var(--ink);transition:transform .12s,box-shadow .12s}
-.idea2:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
-.idea2:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
-.idea2 .ic{grid-row:span 3;width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:28px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.08)}
-.idea2 b{font:800 16.5px "M PLUS Rounded 1c"}
-.idea2 p{font-size:14px;color:var(--sub);line-height:1.6}
-.idea2 .add{justify-self:start;margin-top:4px;font:800 12.5px "M PLUS Rounded 1c";color:var(--ink);background:var(--sun);border-radius:99px;padding:3px 12px}
-.idea2[aria-pressed="true"] .add{background:var(--mint);color:#fff}
-.idea2[aria-pressed="true"] .add::before{content:"✓ "}
-.hint{margin-top:14px;font-size:14px;color:var(--sub)}
-.myhome{position:sticky;top:72px;z-index:5;display:flex;align-items:center;gap:12px;margin-top:22px;padding:10px 14px;border-radius:20px;background:linear-gradient(110deg,#ffd76e,#ff9a8b 55%,#8c6cf0);box-shadow:0 10px 24px rgba(34,49,61,.18);overflow-x:auto;scrollbar-width:none}
-.myhome::-webkit-scrollbar{display:none}
-.myhome .lbl{flex:none;font:800 13px "M PLUS Rounded 1c";color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);line-height:1.3}
-.myhome .row{display:flex;gap:10px}
-.myhome .ic{flex:none;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:22px;box-shadow:0 3px 8px rgba(0,0,0,.18);border:2px solid #fff}
-.myhome .ic.new{animation:pop .55s cubic-bezier(.2,1.6,.4,1) both}
-.myhome .cnt{flex:none;margin-left:auto;background:#fff;border-radius:99px;padding:4px 12px;font:800 13px "M PLUS Rounded 1c";color:var(--ink)}
-
-/* 料金 */
-.price2{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:30px;align-items:stretch}
+/* ---------- 料金 ---------- */
+.price2{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px;align-items:stretch}
 @media (max-width:900px){.price2{grid-template-columns:1fr}}
-.pc{position:relative;display:flex;flex-direction:column;background:#fff;border:2px solid var(--ink);border-radius:24px;padding:24px 22px 20px;box-shadow:5px 5px 0 var(--ink);cursor:pointer}
-.pc.rec{background:linear-gradient(180deg,#fff7dc,#fff 55%);box-shadow:8px 8px 0 var(--coral);transform:translateY(-8px)}
-@media (max-width:900px){.pc.rec{transform:none}}
-.pc .rib{position:absolute;top:-16px;left:20px;background:var(--coral);color:#fff;font:800 13px "M PLUS Rounded 1c";padding:4px 14px;border-radius:99px;border:2px solid var(--ink)}
-.pc .pic{display:flex;gap:6px;margin-bottom:10px}
-.pc .pic span{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:17px}
-.pc h3{font:800 21px "M PLUS Rounded 1c";margin:0}
-.pc .who{color:var(--sub);font-size:14px;margin-top:2px}
-.pc .m{margin-top:14px;font:800 15px "M PLUS Rounded 1c";color:var(--sub)}
-.pc .m b{font:800 44px/1 "M PLUS Rounded 1c";color:var(--ink);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
-.pc .perday{display:inline-block;margin-top:8px;background:var(--mint);color:#fff;font:800 14px "M PLUS Rounded 1c";border-radius:99px;padding:3px 12px}
-.pc .init{margin-top:12px;padding-top:12px;border-top:2px dashed #e3e6ea;font-size:15px}
-.pc .init b{font:800 19px "M PLUS Rounded 1c";font-variant-numeric:tabular-nums}
-.pc ul{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px;font-size:15px}
-.pc li::before{content:"✓";color:var(--mint);font-weight:800;margin-right:8px}
-.pc .buy{margin-top:auto;padding-top:14px;font-size:13px;color:var(--sub)}
-.pc .go{margin-top:12px;text-align:center;background:var(--ink);color:#fff;border-radius:14px;padding:11px;font:800 15px "M PLUS Rounded 1c"}
-.pc.rec .go{background:var(--coral)}
-.compare{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
-.compare div{flex:1 1 200px;display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:12px 16px;border:2px solid #f0e2bd}
-.compare .e{font-size:26px}
-.compare b{font:800 16px "M PLUS Rounded 1c"}
-.compare small{display:block;color:var(--sub);font-size:13px}
-.rules{margin-top:18px;font-size:14px;color:var(--sub);line-height:1.8}
-.zero{display:flex;gap:18px;align-items:center;margin-top:30px;background:var(--ink);color:#fff;border-radius:24px;padding:22px 24px}
-.zero .z{flex:none;width:76px;height:76px;border-radius:50%;background:var(--sun);color:var(--ink);display:grid;place-items:center;font:400 22px var(--display);transform:rotate(-8deg)}
-.zero b{font:800 19px "M PLUS Rounded 1c"}
-.zero p{color:#cfd6dc;font-size:15px;margin-top:4px}
+.pc{position:relative;display:flex;flex-direction:column;background:#fff;border:1px solid var(--line2);border-radius:18px;padding:26px 24px 22px;cursor:pointer;transition:box-shadow .15s,border-color .15s}
+.pc:hover{border-color:#c9c3b6;box-shadow:0 10px 26px rgba(31,42,51,.08)}
+.pc.rec{border:1.5px solid var(--ink3);box-shadow:0 14px 34px rgba(31,42,51,.12)}
+.pc .rib{position:absolute;top:-12px;left:22px;background:var(--ink3);color:#fff;font:700 12px "Zen Kaku Gothic New";letter-spacing:.06em;padding:4px 12px;border-radius:99px}
+.pc h3{font:700 19px "Zen Kaku Gothic New";margin:0;color:var(--ink3)}
+.pc .who{color:var(--sub2);font-size:13.5px;margin-top:2px}
+.pc .m{margin-top:16px;font:700 15px "Zen Kaku Gothic New";color:var(--sub2)}
+.pc .m b{font:900 42px/1 "Zen Kaku Gothic New";color:var(--ink3);letter-spacing:-.01em;font-variant-numeric:tabular-nums;margin:0 2px}
+.pc .perday{display:inline-block;margin-top:8px;color:var(--ok2);background:var(--ok2-bg);font:700 13px "Zen Kaku Gothic New";border-radius:6px;padding:2px 8px}
+.pc .init{margin-top:14px;padding-top:14px;border-top:1px solid var(--line2);font-size:14px;color:var(--sub2)}
+.pc .init b{font:700 18px "Zen Kaku Gothic New";color:var(--ink3);font-variant-numeric:tabular-nums;margin-left:4px}
+.pc ul{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:6px;font-size:14.5px}
+.pc li{padding-left:18px;position:relative}
+.pc li::before{content:"";position:absolute;left:2px;top:.75em;width:6px;height:6px;border-radius:50%;background:var(--ok2)}
+.pc .buy{margin-top:auto;padding-top:16px;font-size:12.5px;color:var(--sub2)}
+.pc .go{margin-top:12px;text-align:center;border:1px solid var(--ink3);color:var(--ink3);border-radius:10px;padding:10px;font:700 14px "Zen Kaku Gothic New"}
+.pc.rec .go{background:var(--ink3);color:#fff}
+.rules{margin-top:18px;font-size:13.5px;color:var(--sub2);line-height:1.85}
+.zero{display:flex;gap:18px;align-items:center;margin-top:28px;background:#fff;border:1px solid var(--line2);border-left:4px solid var(--acc2);border-radius:14px;padding:20px 22px}
+.zero .z{flex:none;font:900 26px "Zen Kaku Gothic New";color:var(--acc2)}
+.zero b{font:700 17px "Zen Kaku Gothic New";color:var(--ink3)}
+.zero p{color:var(--sub2);font-size:14.5px;margin-top:4px}
 
-/* 手順 */
-.steps2{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px;counter-reset:s}
+/* ---------- 手順 ---------- */
+.steps2{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:26px 0 0;padding:0;border:1px solid var(--line2);border-radius:16px;background:#fff;overflow:hidden}
 @media (max-width:800px){.steps2{grid-template-columns:1fr 1fr}}
-.steps2 li{list-style:none;background:#fff;border:2px solid var(--ink);border-radius:20px;padding:18px 16px;position:relative}
-.steps2 li .e{font-size:30px}
-.steps2 li b{display:block;font:800 16.5px "M PLUS Rounded 1c";margin-top:6px}
-.steps2 li span{font-size:14px;color:var(--sub)}
-.steps2 li em{position:absolute;top:12px;right:14px;font:700 12px var(--mono);font-style:normal;color:var(--steel)}
-.steps2 li.free::after{content:"無料";position:absolute;top:-12px;left:14px;background:var(--mint);color:#fff;font:800 12px "M PLUS Rounded 1c";padding:2px 10px;border-radius:99px}
+.steps2 li{list-style:none;padding:20px 18px;border-right:1px solid var(--line2);position:relative}
+.steps2 li:last-child{border-right:0}
+@media (max-width:800px){.steps2 li:nth-child(2){border-right:0}.steps2 li:nth-child(-n+2){border-bottom:1px solid var(--line2)}}
+.steps2 li em{display:block;font:700 12px var(--mono);font-style:normal;letter-spacing:.12em;color:var(--acc2)}
+.steps2 li b{display:block;font:700 16px "Zen Kaku Gothic New";margin-top:6px;color:var(--ink3)}
+.steps2 li span{font-size:13.5px;color:var(--sub2)}
+.steps2 li .free{display:inline-block;margin-left:6px;font:700 11px "Zen Kaku Gothic New";color:var(--ok2);background:var(--ok2-bg);border-radius:4px;padding:1px 6px;vertical-align:2px}
 
-.toast{position:fixed;left:50%;top:84px;z-index:30;transform:translate(-50%,-20px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--ink);border-radius:16px;padding:8px 14px 8px 8px;box-shadow:4px 4px 0 var(--ink);font:800 14px "M PLUS Rounded 1c";transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px)}
+.toast{position:fixed;left:50%;top:84px;z-index:30;transform:translate(-50%,-16px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:10px;background:var(--ink3);color:#fff;border-radius:12px;padding:8px 14px 8px 8px;box-shadow:0 10px 24px rgba(0,0,0,.2);font:700 13.5px "Zen Kaku Gothic New";transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
-.toast .ic{flex:none;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:19px}
+.toast .ic{flex:none;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:17px}
 .sticky-cta{display:none}
 @media (max-width:720px){.sticky-cta{display:flex;position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:20;justify-content:center;box-shadow:0 10px 24px rgba(29,35,39,.25)}}
-@media (prefers-reduced-motion: reduce){.app.new,.kicker i{animation:none}.idea2,.pc{transition:none}}
-
-/* 自分だけ：名前・ペットの名前・好きな色を入れると、アプリの中身が変わる */
-.only{display:grid;grid-template-columns:1fr 300px;grid-template-areas:"txt ph" "mk ph";grid-template-rows:auto 1fr;column-gap:40px;align-items:start;margin-top:20px}
-.only>div:first-child{grid-area:txt}.only .inapp{grid-area:ph}.only .mk{grid-area:mk}
-@media (max-width:860px){.only{grid-template-columns:1fr;grid-template-areas:"txt" "ph" "mk";row-gap:20px}}
-.only .pts{display:grid;gap:12px;margin-top:18px}
-.only .pt{display:flex;gap:12px;align-items:flex-start;font-size:15.5px}
-.only .pt .n{flex:none;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font:800 15px "M PLUS Rounded 1c";color:#fff}
-.mk{margin-top:22px;background:#fff;border:2px solid var(--ink);border-radius:22px;padding:18px 18px 14px;box-shadow:5px 5px 0 var(--ink);display:grid;gap:12px}
-.mk h3{font:800 16px "M PLUS Rounded 1c";margin:0}
-.mk .f{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media (max-width:520px){.mk .f{grid-template-columns:1fr}}
-.mk label{display:grid;gap:4px;font:700 13px "M PLUS Rounded 1c";color:var(--sub)}
-.mk input{font:700 16px "M PLUS Rounded 1c";border:2px solid var(--ink);border-radius:10px;padding:8px 10px;background:var(--cream);min-width:0}
-.mk .sw{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.mk .sw button{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--ink);cursor:pointer;padding:0}
-.mk .sw button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink),0 0 0 6px #fff,0 0 0 8px var(--ink)}
-.mk .sw .em{display:flex;gap:6px}
-.mk .sw .em button{width:auto;height:34px;border-radius:10px;padding:0 6px;background:#fff;font-size:20px;border:2px solid #e3e6ea;box-shadow:none}
-.mk .sw .em button[aria-pressed="true"]{border-color:var(--ink);background:var(--cream)}
-.mk small{color:var(--sub);font-size:12.5px}
-.inapp{--c:#ff7a6b}
-.inapp .screen{background:#f7f7f9;padding:56px 0 0}
-.inapp .ah{background:var(--c);color:#fff;padding:14px 16px 18px;font-family:"M PLUS Rounded 1c"}
-.inapp .ah small{opacity:.9;font-size:12px}
-.inapp .ah b{display:block;font-size:20px;font-weight:800;line-height:1.3}
-.inapp .card{margin:-10px 12px 10px;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 4px 14px rgba(0,0,0,.08);font-family:"M PLUS Rounded 1c"}
-.inapp .card .row{display:flex;align-items:center;gap:10px}
-.inapp .card .pet{width:44px;height:44px;border-radius:50%;background:color-mix(in srgb,var(--c) 22%,#fff);display:grid;place-items:center;font-size:24px}
-.inapp .card b{font-size:15px}
-.inapp .card small{display:block;color:#7a828a;font-size:11.5px}
-.inapp .kg{margin-left:auto;text-align:right;font:800 18px "M PLUS Rounded 1c";color:var(--c)}
-.inapp .kg small{font-size:10px;color:#7a828a}
-.inapp ul{list-style:none;margin:0 12px;padding:0;display:grid;gap:8px;font:700 12.5px "M PLUS Rounded 1c"}
-.inapp li{display:flex;justify-content:space-between;background:#fff;border-radius:12px;padding:9px 12px;border-left:4px solid var(--c)}
-.inapp li span{color:#7a828a;font-weight:500}
-.inapp .btn2{margin:auto 12px 18px;background:var(--c);color:#fff;text-align:center;border-radius:14px;padding:12px;font:800 14px "M PLUS Rounded 1c";box-shadow:0 4px 0 color-mix(in srgb,var(--c) 70%,#000)}
+@media (prefers-reduced-motion: reduce){.app.new{animation:none}.idea2,.pc{transition:none}}
 </style>
 </head>
 <body class="my">
@@ -209,162 +140,101 @@ body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60
 </div></header>
 <main id="top">
 
-<section class="my-hero"><div class="wrap hgrid">
-  <div class="head">
-    <span class="kicker"><i></i>個人のかたの、アプリ作り</span>
-    <h1>スマホに、<br><span class="hl">あなただけ</span>の<br>アプリを。</h1>
-  </div>
-  <div class="rest">
-    <p class="sub">家計のつけ方も、子どもの習いごとも、趣味のコレクションも。市販のアプリに自分を合わせるのはおしまい。<b>あなたの使い方に合わせたアプリ</b>を、ひとつずつ作ります。</p>
-    <div class="namebox">
-      <label for="nm">お名前（ニックネーム）を入れてみて</label>
-      <input id="nm" maxlength="8" placeholder="例：さくら" autocomplete="off">
-      <small>→ スマホのアプリ名が、あなたの名前に変わります（入力した名前はどこにも送られません）</small>
-    </div>
-    <div class="ctas">
-      <a class="btn" href="#contact">無料で相談する</a>
-      <a class="btn ghost" href="#ideas">どんなアプリが作れる？</a>
-    </div>
-    <div class="pricechip"><span class="big">はじめ9,800円<small>・</small>月980円〜</span><span class="day">1日あたり約32円</span><span class="free">完成イメージの試作までは無料</span></div>
-  </div>
-
-  <div class="ph" style="position:relative;justify-self:center">
-    <div class="phone" role="img" aria-label="スマホのホーム画面に、あなた専用のアプリのアイコンが並んでいる様子">
-      <div class="screen">
-        <div class="sbar"><span id="clock">9:41</span><span>5G ▮</span></div>
-        <div class="widget"><b id="wtitle">さくらの家計ノート</b><span>今月 ¥48,210</span><small>先月より ¥3,560 少なめ 🎉</small></div>
-        <div class="apps" id="apps"></div>
-        <div class="dock"><span class="ic">📞</span><span class="ic">💬</span><span class="ic">📷</span><span class="ic">🎵</span></div>
-      </div>
-    </div>
-    <div class="tagbubble">ぜんぶ<br>わたし専用！</div>
-  </div>
-</div></section>
-
-<section id="only" style="padding-top:20px"><div class="wrap">
-  <span class="kicker"><i></i>ここがいちばん、おもしろいところ</span>
-  <h2 class="sec-h" style="margin-top:14px">みんなのアプリじゃなく、<br><span style="background:linear-gradient(transparent 62%,var(--sun) 62%)">自分だけのアプリ。</span></h2>
-  <div class="only">
+<section class="top"><div class="wrap">
+  <span class="eyebrow">FOR YOU ／ 個人のかたへ</span>
+  <h1>みんなのアプリじゃなく、<br><span class="uline">自分だけのアプリ。</span></h1>
+  <div class="intro">
     <div>
-      <p class="lead2">ふつうのアプリは「たくさんの人が使う」前提で作られています。だから名前の欄は空っぽで、言葉もだれにでも通じる無難なもの。ここで作るのは、<b>はじめからあなた専用</b>のアプリです。</p>
-      <div class="pts">
-        <div class="pt"><span class="n" style="background:var(--coral)">1</span><span><b>名前が、最初から入っている。</b>あなたの名前、家族の名前、ペットの名前。開くたびに「おかえり、○○さん」。</span></div>
-        <div class="pt"><span class="n" style="background:var(--mint)">2</span><span><b>色も、言葉も、ボタンも好きに。</b>好きな色、家族の中の呼び方、いつもの言い回しのままで。</span></div>
-        <div class="pt"><span class="n" style="background:var(--sky)">3</span><span><b>使う項目だけ。</b>「体重」「お薬」「散歩」など、あなたの家で本当に記録したいものだけを並べます。</span></div>
-      </div>
+      <p class="lead2">市販のアプリは、たくさんの人が使う前提で作られています。ここで作るのは、はじめからあなた専用。使う項目だけを、あなたの言葉と、あなたの名前で。<b>あなたのアイデアを、あなたのスマホへ</b>届けます。</p>
+      <div class="ctas"><a class="btn" href="#contact">無料で相談する</a><a class="btn ghost" href="#price">料金を見る</a></div>
     </div>
-    <div class="phone inapp" id="inapp" style="justify-self:center;transform:rotate(1.5deg)" role="img" aria-label="名前とペットの名前が入った、自分だけのペット日記アプリの画面">
-      <div class="screen" style="display:flex;flex-direction:column">
-        <div class="sbar" style="color:#333;text-shadow:none"><span class="clk">9:41</span><span>5G ▮</span></div>
-        <div class="ah"><small id="o_hi">おかえり、かずさん</small><b id="o_title">ポチ日記</b></div>
-        <div class="card"><div class="row"><span class="pet" id="o_em">🐶</span><div><b id="o_today">きょうのポチ</b><small>ごはん 2回・散歩 1回</small></div><div class="kg">5.2<small>kg</small></div></div></div>
-        <ul><li id="o_l1">ポチの散歩<span>18:30</span></li><li id="o_l2">ポチのお薬<span>あした</span></li><li>動物病院（ワクチン）<span>12/3</span></li></ul>
-        <div class="btn2" id="o_btn">＋ ポチのごはんを記録</div>
-      </div>
+    <div class="facts" aria-label="料金のめやす">
+      <div class="fact"><span>月額</span><b>980円〜<small>1日あたり約32円</small></b></div>
+      <div class="fact"><span>はじめの費用</span><b>9,800円〜</b></div>
+      <div class="fact"><span>完成イメージの試作</span><b>無料</b></div>
     </div>
-    <div class="mk">
-        <h3>ためしに、入れてみて 👇</h3>
-        <div class="f">
-          <label>あなたの名前<input id="o_me" maxlength="8" placeholder="例：かず" autocomplete="off"></label>
-          <label>ペットの名前<input id="o_pet" maxlength="8" placeholder="例：ポチ" autocomplete="off"></label>
-        </div>
-        <div class="sw" role="group" aria-label="好きな色">
-          <span style="font:700 13px 'M PLUS Rounded 1c';color:var(--sub)">好きな色</span>
-          <button type="button" data-c="#ff7a6b" style="background:#ff7a6b" aria-pressed="true" aria-label="コーラル"></button>
-          <button type="button" data-c="#2ec4a6" style="background:#2ec4a6" aria-pressed="false" aria-label="ミント"></button>
-          <button type="button" data-c="#4aa3ff" style="background:#4aa3ff" aria-pressed="false" aria-label="スカイ"></button>
-          <button type="button" data-c="#8c6cf0" style="background:#8c6cf0" aria-pressed="false" aria-label="グレープ"></button>
-          <button type="button" data-c="#e0a100" style="background:#e0a100" aria-pressed="false" aria-label="ひまわり"></button>
-          <span style="font:700 13px 'M PLUS Rounded 1c';color:var(--sub);margin-left:6px">ペット</span><span class="em" role="group" aria-label="ペットの種類"><button type="button" data-e="🐶" aria-pressed="true">🐶</button><button type="button" data-e="🐱" aria-pressed="false">🐱</button><button type="button" data-e="🐰" aria-pressed="false">🐰</button><button type="button" data-e="🐹" aria-pressed="false">🐹</button></span>
-        </div>
-        <small>入れた名前はこの画面の中だけで使い、どこにも送られません。</small>
-      </div>
   </div>
-</div></section>
 
-<section style="padding-top:0"><div class="wrap">
-  <h2 class="sec-h">アプリに合わせるのは、<br>もうやめよう。</h2>
-  <p class="lead2">必要なものだけを、使いやすい形で。名前もアイコンも、あなたが決められます。</p>
-  <div class="vs">
-    <div class="box them"><h3>よくある市販アプリ</h3><ul>
-      <li>使わない機能がいっぱいで、どこに何があるかわからない</li>
-      <li>欲しい項目が、どこにもない</li>
-      <li>広告がじゃま。外すには高い課金</li>
-      <li>家族と共有するには、全員の登録が必要</li></ul></div>
-    <div class="mid" aria-hidden="true">→</div>
-    <div class="box us"><h3>あなた専用のアプリ</h3><ul>
-      <li>使う画面だけ。開いてすぐ、いつもの操作</li>
-      <li>「この項目が欲しかった」を、そのまま入れる</li>
-      <li>広告なし。月980円から</li>
-      <li>名前・色・アイコンまで、好きなように</li></ul></div>
-  </div>
-</div></section>
-
-<section id="ideas"><div class="wrap">
-  <p class="kicker" style="margin-bottom:14px"><i></i>押して、ホーム画面に置いてみて</p>
-  <h2 class="sec-h">あなたのアイデアを、<br><span style="background:linear-gradient(transparent 62%,var(--sun) 62%)">あなたのスマホへ。</span></h2>
-  <p class="lead2">「こんなのがあったらいいな」が、そのままアプリになります。たとえばこんなもの。気になるものを押すと、スマホのホーム画面に並びます。ここにないアイデアも大歓迎です。</p>
-  <div class="igrid">
-    <div class="ideas2" id="ideaList"></div>
+  <div class="igrid" id="ideas">
+    <div>
+      <p class="pick">押すと、ホーム画面にアプリが並びます</p>
+      <div class="ideas2" id="ideaList"></div>
+      <p class="hint" id="hint">いくつ選んでも大丈夫です。ここにないアイデアも、そのままご相談ください。</p>
+    </div>
     <div class="side">
-      <span class="cap" id="homeCnt">あなたのホーム画面</span>
-      <div class="phone sm" role="img" aria-label="選んだアプリが並ぶ、あなたのスマホのホーム画面">
+      <div class="phone" role="img" aria-label="選んだアプリが並ぶ、あなたのスマホのホーム画面">
         <div class="screen">
           <div class="sbar"><span class="clk">9:41</span><span>5G ▮</span></div>
           <div class="apps" id="apps2" aria-live="polite"></div>
           <div class="dock"><span class="ic">📞</span><span class="ic">💬</span><span class="ic">📷</span><span class="ic">🎵</span></div>
         </div>
       </div>
+      <span class="cap" id="homeCnt">あなたのホーム画面</span>
     </div>
   </div>
-  <p class="hint" id="hint">いくつ選んでも大丈夫。相談のときに「これとこれが欲しい」と伝えてください。</p>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <span class="eyebrow">DIFFERENCE</span>
+  <h2 class="sec-h">アプリに、自分を合わせなくていい。</h2>
+  <p class="lead2">必要なものだけを、使いやすい形で。名前も色も、あなたが決められます。</p>
+  <div class="vs">
+    <div class="box them"><h3>よくある市販のアプリ</h3><ul>
+      <li>使わない機能が多く、どこに何があるかわからない</li>
+      <li>欲しい項目が、どこにもない</li>
+      <li>広告が出る。外すには高い課金</li>
+      <li>家族と共有するには、全員の登録が必要</li></ul></div>
+    <div class="box us"><h3>あなた専用のアプリ</h3><ul>
+      <li>使う画面だけ。開いてすぐ、いつもの操作</li>
+      <li>「この項目が欲しかった」を、そのまま入れる</li>
+      <li>広告なし。あなたと家族の名前、好きな色で</li>
+      <li>共有したい人だけと、同じ画面を</li></ul></div>
+  </div>
 </div></section>
 
 <section id="price"><div class="wrap">
-  <h2 class="sec-h">うれしい、ちょうどいい料金。</h2>
-  <p class="lead2">はじめの費用をぐっとおさえて、あとは毎月の定額。使いながら、小さな直しもおまかせいただけます（金額はすべて税込）。</p>
+  <span class="eyebrow">PRICE</span>
+  <h2 class="sec-h">はじめは小さく、あとは月々の定額で。</h2>
+  <p class="lead2">はじめの費用をおさえ、毎月の定額で使い続けられます。使いながらの小さな直しも、月額に含まれます（金額はすべて税込）。</p>
   <div class="price2">
-    <div class="pc" data-plan="1"><div class="pic"><span style="background:#ffe9a8">🃏</span></div>
+    <div class="pc" data-plan="1">
       <h3>ちょこっと</h3><p class="who">ひとつの記録や表を、使いやすく</p>
-      <p class="m">月 <b>980</b> 円</p><span class="perday">1日あたり約32円</span>
-      <p class="init">はじめの費用 <b>9,800円</b></p>
+      <p class="m">月<b>980</b>円</p><span class="perday">1日あたり約32円</span>
+      <p class="init">はじめの費用<b>9,800円</b></p>
       <ul><li>画面 1〜2つ</li><li>自分のスマホで使う</li><li>データはスマホの中に</li></ul>
-      <p class="buy">買い切りなら 33,000円</p><span class="go">これにする</span></div>
-    <div class="pc rec" data-plan="2"><span class="rib">いちばんのおすすめ</span><div class="pic"><span style="background:#c8f1e7">👛</span><span style="background:#d8eaff">📈</span><span style="background:#ffd9d4">🔔</span></div>
+      <p class="buy">買い切りの場合 33,000円</p><span class="go">このプランで相談する</span></div>
+    <div class="pc rec" data-plan="2"><span class="rib">おすすめ</span>
       <h3>じぶんアプリ</h3><p class="who">写真・グラフ・お知らせまで</p>
-      <p class="m">月 <b>1,980</b> 円</p><span class="perday">1日あたり約65円</span>
-      <p class="init">はじめの費用 <b>19,800円</b></p>
+      <p class="m">月<b>1,980</b>円</p><span class="perday">1日あたり約65円</span>
+      <p class="init">はじめの費用<b>19,800円</b></p>
       <ul><li>画面 3〜4つ</li><li>写真・グラフ・お知らせ</li><li>スマホとパソコンで同じデータ</li></ul>
-      <p class="buy">買い切りなら 55,000円＋月550円</p><span class="go">これにする</span></div>
-    <div class="pc" data-plan="3"><div class="pic"><span style="background:#e6dcff">👨‍👩‍👧</span><span style="background:#d8eaff">🏸</span></div>
+      <p class="buy">買い切りの場合 55,000円＋月550円</p><span class="go">このプランで相談する</span></div>
+    <div class="pc" data-plan="3">
       <h3>みんなで使う</h3><p class="who">家族・仲間とログインして共有</p>
-      <p class="m">月 <b>3,980</b> 円</p><span class="perday">1日あたり約131円</span>
-      <p class="init">はじめの費用 <b>39,800円</b></p>
+      <p class="m">月<b>3,980</b>円</p><span class="perday">1日あたり約131円</span>
+      <p class="init">はじめの費用<b>39,800円</b></p>
       <ul><li>画面 5つ〜</li><li>人ごとのログイン</li><li>だれが入力しても全員に反映</li></ul>
-      <p class="buy">買い切りなら 99,000円＋月1,100円</p><span class="go">これにする</span></div>
+      <p class="buy">買い切りの場合 99,000円＋月1,100円</p><span class="go">このプランで相談する</span></div>
   </div>
-  <div class="compare" aria-label="月980円のイメージ">
-    <div><span class="e">☕</span><p><b>カフェのラテ 2杯ぶん</b><small>月980円のイメージ</small></p></div>
-    <div><span class="e">🛠️</span><p><b>毎月の小さな直しつき</b><small>月1時間まで、おまかせ</small></p></div>
-    <div><span class="e">🚫</span><p><b>広告はゼロ</b><small>あなたのためのアプリだから</small></p></div>
-  </div>
-  <p class="rules">月額には、データの保管・不具合の修正・毎月の小さな変更（月1時間まで）が含まれます。最低利用期間は12か月です（それより前におやめになる場合は、残りの月数分の半額）。13か月目からは、いつでも翌月末でやめられ、データは書き出してお渡しします。どのプランも、スマホのホーム画面にアイコンを置いて使えます（iPhone・Android）。仕上げのときの修正は2回まで。App Store への公開は別途ご相談ください。</p>
+  <p class="rules">月額には、データの保管・不具合の修正・毎月の小さな変更（月1時間まで）が含まれます。広告は入りません。最低利用期間は12か月です（それより前におやめになる場合は、残りの月数分の半額）。13か月目からは、いつでも翌月末でやめられ、データは書き出してお渡しします。どのプランも、スマホのホーム画面にアイコンを置いて使えます（iPhone・Android）。仕上げのときの修正は2回まで。App Store への公開は別途ご相談ください。</p>
   <div class="zero"><span class="z">0円</span>
     <div><b>完成イメージの試作までは無料。気に入らなければ、お支払いはありません。</b>
       <p>お話を伺ったあと、実際にスマホで触れる試作をお送りします。「思っていたのと違う」と感じたら、そこでやめていただいて大丈夫です。</p></div></div>
 </div></section>
 
 <section style="padding-top:0"><div class="wrap">
+  <span class="eyebrow">PROCESS</span>
   <h2 class="sec-h">できあがるまで</h2>
   <ol class="steps2">
-    <li class="free"><em>STEP 1</em><span class="e">💬</span><b>相談する</b><span>フォームから、作りたいものを一言で。メールでやりとりします。</span></li>
-    <li class="free"><em>STEP 2</em><span class="e">📱</span><b>試作を触る</b><span>スマホで触れる試作が届きます。使い心地を確かめてください。</span></li>
-    <li><em>STEP 3</em><span class="e">🎨</span><b>仕上げる</b><span>色・名前・アイコンも決めて仕上げます。修正は2回まで。</span></li>
-    <li><em>STEP 4</em><span class="e">🎉</span><b>ホームに置く</b><span>アイコンをホーム画面へ。今日から、あなたのアプリです。</span></li>
+    <li><em>STEP 1</em><b>相談する<span class="free">無料</span></b><span>フォームから、作りたいものを一言で。メールでやりとりします。</span></li>
+    <li><em>STEP 2</em><b>試作を触る<span class="free">無料</span></b><span>スマホで触れる試作が届きます。使い心地を確かめてください。</span></li>
+    <li><em>STEP 3</em><b>仕上げる</b><span>名前・色・アイコンも決めて仕上げます。修正は2回まで。</span></li>
+    <li><em>STEP 4</em><b>ホームに置く</b><span>アイコンをホーム画面へ。今日から、あなたのアプリです。</span></li>
   </ol>
 </div></section>
 
 <section style="padding-top:0"><div class="wrap">
+  <span class="eyebrow">FAQ</span>
   <h2 class="sec-h">よくある質問</h2>
   <div class="faq" style="margin-top:18px">
     <details><summary>パソコンやアプリにくわしくなくても大丈夫？</summary><p>大丈夫です。「こんなことに困っている」「こうなったら便利」を、ふだんの言葉で教えてください。画面はこちらで考えて、試作でお見せします。</p></details>
@@ -402,69 +272,37 @@ body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60
 <a class="btn sticky-cta" href="#contact">無料で相談する</a>
 <footer><div class="wrap">© Sun'sCreate　アプリの画面・アイコンはイメージです。</div></footer>
 <script>
-/* ホーム画面のアイコン：名前を入れると、自分専用のアプリ名に変わる。アイデアを押すと並ぶ */
+/* いちばん上：アイデアを押すと、ホーム画面にアイコンが並ぶ */
 (function(){
   const IDEAS=[
-    {k:'kakei',e:'👛',bg:'#2ec4a6',n:'家計ノート',s:'家計',d:'レシートを撮るだけで記録。家族で同じ家計簿、月ごとのグラフも。',p:'じぶんアプリ',badge:''},
-    {k:'narai',e:'🎹',bg:'#ff7a6b',n:'習いごと',s:'習いごと',d:'きょうだいの習いごと・月謝・送迎の担当をひと目で。前の日にお知らせ。',p:'みんなで使う',badge:'2'},
-    {k:'coll',e:'🃏',bg:'#ffc93c',n:'コレクション',s:'図鑑',d:'カード・フィギュア・切手。持っている／欲しいを写真つきで。',p:'ちょこっと',badge:''},
-    {k:'tsuri',e:'🎣',bg:'#4aa3ff',n:'釣り日記',s:'釣り日記',d:'場所・天気・写真をその場で。地図で振り返り、よく釣れる条件も。',p:'じぶんアプリ',badge:''},
-    {k:'circle',e:'🏸',bg:'#8c6cf0',n:'サークル',s:'サークル',d:'練習の出欠をタップで。会費の集金状況もみんなで確認。',p:'みんなで使う',badge:'5'},
-    {k:'pet',e:'🐶',bg:'#ff9f43',n:'ペット日記',s:'ペット',d:'ごはん・散歩・体重・通院を家族で記録。ワクチンの時期にお知らせ。',p:'じぶんアプリ',badge:''},
-    {k:'recipe',e:'🍳',bg:'#ee5a8a',n:'わが家レシピ',s:'レシピ',d:'家の味を写真つきで保存。冷蔵庫の残りから作れる料理を探せる。',p:'じぶんアプリ',badge:''},
-    {k:'garden',e:'🌱',bg:'#5cb85c',n:'家庭菜園',s:'菜園',d:'種まき・水やり・収穫を記録。季節ごとの作業をお知らせ。',p:'ちょこっと',badge:''}
+    {k:'kakei',e:'👛',bg:'linear-gradient(160deg,#3fb39b,#2a8f7b)',n:'家計ノート',s:'家計',d:'レシートを撮るだけで記録。家族で同じ家計簿、月ごとのグラフも。'},
+    {k:'narai',e:'🎹',bg:'linear-gradient(160deg,#e9826f,#c8553d)',n:'習いごと',s:'習いごと',d:'きょうだいの習いごと・月謝・送迎の担当をひと目で。',badge:'2'},
+    {k:'coll',e:'🃏',bg:'linear-gradient(160deg,#e8c25a,#c99a22)',n:'コレクション',s:'図鑑',d:'カード・フィギュア・切手。持っている／欲しいを写真つきで。'},
+    {k:'tsuri',e:'🎣',bg:'linear-gradient(160deg,#5b9bd5,#356fa8)',n:'釣り日記',s:'釣り日記',d:'場所・天気・写真をその場で。地図で振り返り。'},
+    {k:'circle',e:'🏸',bg:'linear-gradient(160deg,#8b7fd1,#5d50a8)',n:'サークル',s:'サークル',d:'練習の出欠をタップで。会費の集金状況もみんなで。',badge:'5'},
+    {k:'pet',e:'🐶',bg:'linear-gradient(160deg,#e3a15c,#b8742f)',n:'ペット日記',s:'ペット',d:'ごはん・散歩・体重・通院を家族で記録。'},
+    {k:'recipe',e:'🍳',bg:'linear-gradient(160deg,#d97a95,#b0506d)',n:'わが家レシピ',s:'レシピ',d:'家の味を写真つきで保存。残りものから探せる。'},
+    {k:'garden',e:'🌱',bg:'linear-gradient(160deg,#7cb26b,#4f8a3f)',n:'家庭菜園',s:'菜園',d:'種まき・水やり・収穫を記録。季節の作業をお知らせ。'}
   ];
-  const START=['kakei','narai','coll','pet'];
-  const GENERIC=[{e:'⚙️',bg:'#9aa3ab',n:'設定'},{e:'🗺️',bg:'#9aa3ab',n:'マップ'},{e:'🕐',bg:'#9aa3ab',n:'時計'},{e:'📁',bg:'#9aa3ab',n:'ファイル'}];
-  const apps=document.getElementById('apps'),list=document.getElementById('ideaList'),nm=document.getElementById('nm'),wt=document.getElementById('wtitle');
-  let on=new Set(START);
-  const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const who=()=>(nm.value.trim()||'さくら').slice(0,8);
+  const SYS=[{e:'⚙️',n:'設定'},{e:'🗺️',n:'マップ'},{e:'🕐',n:'時計'},{e:'📁',n:'ファイル'},{e:'🌤️',n:'天気'},{e:'🗒️',n:'メモ'},{e:'📅',n:'カレンダー'},{e:'🧮',n:'計算機'}];
+  const on=new Set(['kakei','narai','pet']);
+  const apps=document.getElementById('apps2'),list=document.getElementById('ideaList');
   function render(newKey){
-    const mine=IDEAS.filter(i=>on.has(i.k)).slice(0,12);
-    const gen=GENERIC.slice(0,Math.max(0,8-mine.length));
-    apps.innerHTML=mine.map(i=>'<div class="app mine'+(i.k===newKey?' new':'')+'"><span class="ic" style="background:'+i.bg+'">'+i.e+(i.badge?'<span class="dot">'+i.badge+'</span>':'')+'</span><span class="lb">'+i.s+'</span></div>').join('')+
-      gen.map(g=>'<div class="app" style="opacity:.75"><span class="ic" style="background:'+g.bg+'">'+g.e+'</span><span class="lb">'+g.n+'</span></div>').join('');
-    wt.textContent=who()+'の家計ノート';
-    document.getElementById('apps2').innerHTML=apps.innerHTML;
-    document.getElementById('homeCnt').textContent=esc(who())+'のホーム画面（'+mine.length+'こ）';
+    const mine=IDEAS.filter(i=>on.has(i.k));
+    const sys=SYS.slice(0,Math.max(0,12-mine.length)).slice(0,8);
+    apps.innerHTML=mine.map(i=>'<div class="app'+(i.k===newKey?' new':'')+'"><span class="ic" style="background:'+i.bg+'">'+i.e+(i.badge?'<span class="dot">'+i.badge+'</span>':'')+'</span><span class="lb">'+i.s+'</span></div>').join('')+
+      sys.map(g=>'<div class="app sys"><span class="ic">'+g.e+'</span><span class="lb">'+g.n+'</span></div>').join('');
+    document.getElementById('homeCnt').textContent='あなたのホーム画面 ・ 自分だけのアプリ '+mine.length+'こ';
   }
-  list.innerHTML=IDEAS.map(i=>'<button type="button" class="idea2" data-k="'+i.k+'" aria-pressed="'+on.has(i.k)+'"><span class="ic" style="background:'+i.bg+'">'+i.e+'</span><b>'+i.n+'</b><p>'+i.d+'</p><span class="add">'+(on.has(i.k)?'ホームに置いた':'ホームに置く')+'</span></button>').join('');
-  list.addEventListener('click',e=>{const b=e.target.closest('.idea2');if(!b)return;const k=b.dataset.k;
-    if(on.has(k)){on.delete(k);b.setAttribute('aria-pressed','false');b.querySelector('.add').textContent='ホームに置く';render()}
-    else{on.add(k);b.setAttribute('aria-pressed','true');b.querySelector('.add').textContent='ホームに置いた';render(k);
-      const it=IDEAS.find(i=>i.k===k);
-      document.getElementById('hint').textContent='「'+who()+'の'+it.n+'」をホームに置きました。いくつ選んでも大丈夫です。';
-      const side=document.querySelector('.igrid .side').getBoundingClientRect();
-      if(side.bottom<0||side.top>innerHeight){/* スマホの絵が見えていないときだけ、上に小さく知らせる */
-        const t=document.getElementById('toast');t.innerHTML='<span class="ic" style="background:'+it.bg+'">'+it.e+'</span>'+esc(who())+'のホーム画面に「'+it.n+'」を置きました';
-        t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}}});
-  nm.addEventListener('input',()=>render());
-  try{const t=new Date();const hm=t.getHours()+':'+String(t.getMinutes()).padStart(2,'0');document.getElementById('clock').textContent=hm;document.querySelectorAll('.clk').forEach(c=>c.textContent=hm)}catch(_){}
+  list.innerHTML=IDEAS.map(i=>'<button type="button" class="idea2" data-k="'+i.k+'" aria-pressed="'+on.has(i.k)+'"><span class="ic" style="background:'+i.bg+'">'+i.e+'</span><b>'+i.n+'</b><p>'+i.d+'</p><span class="add" aria-hidden="true">'+(on.has(i.k)?'✓':'+')+'</span></button>').join('');
+  list.addEventListener('click',e=>{const b=e.target.closest('.idea2');if(!b)return;const k=b.dataset.k,it=IDEAS.find(i=>i.k===k),mark=b.querySelector('.add');
+    if(on.has(k)){on.delete(k);b.setAttribute('aria-pressed','false');mark.textContent='+';render();return}
+    on.add(k);b.setAttribute('aria-pressed','true');mark.textContent='✓';render(k);
+    document.getElementById('hint').textContent='「'+it.n+'」をホーム画面に置きました。いくつ選んでも大丈夫です。';
+    const side=document.querySelector('.igrid .side').getBoundingClientRect();
+    if(side.bottom<0||side.top>innerHeight){const t=document.getElementById('toast');t.innerHTML='<span class="ic" style="background:'+it.bg+'">'+it.e+'</span>ホーム画面に「'+it.n+'」を置きました';t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}});
+  try{const d=new Date(),hm=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');document.querySelectorAll('.clk').forEach(c=>c.textContent=hm)}catch(_){}
   render();
-})();
-
-/* 自分だけのアプリ：名前・ペットの名前・色・種類で、アプリの中身が変わる */
-(function(){
-  const $=id=>document.getElementById(id),box=$('inapp');
-  const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  const top=document.getElementById('nm');
-  function up(){
-    const me=($('o_me').value.trim()||(top&&top.value.trim())||'かず').slice(0,8), pet=($('o_pet').value.trim()||'ポチ').slice(0,8);
-    $('o_hi').textContent='おかえり、'+me+'さん';
-    $('o_title').textContent=pet+'日記';
-    $('o_today').textContent='きょうの'+pet;
-    $('o_l1').firstChild.textContent=pet+'の散歩';
-    $('o_l2').firstChild.textContent=pet+'のお薬';
-    $('o_btn').textContent='＋ '+pet+'のごはんを記録';
-  }
-  ['o_me','o_pet'].forEach(id=>$(id).addEventListener('input',up));
-  if(top)top.addEventListener('input',up);
-  document.querySelectorAll('.mk .sw > button').forEach(b=>b.addEventListener('click',()=>{
-    document.querySelectorAll('.mk .sw > button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');box.style.setProperty('--c',b.dataset.c)}));
-  document.querySelectorAll('.mk .em button').forEach(b=>b.addEventListener('click',()=>{
-    document.querySelectorAll('.mk .em button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');$('o_em').textContent=b.dataset.e}));
-  up();
 })();
 
 /* 料金のカードを押すと、そのプランを選んだ状態で相談フォームへ */
@@ -479,7 +317,6 @@ body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60
   f.addEventListener("submit",async e=>{e.preventDefault();const g=k=>f.elements[k].value.trim(),m=document.getElementById("cfm"),b=document.getElementById("cfb");
     const errs={name:g("name")?"":"お名前を入れてください",email:!g("email")?"返信先のメールアドレスを入れてください":okMail(g("email"))?"":"メールアドレスの形を確かめてください（例 info@example.jp）",message:g("message")?"":"作りたいアプリを一言で入れてください"};
     Object.keys(errs).forEach(k=>show(k,errs[k]));const first=Object.keys(errs).find(k=>errs[k]);if(first){f.elements[first].focus();m.textContent="";return}
-    /* ホームに置いたアイデアも、相談内容に添える */
     const picked=[...document.querySelectorAll('.idea2[aria-pressed="true"] b')].map(x=>x.textContent);
     const msg=g("message")+(picked.length?"\n\n（ページで選んだアイデア："+picked.join("・")+"）":"");
     b.disabled=true;b.textContent="送信しています…";m.className="cmsg";m.textContent="";
