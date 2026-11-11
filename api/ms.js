@@ -94,9 +94,9 @@ const ops = {
     const out = [];
     for (const acc of accs) {
       try {
-        const { imported, token, errors, folders } = await ms.syncInbox(acc, 3);
+        const { imported, token, errors, folders, listed } = await ms.syncInbox(acc, 3);
         await ms.ensureSubscription(acc, token);
-        out.push({ id: acc.id, imported, folders, errors: errors.length ? errors : undefined });
+        out.push({ id: acc.id, imported, folders, listed, errors: errors.length ? errors : undefined });
       } catch (e) {
         await sb(`ms_accounts?id=eq.${acc.id}`, ADMIN, { method: 'PATCH', body: JSON.stringify({ last_error: String(e.message).slice(0, 200) }) });
         out.push({ id: acc.id, error: true });
