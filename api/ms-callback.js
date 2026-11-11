@@ -4,18 +4,22 @@
 const { sb, ADMIN } = require('./_ai');
 const ms = require('./_ms');
 
-const back = (res, q) => { res.setHeader('Location', `/company/?${new URLSearchParams(q)}`); return res.status(302).end(); };
+// 会社がわからないとき（管理者の許可など）はホームへ（会社を選ぶ画面）
+const back = (res, q) => { res.setHeader('Location', q.id ? `/company/?${new URLSearchParams(q)}` : '/'); return res.status(302).end(); };
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   const q = req.query || {};
   if (q.admin_consent) return back(res, { ms: String(q.admin_consent).toLowerCase() === 'true' ? 'consented' : 'error', m: q.error_description || '' });
   if (q.error) return back(res, { ms: 'error', m: String(q.error_description || q.error).slice(0, 300) });
+  let cid = '';
   try {
     const [st] = await sb(`ms_oauth_states?state=eq.${encodeURIComponent(String(q.state || ''))}&select=*`, ADMIN);
     if (!st) return back(res, { ms: 'error', m: 'もう一度「Microsoft でつなぐ」から始めてください' });
+    cid = st.company_id;
+    const cidq = { id: cid };
     await sb(`ms_oauth_states?state=eq.${encodeURIComponent(st.state)}`, ADMIN, { method: 'DELETE' });
-    if (Date.now() - new Date(st.created_at).getTime() > 15 * 60 * 1000) return back(res, { ms: 'error', m: '時間が経ちすぎました。もう一度つないでください' });
+    if (Date.now() - new Date(st.created_at).getTime() > 15 * 60 * 1000) return back(res, { ...cidq, ms: 'error', m: '時間が経ちすぎました。もう一度つないでください' });
     const t = await ms.tokenRequest({ grant_type: 'authorization_code', code: String(q.code || ''), redirect_uri: ms.REDIRECT, code_verifier: st.verifier });
     const meInfo = await ms.graph(t.access_token, '/me?$select=displayName,mail,userPrincipalName');
     const email = (meInfo.mail || meInfo.userPrincipalName || '').toLowerCase();
@@ -28,8 +32,8 @@ module.exports = async (req, res) => {
     try { await ms.ensureSubscription(acc, t.access_token); } catch (e) {
       await sb(`ms_accounts?id=eq.${acc.id}`, ADMIN, { method: 'PATCH', body: JSON.stringify({ last_error: `受信の通知を作れませんでした：${e.message}`.slice(0, 200) }) });
     }
-    return back(res, { ms: 'ok' });
+    return back(res, { id: st.company_id, ms: 'ok' });
   } catch (e) {
-    return back(res, { ms: 'error', m: String(e.message || e).slice(0, 300) });
+    return back(res, { id: cid, ms: 'error', m: String(e.message || e).slice(0, 300) });
   }
 };
