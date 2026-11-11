@@ -88,7 +88,14 @@ body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60
 .vs .mid{align-self:center;font:400 30px var(--display);color:var(--coral)}
 
 /* アイデア：押すとホーム画面に置ける */
-.ideas2{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:26px}
+.igrid{display:grid;grid-template-columns:1fr 290px;gap:32px;align-items:start;margin-top:26px}
+.igrid .side{position:sticky;top:86px;display:grid;justify-items:center;gap:10px}
+.igrid .side .cap{font:800 14px "M PLUS Rounded 1c";color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:99px;padding:4px 14px;box-shadow:3px 3px 0 var(--ink)}
+.phone.sm{width:270px;transform:rotate(-1.5deg)}
+.phone.sm .widget{display:none}
+.phone.sm .screen{padding-top:64px}
+@media (max-width:860px){.igrid{grid-template-columns:1fr}.igrid .side{position:static;order:-1}.phone.sm{width:min(240px,64vw);transform:none}}
+.ideas2{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
 .idea2{position:relative;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;background:#fff;border:2px solid var(--ink);border-radius:20px;padding:16px 16px 14px;text-align:left;cursor:pointer;font:inherit;color:inherit;box-shadow:4px 4px 0 var(--ink);transition:transform .12s,box-shadow .12s}
 .idea2:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
 .idea2:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
@@ -149,6 +156,9 @@ body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60
 .steps2 li em{position:absolute;top:12px;right:14px;font:700 12px var(--mono);font-style:normal;color:var(--steel)}
 .steps2 li.free::after{content:"無料";position:absolute;top:-12px;left:14px;background:var(--mint);color:#fff;font:800 12px "M PLUS Rounded 1c";padding:2px 10px;border-radius:99px}
 
+.toast{position:fixed;left:50%;top:84px;z-index:30;transform:translate(-50%,-20px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--ink);border-radius:16px;padding:8px 14px 8px 8px;box-shadow:4px 4px 0 var(--ink);font:800 14px "M PLUS Rounded 1c";transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast .ic{flex:none;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:19px}
 .sticky-cta{display:none}
 @media (max-width:720px){.sticky-cta{display:flex;position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:20;justify-content:center;box-shadow:0 10px 24px rgba(29,35,39,.25)}}
 @media (prefers-reduced-motion: reduce){.app.new,.kicker i{animation:none}.idea2,.pc{transition:none}}
@@ -184,7 +194,7 @@ body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60
   <div class="ph" style="position:relative;justify-self:center">
     <div class="phone" role="img" aria-label="スマホのホーム画面に、あなた専用のアプリのアイコンが並んでいる様子">
       <div class="screen">
-        <div class="sbar"><span id="clock">9:41</span><span>●●● 5G ▮</span></div>
+        <div class="sbar"><span id="clock">9:41</span><span>5G ▮</span></div>
         <div class="widget"><b id="wtitle">さくらの家計ノート</b><span>今月 ¥48,210</span><small>先月より ¥3,560 少なめ 🎉</small></div>
         <div class="apps" id="apps"></div>
         <div class="dock"><span class="ic">📞</span><span class="ic">💬</span><span class="ic">📷</span><span class="ic">🎵</span></div>
@@ -214,9 +224,20 @@ body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60
 
 <section id="ideas"><div class="wrap">
   <h2 class="sec-h">押して、ホーム画面に置いてみて。</h2>
-  <p class="lead2">たとえばこんなアプリが作れます。気になるものを押すと、あなたのホーム画面に並びます。ここにないものでも大丈夫です。</p>
-  <div class="myhome" aria-live="polite"><span class="lbl">あなたの<br>ホーム画面</span><div class="row" id="homeRow"></div><span class="cnt" id="homeCnt"></span></div>
-  <div class="ideas2" id="ideaList"></div>
+  <p class="lead2">たとえばこんなアプリが作れます。気になるものを押すと、スマホのホーム画面に並びます。ここにないものでも大丈夫です。</p>
+  <div class="igrid">
+    <div class="ideas2" id="ideaList"></div>
+    <div class="side">
+      <span class="cap" id="homeCnt">あなたのホーム画面</span>
+      <div class="phone sm" role="img" aria-label="選んだアプリが並ぶ、あなたのスマホのホーム画面">
+        <div class="screen">
+          <div class="sbar"><span class="clk">9:41</span><span>5G ▮</span></div>
+          <div class="apps" id="apps2" aria-live="polite"></div>
+          <div class="dock"><span class="ic">📞</span><span class="ic">💬</span><span class="ic">📷</span><span class="ic">🎵</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
   <p class="hint" id="hint">いくつ選んでも大丈夫。相談のときに「これとこれが欲しい」と伝えてください。</p>
 </div></section>
 
@@ -298,20 +319,21 @@ body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60
   <small>Sun'sCreate（代表 山田 和矢）／インボイス登録事業者<br>〒154-0004 東京都世田谷区太子堂4丁目18番15号 TASUKI PRIME SANGENJAYA 3F-3</small>
 </div></section>
 </main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <a class="btn sticky-cta" href="#contact">無料で相談する</a>
 <footer><div class="wrap">© Sun'sCreate　アプリの画面・アイコンはイメージです。</div></footer>
 <script>
 /* ホーム画面のアイコン：名前を入れると、自分専用のアプリ名に変わる。アイデアを押すと並ぶ */
 (function(){
   const IDEAS=[
-    {k:'kakei',e:'👛',bg:'#2ec4a6',n:'家計ノート',d:'レシートを撮るだけで記録。家族で同じ家計簿、月ごとのグラフも。',p:'じぶんアプリ',badge:''},
-    {k:'narai',e:'🎹',bg:'#ff7a6b',n:'習いごと',d:'きょうだいの習いごと・月謝・送迎の担当をひと目で。前の日にお知らせ。',p:'みんなで使う',badge:'2'},
-    {k:'coll',e:'🃏',bg:'#ffc93c',n:'コレクション',d:'カード・フィギュア・切手。持っている／欲しいを写真つきで。',p:'ちょこっと',badge:''},
-    {k:'tsuri',e:'🎣',bg:'#4aa3ff',n:'釣り日記',d:'場所・天気・写真をその場で。地図で振り返り、よく釣れる条件も。',p:'じぶんアプリ',badge:''},
-    {k:'circle',e:'🏸',bg:'#8c6cf0',n:'サークル',d:'練習の出欠をタップで。会費の集金状況もみんなで確認。',p:'みんなで使う',badge:'5'},
-    {k:'pet',e:'🐶',bg:'#ff9f43',n:'ペット日記',d:'ごはん・散歩・体重・通院を家族で記録。ワクチンの時期にお知らせ。',p:'じぶんアプリ',badge:''},
-    {k:'recipe',e:'🍳',bg:'#ee5a8a',n:'わが家レシピ',d:'家の味を写真つきで保存。冷蔵庫の残りから作れる料理を探せる。',p:'じぶんアプリ',badge:''},
-    {k:'garden',e:'🌱',bg:'#5cb85c',n:'家庭菜園',d:'種まき・水やり・収穫を記録。季節ごとの作業をお知らせ。',p:'ちょこっと',badge:''}
+    {k:'kakei',e:'👛',bg:'#2ec4a6',n:'家計ノート',s:'家計',d:'レシートを撮るだけで記録。家族で同じ家計簿、月ごとのグラフも。',p:'じぶんアプリ',badge:''},
+    {k:'narai',e:'🎹',bg:'#ff7a6b',n:'習いごと',s:'習いごと',d:'きょうだいの習いごと・月謝・送迎の担当をひと目で。前の日にお知らせ。',p:'みんなで使う',badge:'2'},
+    {k:'coll',e:'🃏',bg:'#ffc93c',n:'コレクション',s:'図鑑',d:'カード・フィギュア・切手。持っている／欲しいを写真つきで。',p:'ちょこっと',badge:''},
+    {k:'tsuri',e:'🎣',bg:'#4aa3ff',n:'釣り日記',s:'釣り日記',d:'場所・天気・写真をその場で。地図で振り返り、よく釣れる条件も。',p:'じぶんアプリ',badge:''},
+    {k:'circle',e:'🏸',bg:'#8c6cf0',n:'サークル',s:'サークル',d:'練習の出欠をタップで。会費の集金状況もみんなで確認。',p:'みんなで使う',badge:'5'},
+    {k:'pet',e:'🐶',bg:'#ff9f43',n:'ペット日記',s:'ペット',d:'ごはん・散歩・体重・通院を家族で記録。ワクチンの時期にお知らせ。',p:'じぶんアプリ',badge:''},
+    {k:'recipe',e:'🍳',bg:'#ee5a8a',n:'わが家レシピ',s:'レシピ',d:'家の味を写真つきで保存。冷蔵庫の残りから作れる料理を探せる。',p:'じぶんアプリ',badge:''},
+    {k:'garden',e:'🌱',bg:'#5cb85c',n:'家庭菜園',s:'菜園',d:'種まき・水やり・収穫を記録。季節ごとの作業をお知らせ。',p:'ちょこっと',badge:''}
   ];
   const START=['kakei','narai','coll','pet'];
   const GENERIC=[{e:'⚙️',bg:'#9aa3ab',n:'設定'},{e:'🗺️',bg:'#9aa3ab',n:'マップ'},{e:'🕐',bg:'#9aa3ab',n:'時計'},{e:'📁',bg:'#9aa3ab',n:'ファイル'}];
@@ -322,19 +344,24 @@ body.my{background:var(--cream);background-image:radial-gradient(rgba(255,201,60
   function render(newKey){
     const mine=IDEAS.filter(i=>on.has(i.k)).slice(0,12);
     const gen=GENERIC.slice(0,Math.max(0,8-mine.length));
-    apps.innerHTML=mine.map(i=>'<div class="app mine'+(i.k===newKey?' new':'')+'"><span class="ic" style="background:'+i.bg+'">'+i.e+(i.badge?'<span class="dot">'+i.badge+'</span>':'')+'</span><span class="lb">'+esc(who())+'の'+i.n+'</span></div>').join('')+
+    apps.innerHTML=mine.map(i=>'<div class="app mine'+(i.k===newKey?' new':'')+'"><span class="ic" style="background:'+i.bg+'">'+i.e+(i.badge?'<span class="dot">'+i.badge+'</span>':'')+'</span><span class="lb">'+i.s+'</span></div>').join('')+
       gen.map(g=>'<div class="app" style="opacity:.75"><span class="ic" style="background:'+g.bg+'">'+g.e+'</span><span class="lb">'+g.n+'</span></div>').join('');
     wt.textContent=who()+'の家計ノート';
-    document.getElementById('homeRow').innerHTML=mine.map(i=>'<span class="ic'+(i.k===newKey?' new':'')+'" style="background:'+i.bg+'" title="'+esc(who())+'の'+i.n+'">'+i.e+'</span>').join('');
-    document.getElementById('homeCnt').textContent=mine.length+'こ';
+    document.getElementById('apps2').innerHTML=apps.innerHTML;
+    document.getElementById('homeCnt').textContent=esc(who())+'のホーム画面（'+mine.length+'こ）';
   }
   list.innerHTML=IDEAS.map(i=>'<button type="button" class="idea2" data-k="'+i.k+'" aria-pressed="'+on.has(i.k)+'"><span class="ic" style="background:'+i.bg+'">'+i.e+'</span><b>'+i.n+'</b><p>'+i.d+'</p><span class="add">'+(on.has(i.k)?'ホームに置いた':'ホームに置く')+'</span></button>').join('');
   list.addEventListener('click',e=>{const b=e.target.closest('.idea2');if(!b)return;const k=b.dataset.k;
     if(on.has(k)){on.delete(k);b.setAttribute('aria-pressed','false');b.querySelector('.add').textContent='ホームに置く';render()}
     else{on.add(k);b.setAttribute('aria-pressed','true');b.querySelector('.add').textContent='ホームに置いた';render(k);
-      document.getElementById('hint').textContent='「'+who()+'の'+IDEAS.find(i=>i.k===k).n+'」をホームに置きました。いくつ選んでも大丈夫です。'}});
+      const it=IDEAS.find(i=>i.k===k);
+      document.getElementById('hint').textContent='「'+who()+'の'+it.n+'」をホームに置きました。いくつ選んでも大丈夫です。';
+      const side=document.querySelector('.igrid .side').getBoundingClientRect();
+      if(side.bottom<0||side.top>innerHeight){/* スマホの絵が見えていないときだけ、上に小さく知らせる */
+        const t=document.getElementById('toast');t.innerHTML='<span class="ic" style="background:'+it.bg+'">'+it.e+'</span>'+esc(who())+'のホーム画面に「'+it.n+'」を置きました';
+        t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}}});
   nm.addEventListener('input',()=>render());
-  try{const t=new Date();document.getElementById('clock').textContent=t.getHours()+':'+String(t.getMinutes()).padStart(2,'0')}catch(_){}
+  try{const t=new Date();const hm=t.getHours()+':'+String(t.getMinutes()).padStart(2,'0');document.getElementById('clock').textContent=hm;document.querySelectorAll('.clk').forEach(c=>c.textContent=hm)}catch(_){}
   render();
 })();
 
