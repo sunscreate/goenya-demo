@@ -236,3 +236,7 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
   .apphero .phone{max-width:240px}
 }
 @media (max-width:860px){.hero-figs figcaption{padding-right:36%}}
+
+/* 月額プラン：はじめの費用を見やすく */
+.plan .init{margin:8px 0 4px;font-size:15px;color:var(--sub)}
+.plan .init b{color:var(--ink);font:700 17px var(--mono);font-variant-numeric:tabular-nums}
