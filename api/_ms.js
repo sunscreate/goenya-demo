@@ -123,16 +123,20 @@ async function syncInbox(acc, maxAi = 5) {
   const token = await accessToken(acc.id);
   const since = new Date(Math.min(Date.now() - 60 * 60 * 1000, acc.last_sync ? new Date(acc.last_sync).getTime() - 60 * 60 * 1000 : Date.now() - 24 * 60 * 60 * 1000)).toISOString();
   const folders = await watchFolders(token);
+  const errs = [];
   let n = 0, ai = 0;
   for (const f of ['inbox', 'junkemail']) {
-    const l = await graph(token, `/me/mailFolders/${f}/messages?$select=id&$top=25&$orderby=receivedDateTime desc&$filter=receivedDateTime ge ${since}`).catch(() => null);
-    for (const x of (l?.value || []).reverse()) {
-      const r = await importMessage(acc, token, x.id, ai < maxAi, folders);
-      if (r && !r.duplicate) { n++; ai++; }
+    const l = await graph(token, `/me/mailFolders/${f}/messages?$select=id,receivedDateTime&$top=25&$filter=${encodeURIComponent(`receivedDateTime ge ${since}`)}`).catch((e) => { errs.push(`${f}: ${e.message}`); return null; });
+    const items = (l?.value || []).sort((a, b) => String(a.receivedDateTime).localeCompare(String(b.receivedDateTime)));
+    for (const x of items) {
+      try {
+        const r = await importMessage(acc, token, x.id, ai < maxAi, folders);
+        if (r && !r.duplicate) { n++; ai++; }
+      } catch (e) { errs.push(`取り込み: ${e.message}`); }
     }
   }
-  await sb(`ms_accounts?id=eq.${acc.id}`, ADMIN, { method: 'PATCH', body: JSON.stringify({ last_sync: new Date().toISOString() }) });
-  return { imported: n, token };
+  await sb(`ms_accounts?id=eq.${acc.id}`, ADMIN, { method: 'PATCH', body: JSON.stringify({ last_sync: new Date().toISOString(), last_error: errs.join(' / ').slice(0, 300) }) });
+  return { imported: n, token, errors: errs, folders: folders.length };
 }
 
 /** 返事をしたあとも処理を続ける（Vercel の waitUntil。使えなければ待ってから返す） */
