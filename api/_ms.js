@@ -121,16 +121,19 @@ async function importMessage(acc, token, msgId, runAi = true, folders = null) {
 /** 受信箱の最近のメールを確かめて、まだのものを取り込む（通知のとりこぼし対策） */
 async function syncInbox(acc, maxAi = 5) {
   const token = await accessToken(acc.id);
-  const since = new Date(Math.min(Date.now() - 60 * 60 * 1000, acc.last_sync ? new Date(acc.last_sync).getTime() - 60 * 60 * 1000 : Date.now() - 24 * 60 * 60 * 1000)).toISOString();
+  const since = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(); // 直近2日（取り込み済みは飛ばす）
   const folders = await watchFolders(token);
   const errs = [];
   const listed = {};
   let n = 0, ai = 0;
   for (const f of ['inbox', 'junkemail']) {
     // 新しい順に25通を見て、時刻で絞る（$filter は環境によって効かないことがあるため）
-    const l = await graph(token, `/me/mailFolders/${f}/messages?$select=id,receivedDateTime&$top=25&$orderby=receivedDateTime%20desc`).catch((e) => { errs.push(`${f}: ${e.message}`); return null; });
+    const l = await graph(token, `/me/mailFolders/${f}/messages?$select=id,receivedDateTime,internetMessageId&$top=25&$orderby=receivedDateTime%20desc`).catch((e) => { errs.push(`${f}: ${e.message}`); return null; });
     listed[f] = (l?.value || []).length;
-    const items = (l?.value || []).filter((x) => String(x.receivedDateTime) >= since).sort((a, b) => String(a.receivedDateTime).localeCompare(String(b.receivedDateTime)));
+    const recent = (l?.value || []).filter((x) => new Date(x.receivedDateTime).getTime() >= new Date(since).getTime());
+    const mids = recent.map((x) => x.internetMessageId).filter(Boolean);
+    const have = mids.length ? new Set((await sb(`emails?company_id=eq.${acc.company_id}&message_id=in.(${mids.map((x) => `"${String(x).replace(/"/g, '')}"`).map(encodeURIComponent).join(',')})&select=message_id`, ADMIN)).map((e) => e.message_id)) : new Set();
+    const items = recent.filter((x) => !have.has(x.internetMessageId)).sort((a, b) => String(a.receivedDateTime).localeCompare(String(b.receivedDateTime)));
     for (const x of items) {
       try {
         const r = await importMessage(acc, token, x.id, ai < maxAi, folders);
