@@ -1,1 +1,1 @@
-{"cleanUrls":false,"trailingSlash":true,"functions":{"api/mail-in.js":{"maxDuration":120},"api/mail-ai.js":{"maxDuration":120},"api/task-ai.js":{"maxDuration":90},"api/doc-ai.js":{"maxDuration":90}}}
+{"cleanUrls":false,"trailingSlash":true,"functions":{"api/mail-in.js":{"maxDuration":120},"api/mail-ai.js":{"maxDuration":120},"api/task-ai.js":{"maxDuration":90},"api/doc-ai.js":{"maxDuration":90},"api/ms.js":{"maxDuration":300},"api/ms-callback.js":{"maxDuration":30}},"crons":[{"path":"/api/ms/?op=renew","schedule":"10 18 * * *"}]}
