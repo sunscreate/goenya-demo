@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="マワリテは、ビルメンテナンス会社のための業務システムです。お客様からのメールが届くと、AIが内容を読んで見積・業者への依頼・返信の下書きまで準備。社員は確かめて決めるだけ。協力業者の日程・完了報告・お支払いの確認もスマホで。">
+<title>マワリテ｜ビルメンテナンス会社のための業務システム | Sun'sCreate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500;700&display=swap">
+<link rel="stylesheet" href="site.css">
+<style>
+/* マワリテのページだけの見た目（色はサイト共通の変数を使う＝ダークモードでも読める） */
+.mw-accent{--mw:#2f6fe4}
+.mwhero{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center}
+.mwhero>*{min-width:0}
+.mwhero h1{font:400 clamp(28px,3.6vw,42px)/1.35 var(--display);letter-spacing:.03em;margin-top:14px}
+.mwhero h1 .nb{display:inline-block;white-space:nowrap}
+.mwhero h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--signal) 62%)}
+.mwvis{position:relative;padding:0 0 40px 0}
+.bwin{border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:var(--card);box-shadow:0 22px 50px rgba(20,30,40,.18)}
+.bwin .bar{display:flex;gap:6px;align-items:center;padding:8px 12px;background:color-mix(in srgb,var(--ink) 8%,var(--card));border-bottom:1px solid var(--rule)}
+.bwin .bar i{width:10px;height:10px;border-radius:50%;background:var(--rule)}
+.bwin .bar span{margin-left:8px;font:500 12px var(--mono);color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bwin img{display:block;width:100%;height:auto}
+.mwvis .ph{position:absolute;right:-6px;bottom:0;width:31%;border-radius:18px;border:4px solid var(--ink);box-shadow:0 18px 40px rgba(20,30,40,.25);background:var(--card)}
+.mwvis .ph img{display:block;width:100%;height:auto;border-radius:14px}
+.mwvis .tagai{position:absolute;left:14px;top:-14px;background:var(--ink);color:var(--paper);font:700 13px var(--body);padding:6px 12px;border-radius:999px;box-shadow:0 8px 20px rgba(0,0,0,.18)}
+.mwvis .tagai b{color:var(--signal)}
+
+.pains{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:28px}
+.pain{background:var(--card);border:1px solid var(--rule);border-radius:8px;padding:18px 20px;display:grid;gap:10px;min-width:0}
+.pain .q{font-weight:700;font-size:17px;display:flex;gap:10px;align-items:flex-start}
+.pain .q::before{content:"！";flex:0 0 26px;height:26px;border-radius:50%;background:color-mix(in srgb,#d93a2b 14%,var(--card));color:#d93a2b;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.pain .a{font-size:15px;color:var(--sub);padding-left:36px;position:relative}
+.pain .a::before{content:"→";position:absolute;left:10px;color:var(--steel);font-weight:700}
+.pain .a b{color:var(--ink)}
+
+.flow5{list-style:none;margin:30px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:12px;counter-reset:f}
+.flow5 li{counter-increment:f;position:relative;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:16px 14px 14px;min-width:0;display:grid;gap:6px;align-content:start}
+.flow5 li::before{content:counter(f);width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);display:inline-flex;align-items:center;justify-content:center;font:700 15px var(--mono)}
+.flow5 li:not(:last-child)::after{content:"";position:absolute;right:-11px;top:28px;width:10px;height:10px;border-top:2.5px solid var(--steel);border-right:2.5px solid var(--steel);transform:rotate(45deg)}
+.flow5 b{font-size:16px;line-height:1.5}
+.flow5 span{font-size:14px;color:var(--sub);line-height:1.7}
+.who{display:inline-flex;align-items:center;gap:6px;font:700 12px var(--body);padding:2px 9px;border-radius:999px;width:max-content}
+.who.ai{background:#efe9ff;color:#5b3cc4}.who.me{background:#e6f0ff;color:#1f55b8}.who.vd{background:#e5f6ec;color:#1d7a45}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .who.ai{background:#2c2443;color:#c9b8ff}:root:not([data-theme="light"]) .who.me{background:#1d2b44;color:#a9c6ff}:root:not([data-theme="light"]) .who.vd{background:#1b3527;color:#9fe0b8}}
+
+.zig{display:grid;gap:64px;margin-top:40px}
+.zrow{display:grid;grid-template-columns:1fr 1.2fr;gap:40px;align-items:center}
+.zrow>*{min-width:0}
+.zrow.rev>.ztxt{order:2}
+.ztxt .num{font:700 14px var(--mono);color:var(--steel);letter-spacing:.12em}
+.ztxt h3{font:400 clamp(22px,2.8vw,28px)/1.4 var(--display);letter-spacing:.03em;margin:6px 0 10px}
+.ztxt p{margin:0 0 10px;color:var(--sub)}
+.ztxt .chk li{font-size:15px}
+.twoph{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:520px;justify-self:center;width:100%}
+.twoph figure{margin:0;display:grid;gap:8px}
+.twoph img{display:block;width:100%;height:auto;border-radius:16px;border:4px solid var(--ink);box-shadow:0 14px 30px rgba(20,30,40,.18)}
+.twoph figure:last-child{margin-top:34px}
+.twoph figcaption{font-size:13px;color:var(--sub);text-align:center}
+.notif{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:10px 12px;box-shadow:0 10px 24px rgba(20,30,40,.12);margin:14px 0 4px;max-width:420px}
+.notif .ic{position:relative;flex:0 0 40px;height:40px;border-radius:10px;background:#2f6fe4;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.notif .ic::after{content:"3";position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;border-radius:9px;background:#d93a2b;color:#fff;font:700 11px/18px var(--mono);text-align:center;border:2px solid var(--card)}
+.notif small{display:block;color:var(--sub);font-size:12px}
+.notif b{font-size:14px}
+
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.trust>div{background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--signal);padding:20px;min-width:0;display:grid;gap:6px;align-content:start}
+.trust h3{font-size:18px}
+.trust p{margin:0;font-size:15px;color:var(--sub)}
+
+.env{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.env span{background:var(--card);border:1px solid var(--rule);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:700}
+
+.intro{list-style:none;margin:24px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid var(--ink);background:var(--card);counter-reset:s}
+.intro li{counter-increment:s;padding:18px;border-right:1px solid var(--rule);min-width:0}
+.intro li:last-child{border-right:0}
+.intro li::before{content:"STEP " counter(s);display:block;font:700 13px var(--mono);letter-spacing:.12em;color:var(--steel);margin-bottom:6px}
+.intro b{display:block;font-size:17px}
+.intro span{color:var(--sub);font-size:14px}
+
+@media (max-width:900px){
+  .mwhero,.zrow{grid-template-columns:1fr}
+  .zrow.rev>.ztxt{order:0}
+  .flow5{grid-template-columns:1fr;gap:14px}
+  .flow5 li{grid-template-columns:30px 1fr;column-gap:12px}
+  .flow5 li>*{grid-column:2}
+  .flow5 li::before{grid-row:1/span 3;grid-column:1}
+  .flow5 li:not(:last-child)::after{right:auto;left:24px;top:auto;bottom:-13px;transform:rotate(135deg)}
+  .trust,.pains{grid-template-columns:1fr}
+  .intro{grid-template-columns:1fr 1fr}.intro li{border-bottom:1px solid var(--rule)}
+}
+@media (max-width:480px){.intro{grid-template-columns:1fr}.intro li{border-right:0}.mwvis .ph{width:34%}}
+</style>
+</head>
+<body class="mw-accent">
+<header><div class="wrap hbar">
+  <a class="brand" href="index.html">Sun'sCreate<small>システム・アプリ制作</small></a>
+  <nav class="nav" aria-label="サイト内"><a class="lnkp" href="myapp.html">個人のアプリ</a><a class="lnkp" href="works.html">制作事例</a><a class="lnkp" href="sonoba.html" aria-current="page">自社アプリ</a><a class="lnkp" href="price.html">料金</a></nav>
+  <a class="btn sm hdr-cta" href="index.html#contact">相談する</a>
+</div></header>
+<main>
+
+<section class="phead" style="padding-bottom:56px"><div class="wrap">
+  <p class="crumb"><a href="index.html">ホーム</a> ／ <a href="sonoba.html">自社アプリ</a> ／ マワリテ</p>
+  <div class="mwhero">
+    <div>
+      <span class="badge">ビルメンテナンス会社のための業務システム</span>
+      <h1><span class="nb">メールが届いたら、</span><span class="nb"><em>AIが先回り。</em></span></h1>
+      <p class="lead">「マワリテ」は、お客様からのメールをAIが読み、<b>見積・協力業者への依頼・返信の下書き</b>までそろえておくシステムです。社員は中身を確かめて「これでいこう」と決めるだけ。業者さんとの日程・完了報告・お支払いの確認も、スマホでつながります。</p>
+      <div class="ctas" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:24px">
+        <a class="btn" href="index.html#contact">画面を見ながら相談する（無料）</a>
+        <a class="btn ghost" href="#flow">しくみを見る</a>
+      </div>
+      <p class="proof"><span>Outlook（Microsoft 365）のまま使える</span><span>業者さんは <b>アプリのインストール不要</b></span><span>パソコン・スマホ</span></p>
+    </div>
+    <div class="mwvis">
+      <div class="bwin"><div class="bar"><i></i><i></i><i></i><span>マワリテ ／ タスク</span></div><img src="img/mw_task.jpg" width="1280" height="800" alt="メールから作られたタスクの画面。AIが内容の要約、次に決めること、確認が必要なこと、依頼先の候補を準備している"></div>
+      <div class="ph"><img src="img/mw_vhome.jpg" width="780" height="1328" alt="協力業者のスマホ画面。日程を決めていない依頼の件数とカレンダー"></div>
+      <span class="tagai"><b>AI</b> が準備ずみ</span>
+    </div>
+  </div>
+</div></section>
+
+<section style="background:var(--card);border-block:1px solid var(--rule)"><div class="wrap">
+  <p class="tag">PROBLEM</p>
+  <h2>こんなこと、ありませんか？</h2>
+  <div class="pains">
+    <div class="pain"><p class="q">メールが多くて、返事や見積が後回しになる</p><p class="a">届いたメールは <b>自動でタスク</b> に。AIが要点・次にやること・返信の下書きを用意して待っています。</p></div>
+    <div class="pain"><p class="q">業者さんとの日程調整が電話とFAXの往復</p><p class="a">依頼を出すと業者さんのスマホに <b>通知とメール</b>。日程は業者さんが画面で決め、こちらのカレンダーにも入ります。</p></div>
+    <div class="pain"><p class="q">完了報告の確認と、お客様への送付がたまる</p><p class="a">報告書と写真は <b>AIが先に確認</b>。不足があれば対処を提案し、業者さんに再報告を頼めます。</p></div>
+    <div class="pain"><p class="q">月末、業者さんへの支払いの集計に追われる</p><p class="a">作業の金額は <b>月ごとに自動で集計</b>。業者さんも自分のページで内訳を確認できます。</p></div>
+  </div>
+</div></section>
+
+<section id="flow"><div class="wrap">
+  <p class="tag">HOW IT WORKS</p>
+  <h2>メール1通から、支払いまで。</h2>
+  <p class="lead">マワリテは「AIが準備して、人が決める」のくり返しです。だれが何をするかを色で分けました。</p>
+  <ol class="flow5">
+    <li><span class="who ai">AI</span><b>メールを読んでタスクに</b><span>お客様・物件を見分け、要点と次にやることをまとめます</span></li>
+    <li><span class="who ai">AI</span><b>見積と返信を下書き</b><span>過去の見積や単価をもとに、見積・返信・業者への依頼文を用意</span></li>
+    <li><span class="who me">社員</span><b>確かめて決める</b><span>直して「これでいこう」。金額によって上司の承認にも回せます</span></li>
+    <li><span class="who vd">業者</span><b>スマホで日程と報告</b><span>依頼が届いたら日程を決め、作業後は写真と報告書を送るだけ</span></li>
+    <li><span class="who ai">AI</span><span class="who me">社員</span><b>確認して客先へ</b><span>AIが報告書を確認、社員が客先へ送付。支払いは月ごとに集計</span></li>
+  </ol>
+</div></section>
+
+<section style="background:var(--card);border-block:1px solid var(--rule)"><div class="wrap">
+  <p class="tag">FEATURES</p>
+  <h2>画面で見る、マワリテ</h2>
+  <p class="lead">画面の内容はすべて架空のデータです。</p>
+  <div class="zig">
+
+    <div class="zrow">
+      <div class="ztxt">
+        <p class="num">01 ／ 社員専属のAI</p>
+        <h3>届いたメールは、準備ができた状態で待っている</h3>
+        <p>Outlookに届いたお客様のメールを、AIがその場で読みます。誰からの、どの物件の、何の話かを整理して、次に決めることと返信の下書きをタスクに添えておきます。</p>
+        <ul class="chk"><li>電話・対面・社内の依頼・定期契約からもタスクに</li><li>「もう少し丁寧に」など、ことばでAIに指示できる</li><li>担当の振り分け・上司への承認もタスクの中で</li></ul>
+      </div>
+      <div class="bwin"><div class="bar"><i></i><i></i><i></i><span>タスク ／ AIの準備</span></div><img src="img/mw_task.jpg" width="1280" height="800" alt="タスクの画面。AIの準備として要約・次に決めること・確認が必要なことが並ぶ" loading="lazy"></div>
+    </div>
+
+    <div class="zrow rev">
+      <div class="ztxt">
+        <p class="num">02 ／ 発注カード</p>
+        <h3>業者さんへの依頼は、カード1枚で</h3>
+        <p>見積から発注カードを作ると、オーナー・管理会社・作業の種別・担当者などの項目はAIが下書きします。「正式発注」を押せば、業者さんのページに表示され、お知らせのメールと通知が届きます。</p>
+        <ul class="chk"><li>物件の情報（オートロックなど）を業者さんに共有</li><li>鍵の番号などは作業日の前後だけ表示し、見た記録を残す</li><li>決まった日程は業者さんのGoogleカレンダーにも入る</li></ul>
+      </div>
+      <div class="bwin"><div class="bar"><i></i><i></i><i></i><span>発注 ／ 受水槽清掃</span></div><img src="img/mw_order.jpg" width="1280" height="800" alt="発注カードの画面。協力業者・物件・作業内容・支払額と、依頼カードの項目" loading="lazy"></div>
+    </div>
+
+    <div class="zrow">
+      <div class="ztxt">
+        <p class="num">03 ／ 協力業者のページ</p>
+        <h3>業者さんは、スマホひとつで</h3>
+        <p>業者さんには、招待のメールを送るだけ。メールアドレスとパスワードを決めれば、すぐに使えます。アプリストアからのインストールは不要で、ホーム画面に置けばアプリのように開けます。</p>
+        <div class="notif" aria-hidden="true"><span class="ic">マ</span><div><small>マワリテ・いま</small><b>新しいお仕事のご依頼</b><small>テストハイツ1号館：受水槽清掃</small></div></div>
+        <ul class="chk"><li>依頼が来ると通知。アイコンに未対応の件数</li><li>カレンダーで予定を確認、日程は画面で決める</li><li>月ごとのお支払いの内訳を確認、CSV・PDFで保存</li></ul>
+      </div>
+      <div class="twoph">
+        <figure><img src="img/mw_vhome.jpg" width="780" height="1328" alt="業者さんのホーム。日程を決めていない依頼の案内とカレンダー" loading="lazy"><figcaption>予定と依頼</figcaption></figure>
+        <figure><img src="img/mw_vorder.jpg" width="780" height="1328" alt="業者さんが見る依頼の詳細。住所・日程・オートロック・建物の情報・お支払い額" loading="lazy"><figcaption>依頼の中身</figcaption></figure>
+      </div>
+    </div>
+
+    <div class="zrow rev">
+      <div class="ztxt">
+        <p class="num">04 ／ 完了報告</p>
+        <h3>報告書は、AIが先に目を通す</h3>
+        <p>業者さんが写真と報告書を送ると、担当者に「完了報告の確認」タスクが上がります。AIが中身を読み、日付のずれや写真の不足など気になる点と、その対処を提案します。</p>
+        <ul class="chk"><li>不足があれば、理由をつけて業者さんに再報告を依頼</li><li>問題なければ、報告書を添えて客先へ送付</li><li>決めたフォルダのルールで、社内データに保存</li></ul>
+      </div>
+      <div class="bwin"><div class="bar"><i></i><i></i><i></i><span>完了報告 ／ AIの確認</span></div><img src="img/mw_vreport.jpg" width="1280" height="374" alt="AIの確認の画面。確かめたほうがよい点と、対処の提案、次にすること" loading="lazy"></div>
+    </div>
+
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="tag">TRUST</p>
+  <h2>AIは準備まで。決めるのは人。</h2>
+  <p class="lead">お客様や業者さんとのやりとりは、会社の信用そのものです。マワリテは、大事なところを必ず人の手に残す作りにしています。</p>
+  <div class="trust">
+    <div><h3>勝手に送らない</h3><p>メールの送信・発注・承認は、すべて社員がボタンを押してから。AIの下書きは、自由に直せます。</p></div>
+    <div><h3>見せる情報をしぼる</h3><p>業者さんに見えるのは、自分への依頼だけ。鍵や口座の番号は必要なときだけ表示し、見た記録が残ります。</p></div>
+    <div><h3>いつもの道具のまま</h3><p>メールは今のOutlookのまま。保存先のフォルダも、会社で決めた場所とルールにそろえられます。</p></div>
+  </div>
+  <div class="env" aria-label="つながるもの"><span>Outlook（Microsoft 365）</span><span>Googleカレンダー</span><span>iPhone・Android</span><span>Windows・Mac</span><span>見積書・請求書のExcel書式</span></div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <p class="tag">START</p>
+  <h2>導入の進め方</h2>
+  <ol class="intro">
+    <li><b>お話をうかがう</b><span>今の仕事の流れ、使っている書式やメールを教えてください</span></li>
+    <li><b>画面で確かめる</b><span>御社の書式・ことばに合わせた画面を、触って確かめられます</span></li>
+    <li><b>少しずつ始める</b><span>まずは社員数名と、よく頼む業者さんから</span></li>
+    <li><b>使いながら直す</b><span>月々の保守の中で、使いにくいところを直していきます</span></li>
+  </ol>
+  <div class="calc">
+    <span class="tag" style="margin:0">料金</span>
+    <p class="n" style="font-size:26px">はじめの費用 ＋ 月々の保守</p>
+    <small>社員の人数や、つなぐもの（Outlook・カレンダーなど）によってお見積りします。画面を見ていただいてからのご判断で大丈夫です。まずはお気軽にご相談ください。</small>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <p class="tag">FAQ</p>
+  <h2>よくあるご質問</h2>
+  <div class="faq" style="margin-top:18px">
+    <details><summary>今のOutlookのメールアドレスのまま使えますか？</summary><p>使えます。社員それぞれがMicrosoftのアカウントでマワリテとつなぐと、届いたメールがタスクになり、マワリテからの送信も本人のOutlookから送られます。</p></details>
+    <details><summary>AIが間違ったことを書いたら？</summary><p>AIが作るのは下書きと提案だけで、送る・決めるのは社員です。下書きは自由に直せますし、「この業者さんにも聞いて」のように、ことばで指示し直すこともできます。</p></details>
+    <details><summary>協力業者さんは、何か準備が必要ですか？</summary><p>スマホかパソコンと、メールアドレスがあれば大丈夫です。招待のメールからパスワードを決めるだけで使えます。アプリストアからのインストールはいりません。</p></details>
+    <details><summary>パソコンが苦手な社員でも使えますか？</summary><p>ボタンや言葉はできるだけ現場で使うことばにしています。導入のときに、御社の仕事の流れに合わせて画面や言葉を調整します。</p></details>
+    <details><summary>今の見積書・請求書の書式は使えますか？</summary><p>Excelの書式を読み込んで使えます。メールの署名も、担当者ごとに設定できます。</p></details>
+  </div>
+</div></section>
+
+<section class="contact"><div class="wrap">
+  <h2>まずは画面を見ながら、お話ししませんか</h2>
+  <p class="lead">マワリテは、ビルメンテナンスの現場に10年以上たずさわってきた Sun'sCreate が、自分たちの困りごとから作りました。御社の流れに合うかどうか、実際の画面でご覧いただけます。</p>
+  <div class="cbox"><a class="btn" href="index.html#contact">無料で相談する</a><a class="btn ghost" href="works.html">ほかの制作事例を見る</a></div>
+</div></section>
+</main>
+<footer><div class="wrap">© Sun'sCreate　画面の内容はすべて架空のデータです。</div></footer>
+</body>
+</html>
