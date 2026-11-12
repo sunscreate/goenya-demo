@@ -2,9 +2,11 @@
 //   POST ?op=invite { vendor_id, email }      → 社内の人が招待リンクを作る（メールは画面から本人の Outlook で送る）
 //   POST ?op=peek   { token }                 → リンクを開いた業者に、どの会社からの招待かを見せる（ログイン不要）
 //   POST ?op=accept { token, email, password } → 業者がメールアドレスとパスワードを決めて登録し、業者として会社に加わる（ログイン不要）
+//   POST ?op=notify_order { order_id }        → 正式発注のお知らせメール（本人の Outlook から自動送信。つながっていなければ文面だけ返す）
 // 環境変数：SUPABASE_SERVICE_KEY
 const crypto = require('crypto');
 const { sb, getUser, body, ADMIN } = require('./_ai');
+const ms = require('./_ms');
 
 const SB_URL = process.env.SUPABASE_URL || 'https://enwpymkodwogyfegbfsq.supabase.co';
 const BASE = process.env.APP_URL || 'https://mawarite.vercel.app';
@@ -33,7 +35,63 @@ async function linkVendor(inv, uid) {
   await sb(`vendor_invites?id=eq.${inv.id}`, ADMIN, { method: 'PATCH', body: JSON.stringify({ used_at: new Date().toISOString() }) });
 }
 
+/** 招待リンクを作る（前の未使用の招待は消す） */
+async function makeInvite(v, email, uid) {
+  const raw = crypto.randomBytes(32).toString('base64url');
+  await sb(`vendor_invites?vendor_id=eq.${v.id}&used_at=is.null`, ADMIN, { method: 'DELETE' });
+  await sb('vendor_invites', ADMIN, { method: 'POST', body: JSON.stringify({ company_id: v.company_id, vendor_id: v.id, email, token_hash: hash(raw), created_by: uid }) });
+  return `${BASE}/vendor/join/?t=${raw}`;
+}
+
+const jst = (t) => (t ? new Date(t).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '');
+
+/** 正式発注のお知らせメールの文面 */
+function orderMail(o, v, company, joinUrl) {
+  const link = `${BASE}/vendor/order/?id=${o.company_id}&o=${o.id}`;
+  const lines = [
+    `${v.name} 御中`, '', `いつもお世話になっております。${company}です。`, '新しいお仕事のご依頼がありました。内容をマワリテでご確認ください。', '',
+    `■ 物件：${o.property_name || '（マワリテでご確認ください）'}`, `■ 作業：${o.work}`,
+  ];
+  if (o.start_at) lines.push(`■ 日程（予定）：${jst(o.start_at)}`);
+  lines.push('', joinUrl
+    ? `▼ はじめての方は、下のリンクからメールアドレスとパスワードを決めてご登録ください（期限14日）\n${joinUrl}\n\n登録後、ご依頼の内容・日程のご連絡・完了報告がマワリテでできます。`
+    : `▼ ご依頼の内容を見る・日程を連絡する\n${link}`);
+  lines.push('', 'ご不明な点がございましたら、このメールにご返信ください。', 'どうぞよろしくお願いいたします。');
+  return { to: v.email, subject: `【マワリテ】${company}から仕事のご依頼がありました（${o.property_name || o.work}）`, body: lines.join('\n') };
+}
+
 const ops = {
+  async notify_order(req, res) {
+    const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+    const u = token ? await getUser(token) : null;
+    if (!u?.id) throw fail(401, 'ログインしてください');
+    const oid = encodeURIComponent(String(body(req).order_id || ''));
+    // 本人の権限で見える発注か（＝その会社の社員か）
+    const [o] = await sb(`orders?id=eq.${oid}&select=id,company_id,vendor_id,task_id,status,work,property_name,start_at,companies(name)`, token);
+    if (!o) throw fail(404, '発注が見つかりません');
+    const [me] = await sb(`memberships?company_id=eq.${o.company_id}&user_id=eq.${u.id}&select=role`, token);
+    if (!me || me.role === 'vendor') throw fail(403, '社内の人だけが送れます');
+    if (['draft', 'cancelled'].includes(o.status)) throw fail(409, 'まだ正式に発注していません');
+    const [v] = await sb(`vendors?id=eq.${o.vendor_id}&select=id,company_id,name,email,user_id`, ADMIN);
+    if (!v?.email || !okMail(v.email)) return res.status(200).json({ sent: false, reason: 'no_email' });
+    const joinUrl = v.user_id ? '' : await makeInvite(v, v.email.toLowerCase(), u.id);
+    const mail = orderMail(o, v, o.companies?.name || '', joinUrl);
+    const [acc] = await sb(`ms_accounts?user_id=eq.${u.id}&select=id,active,ms_email`, ADMIN);
+    let sent = false;
+    let from = '';
+    if (acc?.active) {
+      try {
+        const at = await ms.accessToken(acc.id);
+        await ms.graph(at, '/me/sendMail', { method: 'POST', body: JSON.stringify({ message: { subject: mail.subject, body: { contentType: 'Text', content: mail.body }, toRecipients: [{ emailAddress: { address: mail.to } }] }, saveToSentItems: true }) });
+        sent = true; from = acc.ms_email || '';
+      } catch (_) { /* 送れなければ画面から送ってもらう */ }
+    }
+    if (sent && o.task_id) {
+      await sb('task_events', ADMIN, { method: 'POST', body: JSON.stringify({ company_id: o.company_id, task_id: o.task_id, actor: u.id, type: 'mail_sent', body: mail.subject, data: { to: mail.to, subject: mail.subject, order_id: o.id } }) });
+    }
+    return res.status(200).json({ sent, from, mail, invited: !!joinUrl });
+  },
+
   async invite(req, res) {
     const token = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
     const u = token ? await getUser(token) : null;
@@ -46,12 +104,10 @@ const ops = {
     if (!v) throw fail(404, '業者が見つかりません');
     const [me] = await sb(`memberships?company_id=eq.${v.company_id}&user_id=eq.${u.id}&select=role`, token);
     if (!me || !['admin', 'approver', 'staff'].includes(me.role)) throw fail(403, '招待できるのは社内の人だけです');
-    const raw = crypto.randomBytes(32).toString('base64url');
     // 前に送った、まだ使われていない招待は無効にする（リンクは常に最新の1つだけ）
-    await sb(`vendor_invites?vendor_id=eq.${v.id}&used_at=is.null`, ADMIN, { method: 'DELETE' });
-    await sb('vendor_invites', ADMIN, { method: 'POST', body: JSON.stringify({ company_id: v.company_id, vendor_id: v.id, email, token_hash: hash(raw), created_by: u.id }) });
+    const url = await makeInvite(v, email, u.id);
     if (!v.email) await sb(`vendors?id=eq.${v.id}`, ADMIN, { method: 'PATCH', body: JSON.stringify({ email }) });
-    return res.status(200).json({ url: `${BASE}/vendor/join/?t=${raw}`, email, vendor: v.name, company: v.companies?.name || '' });
+    return res.status(200).json({ url, email, vendor: v.name, company: v.companies?.name || '' });
   },
 
   async peek(req, res) {
@@ -101,3 +157,4 @@ module.exports = async (req, res) => {
   }
 };
 module.exports.hash = hash;
+module.exports.orderMail = orderMail;
