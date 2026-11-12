@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><title>relay</title><body>…
+<script>
+(async()=>{const f=new URLSearchParams(location.search).get('f');if(!/^[\w.-]+\.mp4$/.test(f))return;
+const buf=await (await fetch(f)).arrayBuffer();let ack=false;
+addEventListener('message',e=>{if(e.data==='relay-ack'){ack=true;document.body.textContent='ok';setTimeout(()=>close(),500)}});
+for(let i=0;i<40&&!ack;i++){window.opener&&window.opener.postMessage({relay:f,buf},'*');await new Promise(r=>setTimeout(r,500));}
+})();
+</script>
