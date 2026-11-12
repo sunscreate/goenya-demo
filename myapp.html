@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="みんなのアプリじゃなく、自分だけのアプリ。家計・習いごと・趣味の記録・サークルの出欠など、あなたの使い方に合わせて作ります。はじめ9,800円・月980円から。完成イメージの試作までは無料。">
-<meta property="og:title" content="みんなのアプリじゃなく、自分だけのアプリ。｜Sun'sCreate">
+<meta name="description" content="アプリのしたてや｜みんなのアプリじゃなく、自分だけのアプリ。家計・習いごと・趣味の記録・サークルの出欠など、あなたの使い方に合わせて作ります。はじめ9,800円・月980円から。完成イメージの試作までは無料。">
+<meta property="og:title" content="アプリのしたてや｜自分だけのアプリ、仕立てます">
 <meta property="og:description" content="はじめ9,800円・月980円から。完成イメージの試作までは無料。">
-<title>自分だけのアプリ、作ります｜Sun'sCreate</title>
+<title>アプリのしたてや｜自分だけのアプリ、仕立てます（Sun'sCreate）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
@@ -22,6 +22,9 @@
 :root{--bg2:#f6f4ef;--ink3:#1f2a33;--sub2:#5f6b74;--line2:#e2ded5;--acc2:#c8553d;--acc2-bg:#f7e9e4;--ok2:#2f7d6b;--ok2-bg:#e6f1ee}
 body.my{background:var(--bg2)}
 .my .h-font{font-family:"Zen Kaku Gothic New",var(--body)}
+.shmk{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin:0 0 14px}
+.shmk .nm{font:900 clamp(20px,2.6vw,26px)/1.2 "Zen Kaku Gothic New",var(--body);color:var(--ink3);letter-spacing:.06em;padding-bottom:6px;background:repeating-linear-gradient(90deg,var(--acc2) 0 8px,transparent 8px 13px) left bottom/100% 2px no-repeat}
+.shmk .by{font:700 12.5px var(--mono);letter-spacing:.12em;color:var(--sub2)}
 .eyebrow{display:inline-block;font:700 12.5px var(--mono);letter-spacing:.16em;color:var(--acc2);margin-bottom:12px}
 .sec-h{font:900 clamp(26px,3.6vw,38px)/1.35 "Zen Kaku Gothic New",var(--body);letter-spacing:.02em;margin:0 0 12px;color:var(--ink3)}
 .lead2{color:var(--sub2);font-size:16.5px;max-width:40em;line-height:1.9}
@@ -136,13 +139,13 @@ body.my{background:var(--bg2)}
 <body class="my">
 <header><div class="wrap hbar">
   <a class="brand" href="index.html">Sun'sCreate<small>システム・アプリ制作</small></a>
-  <nav class="nav" aria-label="サイト内"><a class="lnkp" href="myapp.html" aria-current="page">個人のアプリ</a><a class="lnkp" href="mawarite.html">マワリテ</a><a class="lnkp" href="works.html">制作事例</a><a class="lnkp" href="sonoba.html">自社アプリ</a><a class="lnkp" href="price.html">料金</a></nav>
+  <nav class="nav" aria-label="サイト内"><a class="lnkp" href="myapp.html" aria-current="page">アプリのしたてや</a><a class="lnkp" href="mawarite.html">マワリテ</a><a class="lnkp" href="works.html">制作事例</a><a class="lnkp" href="sonoba.html">自社アプリ</a><a class="lnkp" href="price.html">料金</a></nav>
   <a class="btn sm hdr-cta" href="#contact">相談する</a>
 </div></header>
 <main id="top">
 
 <section class="top"><div class="wrap">
-  <span class="eyebrow">FOR YOU ／ 個人のかたへ</span>
+  <p class="shmk" aria-label="アプリのしたてや"><span class="nm">アプリのしたてや</span><span class="by">by Sun'sCreate ／ 個人のかたへ</span></p>
   <h1>みんなのアプリじゃなく、<br><span class="uline">自分だけのアプリ。</span></h1>
   <div class="intro">
     <div>
@@ -271,7 +274,7 @@ body.my{background:var(--bg2)}
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <a class="btn sticky-cta" href="#contact">無料で相談する</a>
-<footer><div class="wrap">© Sun'sCreate　アプリの画面・アイコンはイメージです。</div></footer>
+<footer><div class="wrap">© Sun'sCreate「アプリのしたてや」　アプリの画面・アイコンはイメージです。</div></footer>
 <script>
 /* いちばん上：アイデアを押すと、ホーム画面にアイコンが並ぶ */
 (function(){
