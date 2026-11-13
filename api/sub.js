@@ -11,6 +11,10 @@
 const PRICE_KEY = 'sonoba_monthly_300'; // Stripeの価格を探す名前
 const PRICE_YEN = 300;
 const TRIAL_DAYS = 14;
+// Googleの審査担当の方に渡す「審査用コード」（コード自体はここに書かず、ハッシュだけ置く）
+const REVIEW_HASH = '9344f0f0149ef992f9a02c99876cfe296beddcaf5043689757712464b3d27811';
+const crypto = require('crypto');
+const isReview = (c) => typeof c === 'string' && c.length > 6 && crypto.createHash('sha256').update(c.trim().toUpperCase()).digest('hex') === REVIEW_HASH;
 const ACTIVE = new Set(['trialing', 'active', 'past_due']); // past_due は引き落としの再試行中なので、しばらく使える
 
 const owners = () =>
@@ -82,8 +86,9 @@ async function priceId() {
   return price.id;
 }
 
-async function status(email) {
+async function status(email, body = {}) {
   if (owners().includes(email)) return { active: true, owner: true, ready: true };
+  if (isReview(body.reviewCode)) return { active: true, review: true, ready: true };
   if (!process.env.STRIPE_SECRET_KEY) return { active: true, ready: false };
   const subs = await subsOf(await customersOf(email));
   const live = subs.filter((s) => ACTIVE.has(s.status)).sort((a, b) => b.created - a.created)[0];
@@ -150,7 +155,7 @@ module.exports = async (req, res) => {
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
     const fn = { status, checkout, portal }[body.action];
     if (!fn) return res.status(400).json({ error: 'unknown action' });
-    const out = await fn(email);
+    const out = await fn(email, body);
     console.log('sub', body.action, email.replace(/^(.).*@/, '$1***@'), out.error || (out.active === undefined ? 'url' : `active=${out.active} ready=${out.ready}`));
     return res.status(200).json(out);
   } catch (e) {
