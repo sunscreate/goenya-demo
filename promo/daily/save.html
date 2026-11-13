@@ -1,0 +1,11 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>動画を保存</title>
+<style>body{font-family:sans-serif;padding:24px;text-align:center}button{font-size:22px;padding:18px 28px;margin:14px 0;width:100%;border-radius:14px;border:0;background:#c8553d;color:#fff}</style>
+<p id="s">読み込み中…</p><p id="h"></p>
+<button id="b1">声つき版を保存（Instagram用）</button>
+<button id="b2">音なし版を保存（TikTok用）</button>
+<script>
+const n=(new URLSearchParams(location.search).get('n')||'').replace(/\D/g,'').padStart(2,'0');h.textContent='#'+n;
+const files={};const L={b1:n+'_voice.mp4',b2:n+'_silent.mp4'};
+Promise.all(Object.entries(L).map(async([k,f])=>{const r=await fetch(f);if(!r.ok)throw f;files[k]=new File([await r.blob()],f,{type:'video/mp4'});})).then(()=>s.textContent='準備できました').catch(e=>s.textContent='見つかりません: '+e);
+['b1','b2'].forEach(k=>document.getElementById(k).onclick=()=>navigator.share({files:[files[k]]}).catch(e=>s.textContent=e.message));
+</script></html>
