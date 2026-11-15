@@ -19,6 +19,9 @@
    ・信頼の材料（経験年数・資格・インボイス・公開中のアプリ）は数字と事実で短く
    ========================================================= */
 :root{--shi:#c8553d;--shi-bg:#f7e9e4;--sys:#2f5d7c;--sys-bg:#e7eef3;--fac:#f2c200;--fac-bg:#fdf6d8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--shi:#e07a62;--shi-bg:#3a2722;--sys:#6fa3c8;--sys-bg:#1e2c36;--fac-bg:#2c2812}}
+:root[data-theme="dark"]{--shi:#e07a62;--shi-bg:#3a2722;--sys:#6fa3c8;--sys-bg:#1e2c36;--fac-bg:#2c2812}
+.fac-ic svg,.svc svg{color:var(--ink)}
 .top{padding-block:64px 36px}
 .top .eyebrow{display:inline-block;font:700 13px var(--mono);letter-spacing:.14em;color:var(--steel);margin-bottom:14px}
 .top h1{font:400 clamp(30px,5.2vw,58px)/1.3 var(--display);letter-spacing:.03em;max-width:15em}
@@ -133,10 +136,10 @@
       <p>排水管の洗浄、貯水槽の清掃・点検、増圧ポンプ、空調の点検・清掃をお引き受けしています。</p>
       <p class="price">一都三県は<b>自社で直接</b>対応</p>
       <div class="pic"><div class="fac-ic" aria-hidden="true">
-        <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.4" stroke-linecap="round"><path d="M4 10h14a6 6 0 0 1 6 6v12"/><path d="M4 16h12"/><circle cx="24" cy="6" r="2"/></svg>排水管</div>
-        <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.4" stroke-linejoin="round"><rect x="5" y="8" width="22" height="18" rx="2"/><path d="M5 15c4 2 8-2 11 0s7 2 11 0"/><path d="M12 8V5h8v3"/></svg>貯水槽</div>
-        <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.4"><circle cx="16" cy="16" r="9"/><path d="M16 16l5-4" stroke-linecap="round"/><path d="M3 16h4M25 16h4"/></svg>ポンプ</div>
-        <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="7" width="24" height="10" rx="2"/><path d="M9 21l-2 4M16 21v5M23 21l2 4"/></svg>空調</div>
+        <div><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 10h14a6 6 0 0 1 6 6v12"/><path d="M4 16h12"/><circle cx="24" cy="6" r="2"/></svg>排水管</div>
+        <div><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><rect x="5" y="8" width="22" height="18" rx="2"/><path d="M5 15c4 2 8-2 11 0s7 2 11 0"/><path d="M12 8V5h8v3"/></svg>貯水槽</div>
+        <div><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="16" cy="16" r="9"/><path d="M16 16l5-4" stroke-linecap="round"/><path d="M3 16h4M25 16h4"/></svg>ポンプ</div>
+        <div><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="7" width="24" height="10" rx="2"/><path d="M9 21l-2 4M16 21v5M23 21l2 4"/></svg>空調</div>
       </div></div>
       <span class="go"><span>設備管理を見る</span><span aria-hidden="true">→</span></span>
     </a>
@@ -174,10 +177,10 @@
   <h2>建物の設備の点検・清掃</h2>
   <p class="lead" style="color:var(--ink)">マンション・ビルの管理会社さま、オーナーさまからのご依頼をお引き受けしています。作業のあとは、写真つきの報告書をすぐにお送りします。</p>
   <div class="svc">
-    <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.2" stroke-linecap="round"><path d="M4 10h14a6 6 0 0 1 6 6v12"/><path d="M4 16h12"/><circle cx="24" cy="6" r="2"/></svg><div><b>排水管の洗浄</b><span>高圧洗浄で、詰まりや臭いを防ぎます。</span></div></div>
-    <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.2" stroke-linejoin="round"><rect x="5" y="8" width="22" height="18" rx="2"/><path d="M5 15c4 2 8-2 11 0s7 2 11 0"/><path d="M12 8V5h8v3"/></svg><div><b>貯水槽の清掃・点検</b><span>貯水槽清掃作業監督者が担当します。</span></div></div>
-    <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.2"><circle cx="16" cy="16" r="9"/><path d="M16 16l5-4" stroke-linecap="round"/><path d="M3 16h4M25 16h4"/></svg><div><b>増圧ポンプの点検</b><span>給水を止めないための定期点検です。</span></div></div>
-    <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="7" width="24" height="10" rx="2"/><path d="M9 21l-2 4M16 21v5M23 21l2 4"/></svg><div><b>空調設備の点検・清掃</b><span>フロン点検（簡易点検・定期点検）にも対応します。</span></div></div>
+    <div><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 10h14a6 6 0 0 1 6 6v12"/><path d="M4 16h12"/><circle cx="24" cy="6" r="2"/></svg><div><b>排水管の洗浄</b><span>高圧洗浄で、詰まりや臭いを防ぎます。</span></div></div>
+    <div><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="5" y="8" width="22" height="18" rx="2"/><path d="M5 15c4 2 8-2 11 0s7 2 11 0"/><path d="M12 8V5h8v3"/></svg><div><b>貯水槽の清掃・点検</b><span>貯水槽清掃作業監督者が担当します。</span></div></div>
+    <div><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="16" cy="16" r="9"/><path d="M16 16l5-4" stroke-linecap="round"/><path d="M3 16h4M25 16h4"/></svg><div><b>増圧ポンプの点検</b><span>給水を止めないための定期点検です。</span></div></div>
+    <div><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="7" width="24" height="10" rx="2"/><path d="M9 21l-2 4M16 21v5M23 21l2 4"/></svg><div><b>空調設備の点検・清掃</b><span>フロン点検（簡易点検・定期点検）にも対応します。</span></div></div>
   </div>
   <ul class="area">
     <li>東京・神奈川・埼玉・千葉（一都三県）は、自社で直接うかがいます。</li>
