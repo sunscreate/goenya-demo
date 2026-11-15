@@ -85,6 +85,8 @@ textarea{min-height:100px;resize:vertical}
 .li{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:2px dashed var(--line)}
 .li:first-child{border-top:0}
 .li span{flex:1}
+.made{display:flex;align-items:center;justify-content:center;gap:8px;margin:26px auto 8px;max-width:320px;background:#fff;border:2px solid var(--line);border-radius:99px;padding:10px 18px;color:var(--main-d);font-weight:900;font-size:14px;text-decoration:none;box-shadow:0 3px 0 var(--line)}
+.made small{color:var(--sub);font-weight:700;font-size:12px}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -111,13 +113,15 @@ const $=s=>document.querySelector(s);
 $('#back').onclick=()=>{view={p:'list',tab:view.tab||'now'};render()};
 $('#mng').onclick=()=>{view={p:'manage',tab:view.tab};render()};
 
+const MADE='<a class="made" href="https://sunscreate-works.vercel.app/myapp.html?utm_source=kaihi-note&utm_medium=app&utm_campaign=madeby" target="_blank" rel="noopener">🧵 <span>アプリのしたてや<br><small>このアプリを作ったお店のページ</small></span> ›</a>';
 function render(){
   closeSheet();
   const a=$('#app');$('#back').hidden=view.p==='list';$('#mng').hidden=view.p!=='list';
   document.querySelectorAll('.fab').forEach(e=>e.remove());
-  if(view.p==='list')return renderList(a);
-  if(view.p==='event')return renderEvent(a);
-  if(view.p==='manage')return renderManage(a);
+  if(view.p==='list')renderList(a);
+  else if(view.p==='event')renderEvent(a);
+  else if(view.p==='manage')renderManage(a);
+  if(view.p!=='event')a.insertAdjacentHTML('beforeend',MADE);
 }
 
 function renderList(a){
