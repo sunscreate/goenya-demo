@@ -3,165 +3,202 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Sun'sCreate（サンズクリエイト）は、小さな事業のための業務システム・Webアプリ・スマホアプリ・ホームページを作ります。触れる試作までは無料。">
-<title>Sun'sCreate（サンズクリエイト）｜業務システム・アプリ制作</title>
+<meta name="description" content="Sun'sCreate（サンズクリエイト）は、建物の設備管理を10年以上続けてきた現場の目で、個人のかたのアプリ「アプリのしたてや」、事業者さまの業務システム、建物の設備点検・清掃をお引き受けしています。">
+<meta property="og:title" content="Sun'sCreate（サンズクリエイト）">
+<meta property="og:description" content="アプリのしたてや／業務システム制作／建物の設備管理。現場を知る人が、使える仕組みをつくります。">
+<title>Sun'sCreate（サンズクリエイト）｜アプリ・業務システム・設備管理</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
 <link rel="stylesheet" href="site.css">
+<style>
+/* =========================================================
+   トップ（Sun'sCreate全体の入口）
+   ・最初の画面で「誰が・何をしているか」と、3つの入口（選択肢は3つまで）を見せる
+   ・入口ごとに色を固定（したてや＝赤茶／業務システム＝鉄紺／設備管理＝安全色の黄）。各ページの色と揃えて迷わせない
+   ・信頼の材料（経験年数・資格・インボイス・公開中のアプリ）は数字と事実で短く
+   ========================================================= */
+:root{--shi:#c8553d;--shi-bg:#f7e9e4;--sys:#2f5d7c;--sys-bg:#e7eef3;--fac:#f2c200;--fac-bg:#fdf6d8}
+.top{padding-block:64px 36px}
+.top .eyebrow{display:inline-block;font:700 13px var(--mono);letter-spacing:.14em;color:var(--steel);margin-bottom:14px}
+.top h1{font:400 clamp(30px,5.2vw,58px)/1.3 var(--display);letter-spacing:.03em;max-width:15em}
+.top h1 mark{background:linear-gradient(transparent 62%,var(--signal) 62%);color:inherit;padding:0 2px}
+.top .sub{margin-top:18px;font-size:18px;color:var(--sub);max-width:34em}
+
+/* 3つの入口 */
+.doors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:36px}
+@media (max-width:900px){.doors{grid-template-columns:1fr}}
+.door{position:relative;display:flex;flex-direction:column;background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:22px 22px 20px;text-decoration:none;color:var(--ink);overflow:hidden;transition:transform .15s,box-shadow .15s}
+.door:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(20,30,40,.14)}
+.door::before{content:"";position:absolute;inset:0 0 auto;height:8px;background:var(--c)}
+.door .who{align-self:flex-start;font:700 13px var(--body);letter-spacing:.06em;color:var(--ink);background:var(--cb);border-radius:99px;padding:3px 12px;margin:4px 0 12px}
+.door h2{font:400 clamp(22px,2.4vw,26px)/1.35 var(--display);letter-spacing:.04em;margin:0 0 6px}
+.door p{color:var(--sub);font-size:15.5px;line-height:1.8}
+.door .pic{margin:16px -22px 0;padding:16px 22px 0;background:var(--cb);display:flex;gap:10px;justify-content:center;align-items:flex-start;height:178px;overflow:hidden}
+.door .pic img{display:block;height:auto;border:3px solid var(--ink);border-bottom:0;border-radius:14px 14px 0 0;width:38%}
+.door .pic img.wide{width:86%;border-radius:8px 8px 0 0}
+.door .price{margin-top:14px;font:700 15px var(--body)}
+.door .price b{font:700 22px var(--mono);font-variant-numeric:tabular-nums}
+.door .go{margin-top:auto;padding-top:16px;display:flex;justify-content:space-between;align-items:center;font:700 16px var(--body)}
+.door .go span:last-child{width:38px;height:38px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:18px}
+.door.shi{--c:var(--shi);--cb:var(--shi-bg)}
+.door.sys{--c:var(--sys);--cb:var(--sys-bg)}
+.door.fac{--c:var(--fac);--cb:var(--fac-bg)}
+.fac-ic{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;align-self:center;padding-bottom:16px}
+.fac-ic div{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:10px 4px;text-align:center;font:700 12.5px var(--body);line-height:1.35}
+.fac-ic svg{display:block;margin:0 auto 6px;width:30px;height:30px}
+
+/* 信頼の材料 */
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:2px solid var(--ink);background:var(--card);margin-top:36px}
+@media (max-width:760px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.facts>div:nth-child(2){border-right:0}.facts>div:nth-child(-n+2){border-bottom:1px solid var(--rule)}}
+.facts>div{padding:16px 18px;border-right:1px solid var(--rule);min-width:0}
+.facts>div:last-child{border-right:0}
+.facts b{display:block;font:700 22px var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.facts span{font-size:13.5px;color:var(--sub)}
+
+/* なぜ現場の人が作るのか */
+.story{display:grid;grid-template-columns:1fr 1fr;gap:28px 48px;align-items:start}
+@media (max-width:860px){.story{grid-template-columns:1fr}}
+.story .q{font:400 clamp(24px,3vw,32px)/1.45 var(--display);letter-spacing:.03em}
+.story p{color:var(--sub)}
+.story p+p{margin-top:12px}
+
+/* つくったもの */
+.made{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:26px}
+@media (max-width:860px){.made{grid-template-columns:1fr}}
+.mk{display:grid;grid-template-columns:76px 1fr;gap:14px;align-items:start;background:var(--card);border:1px solid var(--rule);border-left:5px solid var(--c);border-radius:10px;padding:16px;text-decoration:none;color:var(--ink)}
+.mk:hover{border-color:var(--ink);border-left-color:var(--c)}
+.mk img{width:76px;height:auto;border-radius:10px;border:2px solid var(--ink)}
+.mk .t{font:700 17px var(--body)}
+.mk .k{display:inline-block;font:700 12px var(--mono);letter-spacing:.08em;color:var(--sub);margin-bottom:2px}
+.mk p{font-size:14.5px;color:var(--sub);line-height:1.7;margin-top:4px}
+.mk.shi{--c:var(--shi)}.mk.sys{--c:var(--sys)}
+
+/* 設備管理 */
+.fac-sec{background:var(--fac-bg);border-block:2px solid var(--ink)}
+.svc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:24px}
+@media (max-width:760px){.svc{grid-template-columns:1fr}}
+.svc>div{background:var(--card);border:2px solid var(--ink);border-radius:10px;padding:16px 18px;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
+.svc svg{width:44px;height:44px}
+.svc b{display:block;font-size:17px}
+.svc span{font-size:14.5px;color:var(--sub);line-height:1.7}
+.area{margin-top:18px;display:grid;gap:8px;font-size:15.5px}
+.area li{list-style:none;padding-left:26px;position:relative}
+.area li::before{content:"";position:absolute;left:2px;top:.55em;width:14px;height:14px;border-radius:3px;background:var(--ink)}
+.area{padding:0}
+.fac-cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:24px}
+.fac-cta small{color:var(--sub);font-size:14px}
+
+/* 会社 */
+.co{display:grid;grid-template-columns:9em 1fr;border-top:2px solid var(--ink);margin-top:20px;font-size:15.5px}
+.co dt,.co dd{margin:0;padding:12px 4px;border-bottom:1px solid var(--rule)}
+.co dt{font-weight:700}
+@media (max-width:560px){.co{grid-template-columns:1fr}.co dt{border-bottom:0;padding-bottom:0}}
+@media (prefers-reduced-motion: reduce){.door{transition:none}.door:hover{transform:none}}
+</style>
 </head>
 <body>
 <header><div class="wrap hbar">
-  <a class="brand" href="index.html">Sun'sCreate<small>システム・アプリ制作</small></a>
-  <nav class="nav" aria-label="サイト内"><a class="lnkp" href="myapp.html">アプリのしたてや</a><a class="lnkp" href="mawarite.html">マワリテ</a><a class="lnkp" href="works.html">制作事例</a><a class="lnkp" href="sonoba.html">自社アプリ</a><a class="lnkp" href="price.html">料金</a></nav>
-  <a class="btn sm hdr-cta" href="index.html#contact">相談する</a>
+  <a class="brand" href="index.html" aria-current="page">Sun'sCreate<small>アプリ・システム・設備管理</small></a>
+  <nav class="nav" aria-label="サイト内"><a class="lnkp" href="myapp.html">アプリのしたてや</a><a class="lnkp" href="system.html">業務システム</a><a class="lnkp" href="#facility">設備管理</a><a class="lnkp" href="works.html">制作事例</a><a class="lnkp" href="price.html">料金</a></nav>
+  <a class="btn sm hdr-cta" href="#doors">ご相談の窓口</a>
 </div></header>
 <main id="top">
-<section class="hero"><div class="wrap grid">
+
+<section class="top"><div class="wrap">
+  <span class="eyebrow">SUN'SCREATE ／ サンズクリエイト</span>
+  <h1>現場を知る人が、<br><mark>ちょうどいい仕組み</mark><span style="white-space:nowrap">をつくる。</span></h1>
+  <p class="sub">建物の設備管理を10年以上。点検や清掃の現場で「ここがもっと楽になれば」を見てきた経験から、個人のかたのアプリと、事業者さまの業務システムをつくっています。</p>
+
+  <div class="doors" id="doors">
+    <a class="door shi" href="myapp.html">
+      <span class="who">個人のかたへ</span>
+      <h2>アプリのしたてや</h2>
+      <p>家計・習いごと・サークルの集金など。あなた専用のスマホアプリを仕立てます。</p>
+      <p class="price">はじめ<b>1,500</b>円・月<b>300</b>円から</p>
+      <div class="pic"><img src="img/kaihi/list.jpg" width="780" height="1688" alt="事例「会費ノート」のイベント一覧の画面" loading="lazy"><img src="img/kaihi/event.jpg" width="780" height="1688" alt="会費ノートの支払いチェックの画面" loading="lazy"></div>
+      <span class="go"><span>アプリのしたてやを見る</span><span aria-hidden="true">→</span></span>
+    </a>
+    <a class="door sys" href="system.html">
+      <span class="who">事業者さまへ</span>
+      <h2>業務システム制作</h2>
+      <p>予約・現場の記録・報告書・見積や請求。電話とメモと手作業の仕事を、スマホとパソコンの仕組みに。</p>
+      <p class="price">触れる試作まで<b>無料</b></p>
+      <div class="pic"><img class="wide" src="img/mw_tasks.jpg" width="1280" height="800" alt="業務システム「マワリテ」のタスク一覧の画面" loading="lazy"></div>
+      <span class="go"><span>業務システムを見る</span><span aria-hidden="true">→</span></span>
+    </a>
+    <a class="door fac" href="#facility">
+      <span class="who">管理会社・オーナーさまへ</span>
+      <h2>建物の設備管理</h2>
+      <p>排水管の洗浄、貯水槽の清掃・点検、増圧ポンプ、空調の点検・清掃をお引き受けしています。</p>
+      <p class="price">一都三県は<b>自社で直接</b>対応</p>
+      <div class="pic"><div class="fac-ic" aria-hidden="true">
+        <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.4" stroke-linecap="round"><path d="M4 10h14a6 6 0 0 1 6 6v12"/><path d="M4 16h12"/><circle cx="24" cy="6" r="2"/></svg>排水管</div>
+        <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.4" stroke-linejoin="round"><rect x="5" y="8" width="22" height="18" rx="2"/><path d="M5 15c4 2 8-2 11 0s7 2 11 0"/><path d="M12 8V5h8v3"/></svg>貯水槽</div>
+        <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.4"><circle cx="16" cy="16" r="9"/><path d="M16 16l5-4" stroke-linecap="round"/><path d="M3 16h4M25 16h4"/></svg>ポンプ</div>
+        <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.4" stroke-linecap="round"><rect x="4" y="7" width="24" height="10" rx="2"/><path d="M9 21l-2 4M16 21v5M23 21l2 4"/></svg>空調</div>
+      </div></div>
+      <span class="go"><span>設備管理を見る</span><span aria-hidden="true">→</span></span>
+    </a>
+  </div>
+
+  <div class="facts" aria-label="Sun'sCreateについて">
+    <div><b>10年以上</b><span>建物の設備管理の経験</span></div>
+    <div><b>有資格</b><span>貯水槽清掃作業監督者</span></div>
+    <div><b>公開中</b><span>自社アプリ「その場レポ」</span></div>
+    <div><b>インボイス</b><span>適格請求書発行事業者</span></div>
+  </div>
+</div></section>
+
+<section style="padding-top:36px"><div class="wrap story">
+  <p class="q">作る人が、使う人の<br>仕事を知っていること。</p>
   <div>
-    <p class="tag">業務システム ／ Webアプリ ／ スマホアプリ ／ ホームページ</p>
-    <h1><span class="nb">小さな事業の</span><span class="nb">「手間な仕事」を、</span><mark class="nb">使いやすい仕組み</mark><span class="nb">に。</span></h1>
-    <p class="sub">予約の受付、現場の記録、報告書、売上の計算。電話とメモと手作業で回している仕事を、スマホとパソコンで使えるシステムにします。まずは触れる試作で、使い心地を確かめてください。</p>
-    <div class="ctas">
-      <a class="btn" href="#contact">無料で相談する</a>
-      <a class="btn ghost" href="works.html">制作事例を見る</a>
-    </div>
-    <p class="proof"><span>制作事例 <b>3件</b>（デモあり）</span><span>自社アプリ <b>公開中</b></span><span>触れる試作まで <b>無料</b></span></p>
+    <p>点検の報告書づくり、管理会社さんとのメールのやりとり、協力業者さんとの日程合わせ。設備管理の仕事をしながら、毎日の「手間」を自分で仕組みにしてきました。</p>
+    <p>だから、作るのは「多機能なもの」ではなく、毎日開いて、迷わず使えるもの。まず触れる試作をお見せして、使い心地を確かめてもらってから仕上げます。</p>
   </div>
-  <figure class="hero-figs" style="margin:0">
-    <img class="shot" src="img/admin.jpg" width="1280" height="800" alt="訪問サービスの管理画面。今日の訪問、未対応の受付、今月の売上と粗利が並んでいる">
-    <img class="shot phone" src="img/sonoba_home.jpg" width="780" height="1560" alt="報告書アプリ「その場レポ」のホーム画面。大きな「報告書を作る」ボタンがある">
-    <figcaption>左：事例「ご縁屋」の管理画面　右：自社アプリ「その場レポ」（どちらも架空のデータ）</figcaption>
-  </figure>
-</div></section>
-
-<section style="padding-block:8px 24px"><div class="wrap">
-  <a class="ccard" href="myapp.html" style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;padding:20px 24px;border:2px solid var(--signal);text-decoration:none">
-    <div><p class="tag" style="margin:0">NEW ／ 個人のかたへ「アプリのしたてや」</p><h3 style="margin:4px 0">あなただけのスマホアプリ、仕立てます。<span style="color:var(--steel)">はじめ1,500円・月300円〜</span></h3><p style="color:var(--sub);font-size:15px">家計・習いごと・趣味の記録・サークルの出欠など。完成イメージの試作までは無料です。</p></div>
-    <span class="btn">くわしく見る</span>
-  </a>
-</div></section>
-
-<section style="padding-block:0 24px"><div class="wrap">
-  <div class="appband">
-    <div>
-      <span class="badge">NEW ／ ビルメンテナンス会社向けの業務システム</span>
-      <h2 style="margin-top:14px"><span style="display:inline-block">メールが届いたら、</span><span style="display:inline-block">AIが先回り</span><span style="display:inline-block">「マワリテ」</span></h2>
-      <p class="lead">お客様からのメールをAIが読み、見積・協力業者への依頼・返信の下書きまで準備する業務システムです。業者さんとの日程・完了報告・お支払いの確認もスマホでつながります。</p>
-      <ul class="chk"><li>今のOutlookのまま、届いたメールが自動でタスクに</li><li>業者さんはインストール不要、依頼が来たらスマホに通知</li><li>完了報告はAIが先に確認、不足があれば再報告を依頼</li><li>はじめ38.5万円〜＋月6万円（社員10名まで・AIの利用料こみ）</li></ul>
-      <div class="ctas" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:22px"><a class="btn" href="mawarite.html">マワリテの紹介を見る</a></div>
-    </div>
-    <div class="phones">
-      <img src="img/mw_vhome.jpg" width="780" height="1328" alt="協力業者のスマホ画面。日程を決めていない依頼とカレンダー" loading="lazy">
-      <img src="img/mw_vorder.jpg" width="780" height="1328" alt="協力業者が見る依頼の詳細" loading="lazy">
-    </div>
-  </div>
-</div></section>
-
-<section style="padding-top:24px"><div class="wrap">
-  <p class="tag">SERVICE</p>
-  <h2>作れるもの</h2>
-  <p class="lead" style="margin-bottom:28px">一つの作業だけを置き換える小さなものから、事業の流れをまるごとつなぐものまで。必要な分だけ作ります。</p>
-  <div class="svc">
-    <div><span class="no">01</span><h3>業務システム</h3><p>社内やスタッフで使う、仕事の道具です。</p><ul><li>予約・担当の割り振り</li><li>現場の記録と写真つき報告書</li><li>売上・報酬・請求の計算</li></ul></div>
-    <div><span class="no">02</span><h3>Webアプリ・スマホアプリ</h3><p>お客様にも使ってもらう、iPhone・Android対応のアプリです。</p><ul><li>ホーム画面に置けるWebアプリ</li><li>App Storeでの公開</li><li>月額課金・事前決済の組み込み</li></ul></div>
-    <div><span class="no">03</span><h3>ホームページ</h3><p>お店や会社を知ってもらい、問い合わせにつなげるページです。</p><ul><li>スマホで読みやすい作り</li><li>相談・予約のフォーム</li><li>あとから自分で直せる構成</li></ul></div>
-  </div>
-</div></section>
-
-<section style="background:var(--card);border-block:1px solid var(--rule)"><div class="wrap">
-  <div class="case-head">
-    <div><p class="tag">WORKS</p><h2>制作事例</h2><p class="lead">どれも実際に触れるデモか、画面の写真をご覧いただけます。</p></div>
-    <a class="btn ghost" href="works.html">事例をすべて見る</a>
-  </div>
-  <div class="cases">
-    <a class="ccard" href="works.html#case"><img src="img/admin.jpg" width="1280" height="800" alt="訪問サービスの管理画面" loading="lazy"><div><p class="tag">CASE 01 ／ 訪問サービス</p><h3>予約から精算まで一つに</h3><p>空き時間の予約ページ、担当の自動振り分け、スタッフのスマホ画面、売上と振込額の計算。</p><span class="go">くわしく見る →</span></div></a>
-    <a class="ccard" href="works.html#case2"><img src="img/setsubi_cal.jpg" width="1280" height="800" alt="点検の予定表" loading="lazy"><div><p class="tag">CASE 02 ／ 設備点検</p><h3>点検の記録から報告書まで</h3><p>スマホで項目を押して入力、写真つきの報告書PDF、お知らせの掲示物、予定の管理。</p><span class="go">くわしく見る →</span></div></a>
-    <a class="ccard" href="works.html#case3"><img src="img/pan_desk.jpg" width="1280" height="800" alt="パン屋の注文ページ" loading="lazy"><div><p class="tag">CASE 03 ／ パン屋</p><h3>並ばずに受け取れる事前注文</h3><p>受け取り時間の枠、残り数の表示、受付番号とQRコード、お店の受け渡し画面。</p><span class="go">くわしく見る →</span></div></a>
-  </div>
-</div></section>
-
-<section><div class="wrap">
-  <div class="appband">
-    <div>
-      <span class="badge">自社アプリ・公開中</span>
-      <h2 style="margin-top:14px">点検・清掃の報告書アプリ「その場レポ」</h2>
-      <p class="lead">現場でスマホに入力すると、いつもの自社書式のまま報告書とPDFができあがるアプリです。企画から公開、月額課金の仕組みまで、自分たちで作って運用しています。</p>
-      <ul class="chk"><li>自社のExcel書式をそのまま使える（AIが入力欄を見つける）</li><li>写真は枠に合わせて自動で貼り付け</li><li>月額300円・最初の14日間は無料</li></ul>
-      <div class="ctas" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:22px"><a class="btn" href="sonoba.html">アプリの紹介を見る</a></div>
-    </div>
-    <div class="phones">
-      <img src="img/sonoba_home.jpg" width="780" height="1560" alt="その場レポのホーム画面" loading="lazy">
-      <img src="img/sonoba_new.jpg" width="780" height="1560" alt="作る報告書の種類を選ぶ画面" loading="lazy">
-    </div>
-  </div>
-</div></section>
-
-<section id="price" style="padding-top:0"><div class="wrap">
-  <p class="tag">PRICE</p>
-  <h2>料金のめやす</h2>
-  <p class="lead" style="margin-bottom:30px">はじめの費用をおさえて、毎月の定額で使い続けられる「月額プラン」をおすすめしています（買い切りも選べます）。ご相談なしに金額が増えることはありません。金額はすべて税込です。</p>
-  <div class="plans">
-    <div class="plan"><h3>ライト</h3><p class="yen">月16,500円<small>〜</small><span>1つの作業をシステムに</span></p><p class="init">はじめの費用 <b>11万円〜</b></p><dl><dt>期間</dt><dd>約1か月</dd><dt>買い切り</dt><dd>33万円〜</dd></dl><p class="ex">例：予約の受付だけ／報告書のPDF作成だけ</p></div>
-    <div class="plan rec"><span class="rib">おすすめ</span><h3>スタンダード</h3><p class="yen">月33,000円<small>〜</small><span>2〜3の作業をつないで一つに</span></p><p class="init">はじめの費用 <b>22万円〜</b></p><dl><dt>期間</dt><dd>1〜2か月</dd><dt>買い切り</dt><dd>66万円〜</dd></dl><p class="ex">例：事前注文＋お店の管理画面／点検の入力＋報告書＋予定表</p></div>
-    <div class="plan"><h3>しっかり</h3><p class="yen">月55,000円<small>〜</small><span>事業の流れをまるごと</span></p><p class="init">はじめの費用 <b>38.5万円〜</b></p><dl><dt>期間</dt><dd>2〜3か月</dd><dt>買い切り</dt><dd>110万円〜</dd></dl><p class="ex">例：予約・担当の割り振り・スタッフ画面・売上と精算</p></div>
-  </div>
-  <p class="pnote">月額には保守と毎月の小さな変更（月2時間まで）が含まれます。いつでも解約でき、解約にお金はかかりません。決済サービスやLINE通知などをつなぐ場合は、追加料金の一覧からお選びいただけます。</p>
-  <p style="margin-top:18px"><a class="btn" href="price.html">料金をくわしく見る</a></p>
 </div></section>
 
 <section style="padding-top:0"><div class="wrap">
-  <p class="tag">PROCESS</p>
-  <h2>進め方</h2>
-  <ol class="steps" style="margin-top:24px">
-    <li><b>お話を聞く</b><span>今の仕事の流れと、困っていることを伺います。</span></li>
-    <li><b>触れる試作</b><span>実際に操作できる画面を作り、使い心地を確かめてもらいます。</span></li>
-    <li><b>現場で試す</b><span>少人数で使い、つまずく所を直します。</span></li>
-    <li><b>本番の運用</b><span>運用開始後の追加や修正にも対応します。</span></li>
-  </ol>
+  <span class="tag">WORKS</span>
+  <h2>これまでにつくったもの</h2>
+  <div class="made">
+    <a class="mk shi" href="myapp.html#case"><img src="img/kaihi/icon.png" width="192" height="192" alt="" loading="lazy"><div><span class="k">アプリのしたてや</span><div class="t">会費ノート</div><p>サークルの会費集め。チェックで支払い済み、未集金がひと目で。</p></div></a>
+    <a class="mk sys" href="sonoba.html"><img src="img/sonoba_home.jpg" width="780" height="1560" alt="" loading="lazy"><div><span class="k">自社アプリ</span><div class="t">その場レポ</div><p>点検・清掃の報告書を、現場でスマホから。写真もそのまま。</p></div></a>
+    <a class="mk sys" href="mawarite.html"><img src="img/mw_vhome.jpg" width="780" height="1328" alt="" loading="lazy"><div><span class="k">業務システム</span><div class="t">マワリテ</div><p>ビルメンテナンス会社のメールをAIが読み、見積や依頼を先回り。</p></div></a>
+  </div>
+  <p style="margin-top:18px"><a href="works.html">ほかの制作事例を見る →</a></p>
 </div></section>
 
-<section class="contact" id="contact"><div class="wrap">
-  <h2>まずは、今の仕事の流れを聞かせてください</h2>
-  <p class="lead">相談は無料です。「この作業だけシステムにしたい」という小さなご相談も歓迎します。</p>
-  <form class="cform" id="cf" novalidate>
-    <div class="cg2">
-      <label><span class="lt">お名前<span class="req">必須</span></span><input name="name" autocomplete="name" maxlength="80" required><span class="ferr" id="e_name"></span></label>
-      <label><span class="lt">会社名・屋号<span class="opt">任意</span></span><input name="company" autocomplete="organization" maxlength="120"></label>
-      <label><span class="lt">返信先のメールアドレス<span class="req">必須</span></span><input name="email" type="email" autocomplete="email" inputmode="email" maxlength="200" required><span class="ferr" id="e_email"></span></label>
-      <label><span class="lt">電話番号<span class="opt">任意</span></span><input name="tel" type="tel" autocomplete="tel" inputmode="tel" maxlength="30"></label>
-    </div>
-    <label><span class="lt">気になるプラン</span><select name="plan"><option>まだ決めていない</option><option>ライト</option><option>スタンダード</option><option>しっかり</option><option>まず無料の試作を見てみたい</option></select></label>
-    <label><span class="lt">ご相談の内容<span class="req">必須</span></span><textarea name="message" maxlength="4000" required placeholder="例）パン屋をしています。お昼にレジ前で行列ができるので、ネットで先に注文と支払いを受けられるようにしたいです。"></textarea><span class="ferr" id="e_message"></span></label>
-    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <p class="cnote">「今の仕事の流れ」と「困っていること」を書いていただくと、試作のご提案が早くなります。いただいた情報は、このご相談への返信とご連絡のためだけに使います。</p>
-    <div><button class="btn" type="submit" id="cfb">無料で相談する</button></div>
-    <p class="cmsg" id="cfm" role="status" aria-live="polite"></p>
-  </form>
-  <p class="calt">メールで直接送っていただくこともできます：<b>sunscreate@scky.fun</b></p>
-  
-  <small>Sun'sCreate（代表 山田 和矢）／インボイス登録事業者<br>〒154-0004 東京都世田谷区太子堂4丁目18番15号 TASUKI PRIME SANGENJAYA 3F-3</small>
+<section class="fac-sec" id="facility"><div class="wrap">
+  <span class="tag" style="color:var(--ink)">FACILITY ／ 設備管理</span>
+  <h2>建物の設備の点検・清掃</h2>
+  <p class="lead" style="color:var(--ink)">マンション・ビルの管理会社さま、オーナーさまからのご依頼をお引き受けしています。作業のあとは、写真つきの報告書をすぐにお送りします。</p>
+  <div class="svc">
+    <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.2" stroke-linecap="round"><path d="M4 10h14a6 6 0 0 1 6 6v12"/><path d="M4 16h12"/><circle cx="24" cy="6" r="2"/></svg><div><b>排水管の洗浄</b><span>高圧洗浄で、詰まりや臭いを防ぎます。</span></div></div>
+    <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.2" stroke-linejoin="round"><rect x="5" y="8" width="22" height="18" rx="2"/><path d="M5 15c4 2 8-2 11 0s7 2 11 0"/><path d="M12 8V5h8v3"/></svg><div><b>貯水槽の清掃・点検</b><span>貯水槽清掃作業監督者が担当します。</span></div></div>
+    <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.2"><circle cx="16" cy="16" r="9"/><path d="M16 16l5-4" stroke-linecap="round"/><path d="M3 16h4M25 16h4"/></svg><div><b>増圧ポンプの点検</b><span>給水を止めないための定期点検です。</span></div></div>
+    <div><svg viewBox="0 0 32 32" fill="none" stroke="#1d2327" stroke-width="2.2" stroke-linecap="round"><rect x="4" y="7" width="24" height="10" rx="2"/><path d="M9 21l-2 4M16 21v5M23 21l2 4"/></svg><div><b>空調設備の点検・清掃</b><span>フロン点検（簡易点検・定期点検）にも対応します。</span></div></div>
+  </div>
+  <ul class="area">
+    <li>東京・神奈川・埼玉・千葉（一都三県）は、自社で直接うかがいます。</li>
+    <li>そのほかの地域も、地元の協力業者と組んでお引き受けします。</li>
+  </ul>
+  <div class="fac-cta"><a class="btn" href="mailto:sunscreate@scky.fun?subject=%E8%A8%AD%E5%82%99%E7%AE%A1%E7%90%86%E3%81%AE%E3%81%94%E7%9B%B8%E8%AB%87">メールで相談する</a><small>sunscreate@scky.fun ／ お見積りは無料です</small></div>
+</div></section>
+
+<section><div class="wrap">
+  <span class="tag">ABOUT</span>
+  <h2>Sun'sCreate について</h2>
+  <dl class="co">
+    <dt>屋号</dt><dd>Sun'sCreate（サンズクリエイト）</dd>
+    <dt>代表</dt><dd>山田 和矢</dd>
+    <dt>所在地</dt><dd>〒154-0004 東京都世田谷区太子堂4丁目18番15号 TASUKI PRIME SANGENJAYA 3F-3</dd>
+    <dt>メール</dt><dd><a href="mailto:sunscreate@scky.fun">sunscreate@scky.fun</a></dd>
+    <dt>事業</dt><dd>アプリ制作（アプリのしたてや）／業務システム・Webアプリ・ホームページ制作／建物の設備管理（排水管洗浄・貯水槽清掃・増圧ポンプ点検・空調設備の点検清掃）</dd>
+    <dt>登録など</dt><dd>適格請求書発行事業者（インボイス）／貯水槽清掃作業監督者</dd>
+  </dl>
 </div></section>
 </main>
-<footer><div class="wrap">© Sun'sCreate　事例の画面に出てくる人物・住所・電話番号はすべて架空です。</div></footer>
-<script>
-/* 相談フォーム：Google Apps Script（Sun'sCreate 相談フォーム受付）へ送る */
-(function(){const ENDPOINT="https://script.google.com/macros/s/AKfycbw2Fl9A6acrwcXZrFOzFonlSR02ghRS8kTtlTzKcoHceM3bVUxKz6PGs-rhunHRIV7Y/exec",f=document.getElementById("cf");if(!f)return;const t0=Date.now();
-  const show=(k,m)=>{const e=document.getElementById("e_"+k),i=f.elements[k];if(e)e.textContent=m||"";if(i)i.setAttribute("aria-invalid",m?"true":"false")};
-  const okMail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-  f.elements.email.addEventListener("blur",()=>{const v=f.elements.email.value.trim();show("email",v&&!okMail(v)?"メールアドレスの形を確かめてください（例 info@example.jp）":"")});
-  ["name","email","message"].forEach(k=>f.elements[k].addEventListener("input",()=>{if(f.elements[k].value.trim()&&(k!=="email"||okMail(f.elements[k].value.trim())))show(k,"")}));
-  f.addEventListener("submit",async e=>{e.preventDefault();const g=k=>f.elements[k].value.trim(),m=document.getElementById("cfm"),b=document.getElementById("cfb");
-    const errs={name:g("name")?"":"お名前を入れてください",email:!g("email")?"返信先のメールアドレスを入れてください":okMail(g("email"))?"":"メールアドレスの形を確かめてください（例 info@example.jp）",message:g("message")?"":"ご相談の内容を入れてください"};
-    Object.keys(errs).forEach(k=>show(k,errs[k]));const first=Object.keys(errs).find(k=>errs[k]);if(first){f.elements[first].focus();m.textContent="";return}
-    b.disabled=true;b.textContent="送信しています…";m.className="cmsg";m.textContent="";
-    const d={name:g("name"),company:g("company"),email:g("email"),tel:g("tel"),plan:f.elements.plan.value,message:g("message"),website:f.elements.website.value,elapsed:Date.now()-t0,page:location.pathname.split("/").pop()||"index.html"};
-    try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(d)});const j=await r.json();
-      if(!j.ok)throw new Error(j.error||"送信できませんでした");
-      f.outerHTML='<div class="cdone" tabindex="-1" id="cfd"><h3>ご相談を受け付けました</h3><p>'+d.name.replace(/[&<>"]/g,"")+' 様、ありがとうございます。受付のメールを '+d.email.replace(/[&<>"]/g,"")+' にお送りしました。内容を確認して、メールでご返信します。</p><p class="cnote" style="margin-top:8px">受付のメールが届かない場合は、迷惑メールのフォルダもご確認ください。</p></div>';
-      document.getElementById("cfd").focus()}
-    catch(x){m.className="cmsg err";m.textContent=(x.message||"送信できませんでした")+"　お手数ですが、時間をおいてもう一度お試しいただくか、sunscreate@scky.fun へメールでお送りください。";b.disabled=false;b.textContent="無料で相談する"}});
-})();
-</script>
+<footer><div class="wrap">© Sun'sCreate　<a href="myapp.html">アプリのしたてや</a>　<a href="system.html">業務システム</a>　<a href="#facility">設備管理</a>　<a href="works.html">制作事例</a>　<a href="price.html">料金</a></div></footer>
 </body>
 </html>

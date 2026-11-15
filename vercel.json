@@ -1,1 +1,2 @@
-{"headers":[{"source":"/promo/(.*)","headers":[{"key":"Access-Control-Allow-Origin","value":"*"},{"key":"X-Robots-Tag","value":"noindex"}]}]}
+{"rewrites":[{"source":"/shitateya","destination":"/myapp.html"},{"source":"/shitateya/","destination":"/myapp.html"}],
+"headers":[{"source":"/promo/(.*)","headers":[{"key":"Access-Control-Allow-Origin","value":"*"},{"key":"X-Robots-Tag","value":"noindex"}]}]}
