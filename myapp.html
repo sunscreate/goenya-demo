@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="color-scheme" content="light">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="アプリのしたてや｜みんなのアプリじゃなく、自分だけのアプリ。家計・習いごと・趣味の記録・サークルの出欠など、あなたの使い方に合わせて作ります。はじめ9,800円・月980円から。完成イメージの試作までは無料。">
+<meta name="description" content="アプリのしたてや｜みんなのアプリじゃなく、自分だけのアプリ。家計・習いごと・趣味の記録・サークルの出欠など、あなたの使い方に合わせて作ります。はじめ1,500円・月300円から。完成イメージの試作までは無料。">
 <meta property="og:title" content="アプリのしたてや｜自分だけのアプリ、仕立てます">
-<meta property="og:description" content="はじめ9,800円・月980円から。完成イメージの試作までは無料。">
+<meta property="og:description" content="はじめ1,500円・月300円から。完成イメージの試作までは無料。">
 <title>アプリのしたてや｜自分だけのアプリ、仕立てます（Sun'sCreate）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,6 +117,15 @@ body.my{background:var(--bg2)}
 .zero b{font:700 17px "Zen Kaku Gothic New";color:var(--ink3)}
 .zero p{color:var(--sub2);font-size:14.5px;margin-top:4px}
 
+.addfee{margin-top:22px;background:#fff;border:1px solid var(--line2);border-radius:16px;padding:20px 22px}
+.addfee h3{font:700 17px "Zen Kaku Gothic New";color:var(--ink3);margin:0 0 10px}
+.addfee table{width:100%;border-collapse:collapse;font-size:14.5px}
+.addfee th,.addfee td{padding:10px 4px;border-top:1px solid var(--line2);text-align:left;vertical-align:top}
+.addfee tr:first-child th,.addfee tr:first-child td{border-top:0}
+.addfee th{font-weight:700;color:var(--ink3)}.addfee th small{display:block;font-weight:500;font-size:12.5px;color:var(--sub2)}
+.addfee td{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--ink3)}
+.addfee td b{color:var(--ok2)}
+.addfee p{margin:10px 0 0;font-size:13.5px;color:var(--sub2)}
 /* ---------- 手順 ---------- */
 .steps2{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:26px 0 0;padding:0;border:1px solid var(--line2);border-radius:16px;background:#fff;overflow:hidden}
 @media (max-width:800px){.steps2{grid-template-columns:1fr 1fr}}
@@ -176,8 +185,8 @@ body.my{background:var(--bg2)}
       <div class="ctas"><a class="btn" href="#contact">無料で相談する</a><a class="btn ghost" href="#price">料金を見る</a></div>
     </div>
     <div class="facts" aria-label="料金のめやす">
-      <div class="fact"><span>月額</span><b>980円〜<small>1日あたり約32円</small></b></div>
-      <div class="fact"><span>はじめの費用</span><b>9,800円〜</b></div>
+      <div class="fact"><span>月額</span><b>300円〜<small>1日あたり約10円</small></b></div>
+      <div class="fact"><span>はじめの費用</span><b>1,500円〜</b></div>
       <div class="fact"><span>完成イメージの試作</span><b>無料</b></div>
     </div>
   </div>
@@ -236,7 +245,7 @@ body.my{background:var(--bg2)}
         <li>イベントごとのメモ欄。終わったイベントは残しても、消してもOK</li>
         <li>ご本人の好みで、ピンクの丸い文字・ぶたの貯金箱のアイコンに</li>
       </ul>
-      <div class="meta"><span>スマホのホーム画面から開ける</span><span>広告なし</span><span>データはご本人のスマホの中だけ</span></div>
+      <div class="meta"><span>このくらいなら「ちょこっと」はじめ1,500円・月300円</span><span>スマホのホーム画面から開ける</span><span>広告なし</span><span>データはご本人のスマホの中だけ</span></div>
       <div class="try"><a class="btn sm" href="https://kaihi-note.vercel.app/" target="_blank" rel="noopener">実際に触ってみる</a><small>入れたデータは、お使いのスマホの中にだけ保存されます</small></div>
     </div>
     <div class="shots">
@@ -251,28 +260,38 @@ body.my{background:var(--bg2)}
 <section id="price"><div class="wrap">
   <span class="eyebrow">PRICE</span>
   <h2 class="sec-h">はじめは小さく、あとは月々の定額で。</h2>
-  <p class="lead2">はじめの費用をおさえ、毎月の定額で使い続けられます。使いながらの小さな直しも、月額に含まれます（金額はすべて税込）。</p>
+  <p class="lead2">はじめの費用をおさえ、毎月の定額で使い続けられます。月1回の小さな直しは、月額の中で無料です（金額はすべて税込）。</p>
   <div class="price2">
     <div class="pc" data-plan="1">
       <h3>ちょこっと</h3><p class="who">ひとつの記録や表を、使いやすく</p>
-      <p class="m">月<b>980</b>円</p><span class="perday">1日あたり約32円</span>
-      <p class="init">はじめの費用<b>9,800円</b></p>
+      <p class="m">月<b>300</b>円</p><span class="perday">1日あたり約10円</span>
+      <p class="init">はじめの費用<b>1,500円</b></p>
       <ul><li>画面 1〜2つ</li><li>自分のスマホで使う</li><li>データはスマホの中に</li></ul>
-      <p class="buy">買い切りの場合 33,000円</p><span class="go">このプランで相談する</span></div>
+      <p class="buy">買い切りの場合 8,800円</p><span class="go">このプランで相談する</span></div>
     <div class="pc rec" data-plan="2"><span class="rib">おすすめ</span>
       <h3>じぶんアプリ</h3><p class="who">写真・グラフ・お知らせまで</p>
-      <p class="m">月<b>1,980</b>円</p><span class="perday">1日あたり約65円</span>
-      <p class="init">はじめの費用<b>19,800円</b></p>
+      <p class="m">月<b>980</b>円</p><span class="perday">1日あたり約32円</span>
+      <p class="init">はじめの費用<b>9,800円</b></p>
       <ul><li>画面 3〜4つ</li><li>写真・グラフ・お知らせ</li><li>スマホとパソコンで同じデータ</li></ul>
-      <p class="buy">買い切りの場合 55,000円＋月550円</p><span class="go">このプランで相談する</span></div>
+      <p class="buy">買い切りの場合 33,000円＋月330円</p><span class="go">このプランで相談する</span></div>
     <div class="pc" data-plan="3">
       <h3>みんなで使う</h3><p class="who">家族・仲間とログインして共有</p>
-      <p class="m">月<b>3,980</b>円</p><span class="perday">1日あたり約131円</span>
-      <p class="init">はじめの費用<b>39,800円</b></p>
+      <p class="m">月<b>1,980</b>円</p><span class="perday">1日あたり約65円</span>
+      <p class="init">はじめの費用<b>19,800円</b></p>
       <ul><li>画面 5つ〜</li><li>人ごとのログイン</li><li>だれが入力しても全員に反映</li></ul>
-      <p class="buy">買い切りの場合 99,000円＋月1,100円</p><span class="go">このプランで相談する</span></div>
+      <p class="buy">買い切りの場合 66,000円＋月550円</p><span class="go">このプランで相談する</span></div>
   </div>
-  <p class="rules">月額には、データの保管・不具合の修正・毎月の小さな変更（月1時間まで）が含まれます。広告は入りません。いつでも解約でき、解約にお金はかかりません（お申し出の月の末日まで使えます）。データは書き出してお渡しします。どのプランも、スマホのホーム画面にアイコンを置いて使えます（iPhone・Android）。仕上げのときの修正は2回まで。App Store への公開は別途ご相談ください。</p>
+  <p class="rules">月額には、データの保管・不具合の修正・月1回の小さな直しが含まれます。広告は入りません。いつでも解約でき、解約にお金はかかりません（お申し出の月の末日まで使えます）。データは書き出してお渡しします。どのプランも、スマホのホーム画面にアイコンを置いて使えます（iPhone・Android）。仕上げのときの修正は2回まで。App Store への公開は別途ご相談ください。</p>
+  <div class="addfee">
+    <h3>追加・変更の料金（めやす）</h3>
+    <table>
+      <tr><th>小さな直し<small>文字・色・項目名・並び順など</small></th><td><b>月1回 無料</b><br>2回目から 1回 1,100円</td></tr>
+      <tr><th>機能の追加<small>入力する項目・ボタン・集計を足すなど</small></th><td>3,300円〜</td></tr>
+      <tr><th>画面（ページ）の追加</th><td>1画面 5,500円〜</td></tr>
+      <tr><th>大きな機能<small>ログイン・通知・ほかのサービスとの連携など</small></th><td>お見積り</td></tr>
+    </table>
+    <p>金額は概算です。内容をうかがって、その都度お見積りします。お見積りにご了承いただく前に、作業や請求をすることはありません。</p>
+  </div>
   <div class="zero"><span class="z">0円</span>
     <div><b>完成イメージの試作までは無料。気に入らなければ、お支払いはありません。</b>
       <p>お話を伺ったあと、実際にスマホで触れる試作をお送りします。「思っていたのと違う」と感じたら、そこでやめていただいて大丈夫です。</p></div></div>
@@ -298,7 +317,7 @@ body.my{background:var(--bg2)}
     <details><summary>入力したデータは他の人に見られませんか？</summary><p>「ちょこっと」はデータがご自分のスマホの中だけに残ります。「じぶんアプリ」「みんなで使う」はログインした本人（と共有を許可した人）だけが見られる作りにします。</p></details>
     <details><summary>月額プランをやめたらどうなりますか？</summary><p>いつでもやめられます。解約にお金はかかりません。お申し出の月の末日まで使えて、データを書き出してお渡しし、アプリはそこで止まります。ずっと手元で使い続けたい場合は、はじめから買い切りもお選びいただけます。</p></details>
     <details><summary>月額プランと買い切り、どちらがお得？</summary><p>2年ほど使うと、合計はほぼ同じです。はじめの負担を小さくしたい、使いながら少しずつ直してほしい場合は月額プラン。作ったまま長く使う予定なら買い切りが向いています。</p></details>
-    <details><summary>あとから機能を足せますか？</summary><p>足せます。小さな変更は月額に含まれます（月1時間まで）。大きな機能は、事前に金額をお伝えしてから作ります。ご相談なしに料金が増えることはありません。</p></details>
+    <details><summary>あとから機能を足せますか？</summary><p>足せます。月1回の小さな直しは無料です。それ以上の直しや、機能・画面の追加は、料金の「追加・変更の料金」をめやすに、事前に金額をお伝えしてから作ります。ご相談なしに料金が増えることはありません。</p></details>
     <details><summary>支払い方法は？</summary><p>銀行振込です。はじめの費用（買い切りなら代金）は、ご注文時に半分、完成時に半分。月額は使いはじめた月からです。</p></details>
   </div>
 </div></section>
@@ -313,7 +332,7 @@ body.my{background:var(--bg2)}
     </div>
     <input type="hidden" name="company" value="（個人）">
     <input type="hidden" name="tel" value="">
-    <label><span class="lt">気になるプラン</span><select name="plan"><option>まだ決めていない</option><option>個人：ちょこっと（はじめ9,800円・月980円）</option><option>個人：じぶんアプリ（はじめ19,800円・月1,980円）</option><option>個人：みんなで使う（はじめ39,800円・月3,980円）</option><option>個人：買い切りで検討したい</option></select></label>
+    <label><span class="lt">気になるプラン</span><select name="plan"><option>まだ決めていない</option><option>個人：ちょこっと（はじめ1,500円・月300円）</option><option>個人：じぶんアプリ（はじめ9,800円・月980円）</option><option>個人：みんなで使う（はじめ19,800円・月1,980円）</option><option>個人：買い切りで検討したい</option></select></label>
     <label><span class="lt">作りたいアプリ<span class="req">必須</span></span><textarea name="message" maxlength="4000" required placeholder="例）子ども2人の習いごとの予定と月謝をまとめたい。夫婦で同じ画面を見られるとうれしい。"></textarea><span class="ferr" id="e_message"></span></label>
     <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <p class="cnote">いただいた情報は、このご相談への返信とご連絡のためだけに使います。</p>
