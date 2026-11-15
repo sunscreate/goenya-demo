@@ -243,3 +243,6 @@ footer{padding-block:28px;font-size:14px;color:var(--sub)}
 /* 月額プラン：はじめの費用を見やすく */
 .plan .init{margin:8px 0 4px;font-size:15px;color:var(--sub)}
 .plan .init b{color:var(--ink);font:700 17px var(--mono);font-variant-numeric:tabular-nums}
+/* メニューが6つになったので折り返さないように */
+.nav a.lnkp{white-space:nowrap}
+@media (max-width:1320px) and (min-width:761px){.brand small{display:none}.nav{gap:6px}.nav a.lnkp{padding:0 12px;font-size:14px}}

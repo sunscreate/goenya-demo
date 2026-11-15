@@ -166,6 +166,29 @@ body.my{background:var(--bg2)}
 .shots figure:nth-child(2){transform:translateY(-14px)}
 .shots figcaption{margin-top:8px;font:700 12.5px "Zen Kaku Gothic New";color:var(--sub2)}
 @media (max-width:560px){.shots{grid-template-columns:repeat(3,62%);overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 4px;gap:12px}.shots figure{scroll-snap-align:center}.shots img{border-width:4px;border-radius:14px}.shots figure:nth-child(2){transform:none}}
+/* ---------- 作成事例のフォルダ（上の方に目立たせる） ---------- */
+.works-f{padding-block:36px 8px}
+.folder{position:relative;margin-top:22px}
+.folder .tab{display:inline-flex;align-items:center;gap:8px;background:var(--acc2);color:#fff;font:900 15px "Zen Kaku Gothic New";letter-spacing:.06em;padding:10px 20px 12px;border-radius:14px 14px 0 0;position:relative;top:2px}
+.folder .tab small{font:700 12px var(--mono);background:rgba(255,255,255,.22);border-radius:99px;padding:1px 8px}
+.folder .box{background:#fff;border:2px solid var(--acc2);border-radius:0 18px 18px 18px;padding:20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.folder .box{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.folder .box{grid-template-columns:1fr;padding:14px}}
+.wcard{display:flex;flex-direction:column;border:1px solid var(--line2);border-radius:16px;overflow:hidden;background:#fff;text-decoration:none;color:var(--ink3);transition:box-shadow .15s,transform .15s}
+.wcard:hover{box-shadow:0 12px 26px rgba(31,42,51,.12);transform:translateY(-2px)}
+.wcard .pic{background:#fff4f1;height:200px;overflow:hidden;display:flex;justify-content:center;gap:10px;padding:16px 16px 0}
+.wcard .pic img{width:42%;height:auto;border:4px solid #1b1f23;border-bottom:0;border-radius:14px 14px 0 0;align-self:flex-start}
+.wcard .bd{padding:14px 16px 16px;display:grid;gap:6px}
+.wcard .nm{display:flex;align-items:center;gap:10px;font:900 19px "Zen Kaku Gothic New"}
+.wcard .nm img{width:34px;height:34px;border-radius:9px}
+.wcard p{font-size:14px;color:var(--sub2);line-height:1.7}
+.wcard .pl{font:700 13px "Zen Kaku Gothic New";color:var(--ok2)}
+.wcard .go{margin-top:4px;font:700 14px "Zen Kaku Gothic New";color:var(--acc2)}
+.wcard.next{border:2px dashed #c9c3b6;background:transparent;justify-content:center;align-items:center;text-align:center;padding:24px;min-height:240px}
+.wcard.next b{font:900 18px "Zen Kaku Gothic New";color:var(--ink3)}
+.wcard.next span{font-size:14px;color:var(--sub2);margin-top:6px}
+.wcard.next em{font-style:normal;margin-top:12px;display:inline-block;background:var(--ink3);color:#fff;border-radius:99px;padding:8px 18px;font:700 14px "Zen Kaku Gothic New"}
+@media (prefers-reduced-motion: reduce){.wcard{transition:none}.wcard:hover{transform:none}}
 </style>
 </head>
 <body class="my">
@@ -182,7 +205,7 @@ body.my{background:var(--bg2)}
   <div class="intro">
     <div>
       <p class="lead2">市販のアプリは、たくさんの人が使う前提で作られています。ここで作るのは、はじめからあなた専用。使う項目だけを、あなたの言葉と、あなたの名前で。<b>あなたのアイデアを、あなたのスマホへ</b>届けます。</p>
-      <div class="ctas"><a class="btn" href="#contact">無料で相談する</a><a class="btn ghost" href="#price">料金を見る</a></div>
+      <div class="ctas"><a class="btn" href="#contact">無料で相談する</a><a class="btn ghost" href="#works">📁 作成事例を見る</a><a class="btn ghost" href="#price">料金を見る</a></div>
     </div>
     <div class="facts" aria-label="料金のめやす">
       <div class="fact"><span>月額</span><b>300円〜<small>1日あたり約10円</small></b></div>
@@ -191,7 +214,25 @@ body.my{background:var(--bg2)}
     </div>
   </div>
 
-  <div class="igrid" id="ideas">
+  <div class="works-f" id="works">
+  <span class="eyebrow">WORKS</span>
+  <h2 class="sec-h" style="font-size:clamp(22px,2.8vw,30px)">これまでに仕立てたアプリ</h2>
+  <p class="lead2">実際のご依頼から仕立てたアプリです。押すと、どんなアプリか・何ができるかを画面つきで見られます。「これに近いものがほしい」も、そこから頼めます。</p>
+  <div class="folder">
+    <span class="tab">📁 作成事例 <small>1</small></span>
+    <div class="box">
+      <a class="wcard" href="shitateya-kaihi.html">
+        <div class="pic"><img src="img/kaihi/list.jpg" width="780" height="1688" alt="" loading="lazy"><img src="img/kaihi/event.jpg" width="780" height="1688" alt="" loading="lazy"></div>
+        <div class="bd"><span class="nm"><img src="img/kaihi/icon.png" width="192" height="192" alt="">会費ノート</span>
+          <p>サークルや飲み会の会費集め。名前を選んで、払ったらチェックするだけ。</p>
+          <span class="pl">ちょこっと：はじめ1,500円・月300円</span>
+          <span class="go">中身を見る →</span></div>
+      </a>
+      <a class="wcard next" href="#contact"><b>次は、あなたのアプリ</b><span>「こんなのがあったら」を、ふだんの言葉で。<br>完成イメージの試作までは無料です。</span><em>相談する</em></a>
+    </div>
+  </div>
+</div>
+<div class="igrid" id="ideas">
     <div>
       <p class="pick">押すと、ホーム画面にアプリが並びます</p>
       <div class="ideas2" id="ideaList"></div>
