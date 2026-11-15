@@ -134,6 +134,29 @@ body.my{background:var(--bg2)}
 .sticky-cta{display:none}
 @media (max-width:720px){.sticky-cta{display:flex;position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:20;justify-content:center;box-shadow:0 10px 24px rgba(29,35,39,.25)}}
 @media (prefers-reduced-motion: reduce){.app.new{animation:none}.idea2,.pc{transition:none}}
+/* ---------- 仕立てた例 ---------- */
+.case{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:28px 44px;margin-top:28px;background:#fff;border:1px solid var(--line2);border-radius:20px;padding:30px 30px 26px}
+@media (max-width:900px){.case{grid-template-columns:1fr;padding:22px 18px}}
+.case .who{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.case .who .ic{width:52px;height:52px;border-radius:14px;flex:none;background:#f6a0a0 url(img/kaihi/icon.png) center/cover}
+.case .who b{display:block;font:900 20px "Zen Kaku Gothic New";color:var(--ink3)}
+.case .who span{font-size:13px;color:var(--sub2)}
+.case .q{position:relative;background:var(--acc2-bg);border-radius:14px;padding:14px 16px;font-size:15px;line-height:1.85;color:var(--ink3)}
+.case .q::before{content:"ご要望";display:block;font:700 12px "Zen Kaku Gothic New";letter-spacing:.1em;color:var(--acc2);margin-bottom:4px}
+.case h3{font:700 15px "Zen Kaku Gothic New";color:var(--ink3);margin:20px 0 8px}
+.case ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.case li{display:flex;gap:10px;font-size:14.5px;line-height:1.7}
+.case li::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;margin-top:4px;background:var(--ok2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.5l2.5 2.5L13 6.5' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat}
+.case .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.case .meta span{font:700 12.5px "Zen Kaku Gothic New";color:var(--sub2);border:1px solid var(--line2);border-radius:99px;padding:3px 10px}
+.case .try{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px}
+.case .try small{color:var(--sub2);font-size:12.5px}
+.shots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-self:center}
+.shots figure{margin:0;text-align:center}
+.shots img{display:block;width:100%;height:auto;border-radius:20px;border:6px solid #1b1f23;box-shadow:0 14px 30px rgba(31,42,51,.16);background:#fff7f3}
+.shots figure:nth-child(2){transform:translateY(-14px)}
+.shots figcaption{margin-top:8px;font:700 12.5px "Zen Kaku Gothic New";color:var(--sub2)}
+@media (max-width:560px){.shots{grid-template-columns:repeat(3,62%);overflow-x:auto;scroll-snap-type:x mandatory;padding:6px 2px 4px;gap:12px}.shots figure{scroll-snap-align:center}.shots img{border-width:4px;border-radius:14px}.shots figure:nth-child(2){transform:none}}
 </style>
 </head>
 <body class="my">
@@ -194,6 +217,35 @@ body.my{background:var(--bg2)}
       <li>広告なし。あなたと家族の名前、好きな色で</li>
       <li>共有したい人だけと、同じ画面を</li></ul></div>
   </div>
+</div></section>
+
+<section id="case" style="padding-top:0"><div class="wrap">
+  <span class="eyebrow">CASE 01</span>
+  <h2 class="sec-h">仕立てた例：<span class="uline">会費ノート</span></h2>
+  <p class="lead2">サークルの会費を集める係をしている妻から「ノートとメモ帳だと、誰が払ったか分からなくなる」と頼まれて作りました。家族からの頼まれごとなので、お代はいただいていません。</p>
+  <div class="case">
+    <div>
+      <div class="who"><span class="ic" aria-hidden="true"></span><div><b>会費ノート</b><span>サークル・習いごと・飲み会の集金に</span></div></div>
+      <p class="q">イベントごとに参加する人を決めて、一人ずつの金額と、全体の料金を入れたい。払ったかどうかは、名前の横のチェックでつけたい。一度入れた名前は、次のイベントで選ぶだけにしたい。</p>
+      <h3>こう仕立てました</h3>
+      <ul>
+        <li>一度入れた名前は登録されて、次からは押して選ぶだけ</li>
+        <li>金額は「全員同じ」を一度に入れても、一人ずつ直してもOK</li>
+        <li>全体の料金とずれていたら「○円足りません」と教えてくれる</li>
+        <li>名前の横のチェックで支払い済み。未集金の金額がひと目で分かる</li>
+        <li>イベントごとのメモ欄。終わったイベントは残しても、消してもOK</li>
+        <li>ご本人の好みで、ピンクの丸い文字・ぶたの貯金箱のアイコンに</li>
+      </ul>
+      <div class="meta"><span>スマホのホーム画面から開ける</span><span>広告なし</span><span>データはご本人のスマホの中だけ</span></div>
+      <div class="try"><a class="btn sm" href="https://kaihi-note.vercel.app/" target="_blank" rel="noopener">実際に触ってみる</a><small>入れたデータは、お使いのスマホの中にだけ保存されます</small></div>
+    </div>
+    <div class="shots">
+      <figure><img src="img/kaihi/list.jpg" width="780" height="1688" alt="会費ノートのイベント一覧。未集金の金額と進み具合が出ている" loading="lazy"><figcaption>イベントの一覧</figcaption></figure>
+      <figure><img src="img/kaihi/event.jpg" width="780" height="1688" alt="イベントの画面。集める合計・支払い済み・未払いと、メンバーのチェック" loading="lazy"><figcaption>支払いチェック</figcaption></figure>
+      <figure><img src="img/kaihi/add.jpg" width="780" height="1688" alt="登録済みの名前から押して選ぶ画面" loading="lazy"><figcaption>名前は選ぶだけ</figcaption></figure>
+    </div>
+  </div>
+  <p class="rules">※ 画面の名前・金額は見本です。</p>
 </div></section>
 
 <section id="price"><div class="wrap">
