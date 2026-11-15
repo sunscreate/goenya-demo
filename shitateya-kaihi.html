@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="アプリのしたてやで仕立てた「会費ノート」。サークルや飲み会の会費集めを、名前を選んでチェックするだけに。どんなアプリか、何ができるかを、実際の画面でご紹介します。">
+<meta property="og:title" content="会費ノート｜アプリのしたてやで仕立てたアプリ">
+<title>会費ノート｜アプリのしたてやで仕立てたアプリ（Sun'sCreate）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<link rel="stylesheet" href="site.css">
+<style>
+/* =========================================================
+   したてやで作ったアプリの紹介ページ（1アプリ1ページ）
+   ・技術の話はしない。「困りごと → できること → 画面 → 近いものを頼む」の順
+   ・「近いものがほしい」ボタンは最初の画面と、読み終えたところの2か所（見たい人がすぐ押せる・読んだ人も迷わない）
+   ・フォームは「何を変えたいか」だけ書けばよい形にして、書くことに迷わないよう例を出す
+   ========================================================= */
+:root{--acc2:#c8553d;--acc2-bg:#f7e9e4;--ok2:#2f7d6b;--ok2-bg:#e6f1ee;--line2:#e2ded5;--sub2:#5f6b74;--ink3:#1f2a33;--card2:#fff;--app:#f08a8a;--app-bg:#fff4f1}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--acc2:#e07a62;--acc2-bg:#3a2722;--ok2:#6cc3a8;--ok2-bg:#1d3530;--line2:#323a40;--sub2:#a4afb8;--ink3:#e9edf0;--card2:#1d2226;--app-bg:#2e2224}}
+:root[data-theme="dark"]{--acc2:#e07a62;--acc2-bg:#3a2722;--ok2:#6cc3a8;--ok2-bg:#1d3530;--line2:#323a40;--sub2:#a4afb8;--ink3:#e9edf0;--card2:#1d2226;--app-bg:#2e2224}
+.h-font{font-family:"Zen Kaku Gothic New",var(--body)}
+.crumb{font-size:14px;color:var(--sub2);padding-top:18px}
+.crumb a{color:var(--sub2)}
+.hero2{padding-block:28px 40px}
+.hero2 .g{display:grid;grid-template-columns:1.1fr .9fr;gap:30px 48px;align-items:center}
+@media (max-width:860px){.hero2 .g{grid-template-columns:1fr}}
+.tagline{display:inline-flex;align-items:center;gap:8px;font:700 13px "Zen Kaku Gothic New";color:var(--acc2);background:var(--acc2-bg);border-radius:99px;padding:4px 12px}
+.hero2 h1{font:900 clamp(30px,4.6vw,50px)/1.25 "Zen Kaku Gothic New",var(--body);color:var(--ink3);margin:14px 0 10px;display:flex;align-items:center;gap:14px}
+.hero2 h1 img{width:64px;height:64px;border-radius:16px;flex:none}
+.hero2 .lead{font-size:17.5px;color:var(--sub2);max-width:32em}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chips span{font:700 13px "Zen Kaku Gothic New";color:var(--ink3);border:1px solid var(--line2);background:var(--card2);border-radius:99px;padding:4px 12px}
+.ctas2{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.phones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:440px;justify-self:center}
+.phones img{display:block;width:100%;height:auto;border-radius:24px;border:7px solid #1b1f23;box-shadow:0 18px 38px rgba(31,42,51,.18);background:#fff7f3}
+.phones img:nth-child(2){transform:translateY(26px)}
+.sec2{padding-block:44px}
+.sec2 h2{font:900 clamp(24px,3vw,32px)/1.35 "Zen Kaku Gothic New",var(--body);color:var(--ink3);margin-bottom:8px}
+.sec2 .sublead{color:var(--sub2);max-width:40em}
+.before{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:stretch;margin-top:22px}
+@media (max-width:760px){.before{grid-template-columns:1fr}.before .arrow{transform:rotate(90deg);justify-self:center}}
+.before .bx{background:var(--card2);border:1px solid var(--line2);border-radius:16px;padding:18px 20px}
+.before .bx.us{border:2px solid var(--ok2)}
+.before b{display:block;font:700 15px "Zen Kaku Gothic New";color:var(--sub2);margin-bottom:8px}
+.before .us b{color:var(--ok2)}
+.before ul{margin:0;padding-left:1.1em;display:grid;gap:6px;font-size:15.5px;color:var(--ink3)}
+.before .arrow{align-self:center;font:900 28px var(--body);color:var(--sub2)}
+.feats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 28px;margin-top:26px}
+@media (max-width:760px){.feats{grid-template-columns:1fr}}
+.feat2{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:start;background:var(--card2);border:1px solid var(--line2);border-radius:18px;padding:16px}
+.feat2 img{width:130px;height:auto;border-radius:14px;border:4px solid #1b1f23}
+.feat2 .n{font:700 12px var(--mono);color:var(--acc2);letter-spacing:.1em}
+.feat2 h3{font:700 18px "Zen Kaku Gothic New";color:var(--ink3);margin:2px 0 6px}
+.feat2 p{font-size:14.5px;color:var(--sub2);line-height:1.8}
+.reqs{margin-top:22px;border:1px solid var(--line2);border-radius:16px;background:var(--card2);overflow:hidden}
+.reqs div{display:grid;grid-template-columns:11em 1fr;border-top:1px solid var(--line2)}
+.reqs div:first-child{border-top:0}
+.reqs dt,.reqs dd{margin:0;padding:12px 16px;font-size:15px}
+.reqs dt{font-weight:700;color:var(--ink3);background:var(--app-bg)}
+.reqs dd{color:var(--ink3)}
+@media (max-width:560px){.reqs div{grid-template-columns:1fr}.reqs dt{padding-bottom:4px}}
+.price3{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;margin-top:22px;background:var(--card2);border:2px solid var(--ink3);border-radius:16px;padding:18px 22px}
+.price3 .p{font:700 15px "Zen Kaku Gothic New";color:var(--sub2)}
+.price3 .p b{font:900 30px "Zen Kaku Gothic New";color:var(--ink3);margin:0 2px;font-variant-numeric:tabular-nums}
+.price3 small{color:var(--sub2);font-size:13.5px}
+.ideas{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ideas button{font:700 14px var(--body);border:1.5px solid color-mix(in srgb,var(--paper) 45%,transparent);background:transparent;color:var(--paper);border-radius:99px;padding:6px 14px;cursor:pointer}
+.ideas button:hover{background:color-mix(in srgb,var(--paper) 12%,transparent)}
+.base{display:inline-flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--paper) 10%,transparent);border-radius:12px;padding:8px 14px 8px 8px;margin-top:6px;font-weight:700}
+.base img{width:36px;height:36px;border-radius:9px}
+</style>
+</head>
+<body>
+<header><div class="wrap hbar">
+  <a class="brand" href="index.html">Sun'sCreate<small>アプリ・システム・設備管理</small></a>
+  <nav class="nav" aria-label="サイト内"><a class="lnkp" href="myapp.html" aria-current="page">アプリのしたてや</a><a class="lnkp" href="system.html">業務システム</a><a class="lnkp" href="works.html">制作事例</a><a class="lnkp" href="price.html">料金</a></nav>
+  <a class="btn sm hdr-cta" href="#want">近いものを頼む</a>
+</div></header>
+<main>
+<div class="wrap"><p class="crumb"><a href="myapp.html">アプリのしたてや</a> ／ <a href="myapp.html#case">仕立てたアプリ</a> ／ 会費ノート</p></div>
+
+<section class="hero2"><div class="wrap g">
+  <div>
+    <span class="tagline">仕立てたアプリ No.01</span>
+    <h1><img src="img/kaihi/icon.png" width="192" height="192" alt="">会費ノート</h1>
+    <p class="lead">サークルや飲み会の会費集め。「誰が払った？」を、名前を選んでチェックするだけにしたアプリです。会費を集める係のかたからのご依頼で仕立てました。</p>
+    <div class="chips"><span>スマホのホーム画面から開ける</span><span>電波がなくても使える</span><span>広告なし</span><span>データはご本人のスマホの中だけ</span></div>
+    <div class="ctas2"><a class="btn" href="#want">このアプリに近いものがほしい</a><a class="btn ghost" href="https://kaihi-note.vercel.app/" target="_blank" rel="noopener">実際に触ってみる</a></div>
+  </div>
+  <div class="phones"><img src="img/kaihi/list.jpg" width="780" height="1688" alt="イベントの一覧。未集金の金額と、集まり具合のバーが出ている"><img src="img/kaihi/event.jpg" width="780" height="1688" alt="イベントの画面。集める合計・支払い済み・未払いと、名前の横のチェック"></div>
+</div></section>
+
+<section class="sec2"><div class="wrap">
+  <h2>ご依頼の前と、あと</h2>
+  <div class="before">
+    <div class="bx"><b>これまで</b><ul><li>ノートとメモ帳で管理していて、誰が払ったか分からなくなる</li><li>イベントのたびに、同じ名前を何度も書く</li><li>いくら集まって、あといくら足りないのか、毎回計算する</li></ul></div>
+    <span class="arrow" aria-hidden="true">→</span>
+    <div class="bx us"><b>会費ノートで</b><ul><li>払ったら、名前の横を押すだけ</li><li>一度入れた名前は、次から押して選ぶだけ</li><li>集まった金額と、未集金の金額がいつも出ている</li></ul></div>
+  </div>
+</div></section>
+
+<section class="sec2" style="padding-top:0"><div class="wrap">
+  <h2>できること</h2>
+  <p class="sublead">ご依頼の内容を、そのまま形にしました。使う画面は少なく、開いてすぐ、いつもの操作ができます。</p>
+  <div class="feats">
+    <div class="feat2"><img src="img/kaihi/list.jpg" width="780" height="1688" alt="" loading="lazy"><div><span class="n">01</span><h3>イベントごとに管理</h3><p>イベント名・日付・全体の料金を入れて作ります。一覧には、まだ集まっていない金額と、集まり具合のバーが出ます。</p></div></div>
+    <div class="feat2"><img src="img/kaihi/add.jpg" width="780" height="1688" alt="" loading="lazy"><div><span class="n">02</span><h3>名前は選ぶだけ</h3><p>一度入れた名前は登録されて、次のイベントでは押して選ぶだけ。「全員を選ぶ」もできます。</p></div></div>
+    <div class="feat2"><img src="img/kaihi/bulk.jpg" width="780" height="1688" alt="" loading="lazy"><div><span class="n">03</span><h3>金額は一括でも、一人ずつでも</h3><p>全員に同じ金額を一度に入れられます。全体の料金を人数で割った金額が、はじめから入っています。もちろん一人ずつ直すこともできます。</p></div></div>
+    <div class="feat2"><img src="img/kaihi/event.jpg" width="780" height="1688" alt="" loading="lazy"><div><span class="n">04</span><h3>チェックで支払い済み</h3><p>払った人は名前の横を押すだけ。全体の料金と合計がずれていると「○円足りません」と教えてくれます。イベントごとにメモも残せます。</p></div></div>
+    <div class="feat2"><img src="img/kaihi/end.jpg" width="780" height="1688" alt="" loading="lazy"><div><span class="n">05</span><h3>終わったイベントは残せる</h3><p>終わったら「終了にする」で別の欄へ。あとから見返せます。集金中に戻すこともできます。</p></div></div>
+    <div class="feat2"><img src="img/kaihi/manage.jpg" width="780" height="1688" alt="" loading="lazy"><div><span class="n">06</span><h3>データの整理と、もしものときの控え</h3><p>名前の直し・消去、終わったイベントのまとめての消去ができます。機種変更に備えて、控えのファイルを保存・読み込みできます。</p></div></div>
+  </div>
+</div></section>
+
+<section class="sec2" style="padding-top:0"><div class="wrap">
+  <h2>このアプリの決まりごと</h2>
+  <p class="sublead">ご依頼のときに決めた、このアプリの「こう作る」です。あなたのアプリでは、ここを変えられます。</p>
+  <dl class="reqs">
+    <div><dt>使う人</dt><dd>会費を集める係の1人。自分のスマホで使う</dd></div>
+    <div><dt>入れるもの</dt><dd>イベント名・日付・全体の料金・参加する人・一人ずつの金額・払ったかどうか・メモ</dd></div>
+    <div><dt>画面</dt><dd>イベントの一覧／イベントの画面／データの整理　の3つ</dd></div>
+    <div><dt>データの置き場所</dt><dd>ご本人のスマホの中だけ。ほかの人からは見えない</dd></div>
+    <div><dt>見た目</dt><dd>ご本人の好みで、ピンクの丸い文字と、ぶたの貯金箱のアイコン</dd></div>
+    <div><dt>使いやすさ</dt><dd>指で広げて拡大しない（押し間違いを防ぐ）。消す前には必ず確認を出す</dd></div>
+    <div><dt>入れなかったもの</dt><dd>みんなでの共有、ログイン、メンバーへのお知らせ、アプリでの支払いの受け取り</dd></div>
+  </dl>
+  <div class="price3">
+    <p class="p">このくらいのアプリなら「ちょこっと」　はじめ<b>1,500</b>円・月<b>300</b>円</p>
+    <small>みんなで同じデータを見たい場合は「じぶんアプリ」以上になります。<a href="myapp.html#price">料金のくわしい説明</a></small>
+  </div>
+</div></section>
+
+<section class="contact" id="want"><div class="wrap">
+  <h2>このアプリに近いものが、ほしいかたへ</h2>
+  <p class="lead">会費ノートをもとに、あなたの使い方に合わせて仕立て直します。「ここを変えたい」「これを足したい」を、ふだんの言葉で書いてください。完成イメージの試作までは無料です。</p>
+  <p class="base"><img src="img/kaihi/icon.png" width="192" height="192" alt="">もとにするアプリ：会費ノート</p>
+  <form class="cform" id="cf" novalidate>
+    <div class="cg2">
+      <label><span class="lt">お名前<span class="req">必須</span></span><input name="name" autocomplete="name" maxlength="80" required><span class="ferr" id="e_name"></span></label>
+      <label><span class="lt">返信先のメールアドレス<span class="req">必須</span></span><input name="email" type="email" autocomplete="email" inputmode="email" maxlength="200" required><span class="ferr" id="e_email"></span></label>
+    </div>
+    <label><span class="lt">変えたいこと・足したいこと<span class="req">必須</span></span>
+      <span style="font-weight:400;font-size:14px">よくあるご希望（押すと下の欄に入ります）</span>
+      <span class="ideas" id="ideas"><button type="button">メンバーと共有して見たい</button><button type="button">年会費・月謝の管理にしたい</button><button type="button">支払い期限とお知らせがほしい</button><button type="button">集計を表やファイルで出したい</button><button type="button">色や名前を変えたい</button></span>
+      <textarea name="message" maxlength="4000" required placeholder="例）子どものサッカーチームの月謝集めに使いたいです。月ごとに未払いの人が一目で分かって、保護者のLINEに送る文も作れるとうれしいです。"></textarea><span class="ferr" id="e_message"></span></label>
+    <div class="cg2">
+      <label><span class="lt">使う人数・使い方<span class="opt">任意</span></span><input name="use" maxlength="200" placeholder="例）係2人で使う／メンバー30人くらい"></label>
+      <label><span class="lt">電話番号<span class="opt">任意</span></span><input name="tel" type="tel" autocomplete="tel" inputmode="tel" maxlength="30"></label>
+    </div>
+    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div><button class="btn" id="cfb" type="submit">この内容で相談する（無料）</button><p class="cmsg" id="cfm" role="status" aria-live="polite"></p></div>
+  </form>
+  <small>送っていただいた内容は、ご相談への返信のためだけに使います。</small>
+</div></section>
+</main>
+<footer><div class="wrap">© Sun'sCreate「アプリのしたてや」　画面に出てくる名前・金額は見本です。　<a href="myapp.html">アプリのしたてや</a>　<a href="index.html">ホーム</a></div></footer>
+<script>
+(function(){const ENDPOINT="https://script.google.com/macros/s/AKfycbw2Fl9A6acrwcXZrFOzFonlSR02ghRS8kTtlTzKcoHceM3bVUxKz6PGs-rhunHRIV7Y/exec",APP="会費ノート",f=document.getElementById("cf");if(!f)return;const t0=Date.now();
+  document.querySelectorAll("#ideas button").forEach(b=>b.addEventListener("click",()=>{const t=f.elements.message;t.value=(t.value.trim()?t.value.trim()+"\n":"")+"・"+b.textContent;t.focus();b.disabled=true;b.style.opacity=.45}));
+  const show=(k,m)=>{const e=document.getElementById("e_"+k),i=f.elements[k];if(e)e.textContent=m||"";if(i)i.setAttribute("aria-invalid",m?"true":"false")};
+  const okMail=v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  ["name","email","message"].forEach(k=>f.elements[k].addEventListener("input",()=>{if(f.elements[k].value.trim()&&(k!=="email"||okMail(f.elements[k].value.trim())))show(k,"")}));
+  f.addEventListener("submit",async e=>{e.preventDefault();const g=k=>f.elements[k].value.trim(),m=document.getElementById("cfm"),b=document.getElementById("cfb");
+    const errs={name:g("name")?"":"お名前を入れてください",email:!g("email")?"返信先のメールアドレスを入れてください":okMail(g("email"))?"":"メールアドレスの形を確かめてください（例 info@example.jp）",message:g("message")?"":"変えたいこと・足したいことを一言でも入れてください"};
+    Object.keys(errs).forEach(k=>show(k,errs[k]));const first=Object.keys(errs).find(k=>errs[k]);if(first){f.elements[first].focus();m.textContent="";return}
+    const msg="【もとにするアプリ】"+APP+"\n\n"+g("message")+(g("use")?"\n\n（使う人数・使い方："+g("use")+"）":"");
+    b.disabled=true;b.textContent="送信しています…";m.className="cmsg";m.textContent="";
+    const d={name:g("name"),company:"",email:g("email"),tel:g("tel"),plan:"近いアプリ："+APP,message:msg,website:f.elements.website.value,elapsed:Date.now()-t0,page:"shitateya-kaihi.html"};
+    try{const r=await fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(d)});const j=await r.json();
+      if(!j.ok)throw new Error(j.error||"送信できませんでした");
+      const esc=s=>s.replace(/[&<>"]/g,"");
+      f.outerHTML='<div class="cdone" tabindex="-1" id="cfd"><h3>ご相談を受け付けました</h3><p>'+esc(d.name)+' 様、ありがとうございます。受付のメールを '+esc(d.email)+' にお送りしました。内容を確認して、メールでご返信します。</p></div>';
+      document.getElementById("cfd").focus()}
+    catch(x){m.className="cmsg err";m.textContent=(x.message||"送信できませんでした")+"　お手数ですが、時間をおいてもう一度お試しいただくか、sunscreate@scky.fun へメールでお送りください。";b.disabled=false;b.textContent="この内容で相談する（無料）"}});
+})();
+</script>
+</body>
+</html>
