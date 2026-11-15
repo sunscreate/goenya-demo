@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>会費ノート</title>
+<meta name="theme-color" content="#2f6f5e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="会費ノート">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1f2a27;--sub:#6b7672;--line:#e3e0d8;--main:#2f6f5e;--main2:#e6f0ec;--warn:#b54a3c;--warn2:#fbeceA;--paid:#2f6f5e;--r:14px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:16px;line-height:1.5;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:var(--main);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px;min-height:52px}
+header h1{font-size:18px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:10px;padding:6px 12px;font-size:15px}
+main{max-width:640px;margin:0 auto;padding:14px 14px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.ev{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px;font:inherit;color:inherit}
+.ev .t{font-weight:700;font-size:17px}
+.ev .m{color:var(--sub);font-size:14px;margin-top:2px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--main)}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--main2);color:var(--main);margin-left:6px;vertical-align:2px;font-weight:600}
+.tag.end{background:#ece9e2;color:var(--sub)}
+.tag.due{background:var(--warn2);color:var(--warn)}
+h2{font-size:14px;color:var(--sub);margin:18px 2px 8px;font-weight:600}
+label.f{display:block;font-size:13px;color:var(--sub);margin:0 0 4px}
+input,textarea,select{font:inherit;font-size:16px;width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink)}
+textarea{min-height:96px;resize:vertical}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:12px;padding:12px 16px;font:inherit;font-weight:700;background:var(--main);color:#fff;min-height:46px}
+.btn.sub{background:var(--main2);color:var(--main)}
+.btn.ghost{background:transparent;color:var(--sub);border:1px solid var(--line)}
+.btn.danger{background:var(--warn2);color:var(--warn)}
+.btn.w{width:100%}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom));z-index:6;box-shadow:0 6px 18px rgba(0,0,0,.18);padding:14px 26px;border-radius:99px}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.sum div{background:var(--bg);border-radius:10px;padding:8px 4px}
+.sum b{display:block;font-size:17px}
+.sum span{font-size:12px;color:var(--sub)}
+.mem{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.mem:first-child{border-top:0}
+.chk{width:34px;height:34px;flex:none;border-radius:10px;border:2px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;padding:0}
+.chk.on{background:var(--paid);border-color:var(--paid)}
+.mem .nm{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mem.paid .nm{color:var(--sub)}
+.mem .fee{width:110px;flex:none;text-align:right;padding:8px 10px}
+.x{flex:none;border:0;background:none;color:var(--sub);font-size:20px;width:32px;height:32px;padding:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;font:inherit;font-size:15px;color:var(--ink)}
+.chip.on{background:var(--main);border-color:var(--main);color:#fff}
+.muted{color:var(--sub);font-size:14px}
+.diff{font-size:14px;margin-top:8px}
+.diff.ok{color:var(--main)}.diff.ng{color:var(--warn)}
+.tabs{display:flex;gap:6px;margin:4px 0 12px}
+.tabs button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px;font:inherit;font-size:15px;color:var(--sub)}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.empty{text-align:center;color:var(--sub);padding:40px 10px}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet>div{background:var(--card);width:100%;max-width:640px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:85vh;overflow:auto}
+.sheet h3{margin:0 0 12px;font-size:17px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom));background:var(--ink);color:#fff;padding:10px 18px;border-radius:99px;z-index:30;font-size:14px}
+.li{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.li:first-child{border-top:0}
+.li span{flex:1}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><button id="back" hidden>‹ 戻る</button><h1 id="ttl">会費ノート</h1><button id="mng">データ管理</button></header>
+<main id="app"></main>
+<div id="sheet"></div>
+<script>
+const KEY='kaihi-note-v1';
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=S||{members:[],events:[]};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('保存できませんでした')}};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const yen=n=>'¥'+(Math.round(+n||0)).toLocaleString('ja-JP');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{v=String(v??'').replace(/[^\d]/g,'');return v===''?0:+v};
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const fmtD=s=>{if(!s)return'日付なし';const[y,m,d]=s.split('-');const w='日月火水木金土'[new Date(+y,m-1,+d).getDay()];return`${+y}年${+m}月${+d}日(${w})`};
+const mname=id=>(S.members.find(m=>m.id===id)||{}).name||'（削除した名前）';
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),1800)}
+function calc(ev){const due=ev.members.reduce((a,m)=>a+(+m.fee||0),0),got=ev.members.filter(m=>m.paid).reduce((a,m)=>a+(+m.fee||0),0);const pc=ev.members.filter(m=>m.paid).length;return{due,got,rest:due-got,pc,n:ev.members.length}}
+let view={p:'list',tab:'now'};
+const $=s=>document.querySelector(s);
+$('#back').onclick=()=>{view={p:'list',tab:view.tab||'now'};render()};
+$('#mng').onclick=()=>{view={p:'manage',tab:view.tab};render()};
+
+function render(){
+  closeSheet();
+  const a=$('#app');$('#back').hidden=view.p==='list';$('#mng').hidden=view.p!=='list';
+  document.querySelectorAll('.fab').forEach(e=>e.remove());
+  if(view.p==='list')return renderList(a);
+  if(view.p==='event')return renderEvent(a);
+  if(view.p==='manage')return renderManage(a);
+}
+
+function renderList(a){
+  $('#ttl').textContent='会費ノート';
+  const list=S.events.filter(e=>view.tab==='now'?!e.done:e.done).sort((x,y)=>(view.tab==='now'?1:-1)*((x.date||'9999').localeCompare(y.date||'9999')));
+  const nNow=S.events.filter(e=>!e.done).length,nEnd=S.events.length-nNow;
+  a.innerHTML=`<div class="tabs"><button data-t="now" class="${view.tab==='now'?'on':''}">集金中（${nNow}）</button><button data-t="end" class="${view.tab==='end'?'on':''}">終わった（${nEnd}）</button></div>`+
+  (list.length?list.map(e=>{const c=calc(e);const pct=c.due?Math.round(c.got/c.due*100):(c.n&&c.pc===c.n?100:0);
+   return`<button class="ev" data-id="${e.id}"><div class="t">${esc(e.title||'名前のないイベント')}${e.done?'<span class="tag end">終了</span>':c.rest>0?`<span class="tag due">未集金 ${yen(c.rest)}</span>`:c.n&&c.due?'<span class="tag">集金済み</span>':c.n?'<span class="tag end">金額未入力</span>':''}</div>
+   <div class="m">${fmtD(e.date)}　支払い ${c.pc}/${c.n}人　${yen(c.got)} / ${yen(c.due)}</div><div class="bar"><i style="width:${pct}%"></i></div></button>`}).join('')
+   :`<div class="empty">${view.tab==='now'?'イベントはまだありません。<br>下の「＋ イベントを作る」から始めましょう。':'終わったイベントはありません。'}</div>`);
+  a.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{view.tab=b.dataset.t;render()});
+  a.querySelectorAll('.ev').forEach(b=>b.onclick=()=>{view={p:'event',id:b.dataset.id,tab:view.tab};render();scrollTo(0,0)});
+  const f=document.createElement('button');f.className='btn fab';f.textContent='＋ イベントを作る';f.onclick=newEvent;document.body.append(f);
+}
+
+function newEvent(){
+  const ev={id:uid(),title:'',date:today(),total:0,memo:'',members:[],done:false,created:Date.now()};
+  S.events.push(ev);save();view={p:'event',id:ev.id,tab:'now',fresh:true};render();
+  setTimeout(()=>$('#f-title')&&$('#f-title').focus(),50);
+}
+
+function sumHTML(ev){const c=calc(ev),diff=(+ev.total||0)-c.due;
+  return `<div class="sum"><div><b>${yen(c.due)}</b><span>集める合計</span></div><div><b style="color:var(--main)">${yen(c.got)}</b><span>支払い済み</span></div><div><b style="color:${c.rest>0?'var(--warn)':'inherit'}">${yen(c.rest)}</b><span>未払い</span></div></div>
+    ${ev.total?`<div class="diff ${diff===0?'ok':'ng'}">全体の料金 ${yen(ev.total)} に対して、メンバーの料金の合計は${diff===0?'ぴったりです':diff>0?` ${yen(diff)} 足りません`:` ${yen(-diff)} 多いです`}</div>`:''}`}
+function renderEvent(a){
+  const ev=S.events.find(e=>e.id===view.id);if(!ev){view={p:'list',tab:'now'};return render()}
+  $('#ttl').textContent=ev.title||'新しいイベント';
+  const c=calc(ev);
+  a.innerHTML=`
+  <div class="card">
+    <label class="f">イベント名</label><input id="f-title" value="${esc(ev.title)}" placeholder="例：12月の忘年会">
+    <div class="row" style="margin-top:10px">
+      <div><label class="f">日付</label><input id="f-date" type="date" value="${esc(ev.date)}"></div>
+      <div><label class="f">全体の料金</label><input id="f-total" inputmode="numeric" value="${ev.total?ev.total:''}" placeholder="例：30000"></div>
+    </div>
+  </div>
+  <div class="card" id="sumc">${sumHTML(ev)}</div>
+  <h2 id="mh">メンバー（${c.pc}/${c.n}人 支払い済み）</h2>
+  <div class="card">
+    ${ev.members.length?ev.members.map((m,i)=>`<div class="mem ${m.paid?'paid':''}">
+      <button class="chk ${m.paid?'on':''}" data-i="${i}" aria-label="支払い済み">${m.paid?'✓':''}</button>
+      <div class="nm">${esc(mname(m.mid))}</div>
+      <input class="fee" data-i="${i}" inputmode="numeric" value="${m.fee?m.fee:''}" placeholder="金額">
+      <button class="x" data-i="${i}" aria-label="外す">×</button></div>`).join(''):'<div class="muted">まだメンバーがいません。下のボタンから追加してください。</div>'}
+    <div class="row" style="margin-top:12px"><button class="btn sub" id="addm">＋ メンバー追加</button><button class="btn sub" id="bulk">金額を一括入力</button></div>
+  </div>
+  <h2>メモ</h2>
+  <div class="card"><textarea id="f-memo" placeholder="場所、集金方法、連絡事項など">${esc(ev.memo)}</textarea></div>
+  <div class="row" style="margin:6px 0 30px">
+    <button class="btn ${ev.done?'sub':'ghost'}" id="done">${ev.done?'集金中に戻す':'終了にする'}</button>
+    <button class="btn danger" id="del">イベントを消す</button>
+  </div>`;
+  const up=(k,v)=>{ev[k]=v;save()};
+  $('#f-title').oninput=e=>{up('title',e.target.value);$('#ttl').textContent=e.target.value||'新しいイベント'};
+  $('#f-date').onchange=e=>up('date',e.target.value);
+  $('#f-total').oninput=e=>{const v=num(e.target.value);e.target.value=v||'';up('total',v);$('#sumc').innerHTML=sumHTML(ev)};
+  $('#f-memo').oninput=e=>up('memo',e.target.value);
+  a.querySelectorAll('.chk').forEach(b=>b.onclick=()=>{const m=ev.members[b.dataset.i];m.paid=!m.paid;m.paidAt=m.paid?Date.now():null;save();render()});
+  a.querySelectorAll('.fee').forEach(i=>{i.oninput=e=>{const v=num(e.target.value);e.target.value=v||'';ev.members[i.dataset.i].fee=v;save();$('#sumc').innerHTML=sumHTML(ev)}});
+  a.querySelectorAll('.x').forEach(b=>b.onclick=()=>{const m=ev.members[b.dataset.i];if(confirm(`${mname(m.mid)} さんをこのイベントから外しますか？`)){ev.members.splice(b.dataset.i,1);save();render()}});
+  $('#addm').onclick=()=>addMembers(ev);
+  $('#bulk').onclick=()=>bulkFee(ev);
+  $('#done').onclick=()=>{ev.done=!ev.done;save();toast(ev.done?'終わったイベントに移しました':'集金中に戻しました');view={p:'list',tab:ev.done?'end':'now'};render()};
+  $('#del').onclick=()=>{if(confirm(`「${ev.title||'名前のないイベント'}」を消しますか？\n消すと元に戻せません。`)){S.events=S.events.filter(e=>e.id!==ev.id);save();toast('消しました');view={p:'list',tab:view.tab};render()}};
+}
+
+function openSheet(html){const s=$('#sheet');s.innerHTML=`<div class="sheet"><div>${html}</div></div>`;s.firstChild.onclick=e=>{if(e.target===s.firstChild)closeSheet()};return s}
+function closeSheet(){$('#sheet').innerHTML=''}
+
+function addMembers(ev){
+  const inEv=new Set(ev.members.map(m=>m.mid));
+  const pick=new Set();
+  const draw=()=>{
+    const cand=S.members.filter(m=>!inEv.has(m.id)).sort((a,b)=>(b.used||0)-(a.used||0)||a.name.localeCompare(b.name,'ja'));
+    const s=openSheet(`<h3>メンバーを追加</h3>
+      <label class="f">新しい名前（入れると次から選べるようになります）</label>
+      <div class="row"><input id="nn" placeholder="名前を入力"><button class="btn" id="nnb" style="flex:none">追加</button></div>
+      <h2 style="margin-top:16px">登録済みの名前から選ぶ</h2>
+      ${cand.length?`<div class="chips">${cand.map(m=>`<button class="chip ${pick.has(m.id)?'on':''}" data-id="${m.id}">${esc(m.name)}</button>`).join('')}</div>
+      <div class="row" style="margin-top:10px"><button class="btn ghost" id="all">全員を選ぶ</button></div>`:'<div class="muted">選べる名前はまだありません。</div>'}
+      <div class="row" style="margin-top:16px"><button class="btn ghost" id="cn">閉じる</button><button class="btn" id="ok">${pick.size?pick.size+'人を追加':'追加する'}</button></div>`);
+    s.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{pick.has(b.dataset.id)?pick.delete(b.dataset.id):pick.add(b.dataset.id);draw()});
+    const all=s.querySelector('#all');if(all)all.onclick=()=>{cand.forEach(m=>pick.add(m.id));draw()};
+    const addNew=()=>{const n=s.querySelector('#nn').value.trim();if(!n)return;let m=S.members.find(x=>x.name===n);if(!m){m={id:uid(),name:n,used:0};S.members.push(m);save()}if(inEv.has(m.id)){toast('もう入っています');return}pick.add(m.id);draw();setTimeout(()=>$('#nn')&&$('#nn').focus(),30)};
+    s.querySelector('#nnb').onclick=addNew;s.querySelector('#nn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing)addNew()};
+    s.querySelector('#cn').onclick=closeSheet;
+    s.querySelector('#ok').onclick=()=>{const base=ev.members.length&&ev.members.every(m=>m.fee===ev.members[0].fee)?ev.members[0].fee:0;
+      pick.forEach(id=>{ev.members.push({mid:id,fee:base||0,paid:false});const m=S.members.find(x=>x.id===id);if(m)m.used=(m.used||0)+1});save();render()};
+  };draw();
+}
+
+function bulkFee(ev){
+  if(!ev.members.length){toast('先にメンバーを追加してください');return}
+  const n=ev.members.length,per=ev.total?Math.floor(ev.total/n):0;
+  const s=openSheet(`<h3>金額を一括入力</h3>
+    <label class="f">1人あたりの金額</label><input id="bf" inputmode="numeric" value="${per||''}" placeholder="例：3000">
+    ${ev.total?`<div class="muted" style="margin-top:6px">全体の料金 ${yen(ev.total)} ÷ ${n}人 ＝ ${yen(per)}${ev.total%n?`（${yen(ev.total%n)} 余ります）`:''}</div>`:''}
+    <label style="display:flex;gap:8px;align-items:center;margin-top:12px"><input type="checkbox" id="bo" style="width:22px;height:22px"> 支払い済みの人の金額は変えない</label>
+    <div class="row" style="margin-top:16px"><button class="btn ghost" id="cn">閉じる</button><button class="btn" id="ok">${n}人に入れる</button></div>`);
+  s.querySelector('#bf').oninput=e=>{const v=num(e.target.value);e.target.value=v||''};
+  s.querySelector('#cn').onclick=closeSheet;
+  s.querySelector('#ok').onclick=()=>{const v=num(s.querySelector('#bf').value),keep=s.querySelector('#bo').checked;ev.members.forEach(m=>{if(!(keep&&m.paid))m.fee=v});save();toast('金額を入れました');render()};
+}
+
+function renderManage(a){
+  $('#ttl').textContent='データ管理';
+  const ended=S.events.filter(e=>e.done);
+  const used=id=>S.events.filter(e=>e.members.some(m=>m.mid===id)).length;
+  a.innerHTML=`
+  <h2>登録済みの名前（${S.members.length}人）</h2>
+  <div class="card">${S.members.length?S.members.slice().sort((x,y)=>x.name.localeCompare(y.name,'ja')).map(m=>`<div class="li"><span>${esc(m.name)} <span class="muted">（${used(m.id)}件のイベント）</span></span><button class="btn ghost" style="min-height:36px;padding:6px 10px" data-ren="${m.id}">名前を直す</button><button class="x" data-rm="${m.id}" aria-label="消す">×</button></div>`).join(''):'<div class="muted">まだありません。</div>'}</div>
+  <h2>終わったイベント（${ended.length}件）</h2>
+  <div class="card">${ended.length?ended.sort((x,y)=>(y.date||'').localeCompare(x.date||'')).map(e=>`<div class="li"><span>${esc(e.title||'名前のないイベント')}<br><span class="muted">${fmtD(e.date)}</span></span><button class="x" data-de="${e.id}" aria-label="消す">×</button></div>`).join('')+`<button class="btn danger w" id="delend" style="margin-top:10px">終わったイベントをまとめて消す</button>`:'<div class="muted">ありません。</div>'}</div>
+  <h2>バックアップ</h2>
+  <div class="card">
+    <div class="muted" style="margin-bottom:10px">データはこのスマホの中に保存されています。機種変更のときや念のため、ときどきバックアップを保存しておくと安心です。</div>
+    <div class="row"><button class="btn sub" id="exp">バックアップを保存</button><button class="btn sub" id="imp">バックアップから戻す</button></div>
+    <input type="file" id="file" accept=".json,application/json" hidden>
+  </div>
+  <h2>すべて消す</h2>
+  <div class="card"><button class="btn danger w" id="wipe">すべてのデータを消す</button></div>`;
+  a.querySelectorAll('[data-ren]').forEach(b=>b.onclick=()=>{const m=S.members.find(x=>x.id===b.dataset.ren);const n=prompt('新しい名前',m.name);if(n&&n.trim()){m.name=n.trim();save();render()}});
+  a.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{const m=S.members.find(x=>x.id===b.dataset.rm),u=used(m.id);
+    if(!confirm(u?`「${m.name}」は ${u}件のイベントに入っています。\n候補から消すと、そのイベントからも外れます。消しますか？`:`「${m.name}」を候補から消しますか？`))return;
+    S.members=S.members.filter(x=>x.id!==m.id);S.events.forEach(e=>e.members=e.members.filter(x=>x.mid!==m.id));save();render()});
+  a.querySelectorAll('[data-de]').forEach(b=>b.onclick=()=>{const e=S.events.find(x=>x.id===b.dataset.de);if(confirm(`「${e.title||'名前のないイベント'}」を消しますか？\n元に戻せません。`)){S.events=S.events.filter(x=>x.id!==e.id);save();render()}});
+  const de=$('#delend');if(de)de.onclick=()=>{if(confirm(`終わったイベント ${ended.length}件をすべて消しますか？\n元に戻せません。`)){S.events=S.events.filter(e=>!e.done);save();toast('消しました');render()}};
+  $('#exp').onclick=async()=>{const name=`会費ノート_バックアップ_${today()}.json`,blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+    const f=new File([blob],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:name});return}catch(e){if(e.name==='AbortError')return}}
+    const u=URL.createObjectURL(blob),l=document.createElement('a');l.href=u;l.download=name;l.click();setTimeout(()=>URL.revokeObjectURL(u),2000)};
+  $('#imp').onclick=()=>$('#file').click();
+  $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d.events)||!Array.isArray(d.members))throw 0;
+    if(confirm(`バックアップ（イベント${d.events.length}件・名前${d.members.length}人）で、今のデータを置きかえますか？`)){S=d;save();toast('戻しました');render()}}catch(_){alert('バックアップのファイルを読めませんでした')}e.target.value=''};
+  $('#wipe').onclick=()=>{if(confirm('すべてのイベントと名前を消しますか？\n元に戻せません。')&&confirm('本当に消しますか？')){S={members:[],events:[]};save();toast('すべて消しました');render()}};
+}
+document.addEventListener('gesturestart',e=>e.preventDefault());
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+render();
+</script>
+</body>
+</html>
