@@ -1,5 +1,5 @@
 // Vercelのビルドで実行：公開しているお試し版から、購入者用の本体（秘密のURL）を作る。鍵は環境変数 TABI_KEY（リポジトリには置かない）
-const fs=require('fs'),path=require('path');const KEY=process.env.TABI_KEY;const BASE='https://tabi-pocket.vercel.app';
+const fs=require('fs'),path=require('path');const KEY=process.env.TABI_KEY;const BASE='https://tabipocket.vercel.app';
 const cp=(s,d)=>{fs.mkdirSync(path.dirname(d),{recursive:true});fs.copyFileSync(s,d)};
 const walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?(['dist','node_modules','.git'].includes(e.name)?[]:walk(path.join(d,e.name))):[path.join(d,e.name)]);
 fs.rmSync('dist',{recursive:true,force:true});for(const f of walk('.'))if(!/make_full\.js$|vercel\.json$|\.gitignore$/.test(f))cp(f,path.join('dist',f));
