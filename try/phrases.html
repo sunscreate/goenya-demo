@@ -73,6 +73,7 @@ label{display:block;font-size:13px;font-weight:700;color:var(--sub);margin:10px 
 <body>
 <header class="top"><div class="logo jp">話</div><div><h1>Point &amp; Show Japan</h1><small>Show the screen — no need to speak</small></div></header>
 <main>
+  <div class="card" id="pod"></div>
   <div class="cats" id="cats"></div>
   <div id="body"></div>
   <p class="foot">Japanese checked by a native speaker in Japan. No account, no ads. · <a href="../">Tabi Pocket</a></p>
@@ -107,7 +108,7 @@ const C=[
 ['Help!','助けてください！','Tasukete kudasai!'],['Please call an ambulance.','救急車を呼んでください。','Kyūkyūsha o yonde kudasai.'],['Please call the police.','警察を呼んでください。','Keisatsu o yonde kudasai.'],['I lost my wallet.','財布をなくしました。','Saifu o nakushimashita.'],['I lost my passport.','パスポートをなくしました。','Pasupōto o nakushimashita.']]},
 {id:'fav',ic:'⭐',n:'Saved'}];
 const AL=[['Peanuts','落花生','rakkasei'],['Tree nuts','ナッツ類','nattsu-rui'],['Wheat','小麦','komugi'],['Egg','卵','tamago'],['Milk / dairy','乳製品','nyūseihin'],['Shrimp','えび','ebi'],['Crab','かに','kani'],['Buckwheat (soba)','そば','soba'],['Sesame','ごま','goma'],['Fish','魚','sakana'],['Shellfish','貝類','kai-rui'],['Soy','大豆','daizu']];
-let S;try{S=FULL?JSON.parse(localStorage.getItem(K)||'null'):null}catch(e){S=null}if(!S)S={fav:[],al:[]};if(!FULL)S={fav:[],al:[3,5]};
+let S;try{S=FULL?JSON.parse(localStorage.getItem(K)||'null'):null}catch(e){S=null}if(!S)S={fav:[],al:[]};S.day=S.day||{last:'',n:0};if(!FULL)S={fav:[],al:[3,5],day:{last:new Date(Date.now()-864e5).toISOString().slice(0,10),n:4}};
 const save=()=>{if(!FULL)return;try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800)}
@@ -135,6 +136,12 @@ function fit(){const el=$('#sJ');let f=Math.min(innerWidth/5,92);el.style.fontSi
 addEventListener('resize',()=>{if($('#show').classList.contains('open'))fit()});
 $('#sClose').onclick=()=>{$('#show').classList.remove('open');speechSynthesis&&speechSynthesis.cancel()};
 $('#sSpeak').onclick=()=>{if(!('speechSynthesis' in window)){toast('Audio not supported on this phone');return}const u=new SpeechSynthesisUtterance(curP[1]);u.lang='ja-JP';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)};
-render();
+const tday=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+function pod(){const A=allP(),t=tday(),p=A[Math.floor(new Date(t)/864e5)%A.length],done=S.day.last===t,y=new Date(new Date(t)-864e5).toISOString().slice(0,10),n=(S.day.last===t||S.day.last===y)?S.day.n:0;
+ $('#pod').innerHTML=`<div class="muted" style="font-size:12px;font-weight:700;letter-spacing:.04em">PHRASE OF THE DAY · 🔥 ${n} day${n===1?'':'s'}</div><div class="j jp" style="font-size:22px;margin:6px 0 2px">${esc(p[1])}</div><div class="r">${esc(p[2])}</div><div class="muted">${esc(p[0])}</div>
+ <div class="row" style="margin-top:10px;gap:8px"><button class="btn ghost sm" id="podPlay">🔊 Listen</button><button class="btn sm grow" id="podOk"${done?' disabled':''}>${done?'Done for today ✓':'I said it out loud ✓'}</button></div>`;
+ $('#podPlay').onclick=()=>{if(!('speechSynthesis' in window))return;const u=new SpeechSynthesisUtterance(p[1]);u.lang='ja-JP';u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)};
+ $('#podOk').onclick=()=>{S.day={last:t,n:n+1};save();pod();toast(`🔥 ${n+1}-day streak! See you tomorrow`)}}
+pod();render();
 /*SWSLOT*/
 </script></body></html>

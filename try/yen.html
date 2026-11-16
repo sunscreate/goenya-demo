@@ -86,6 +86,7 @@ body.isdemo .fab{bottom:calc(84px + env(safe-area-inset-bottom))}
   <div class="card" id="settle"></div>
   <div class="h">Expenses</div>
   <div class="card" id="list"></div>
+  <div id="pastW"></div>
   <p class="foot">Data stays on this phone. No account, no ads. · <a href="../">Tabi Pocket</a></p>
 </main>
 <button class="fab" id="fab" aria-label="Add expense">＋</button>
@@ -107,7 +108,7 @@ body.isdemo .fab{bottom:calc(84px + env(safe-area-inset-bottom))}
   <select id="sCur"><option>USD</option><option>EUR</option><option>GBP</option><option>AUD</option><option>CAD</option><option>SGD</option><option>HKD</option><option>TWD</option><option>KRW</option><option>CNY</option><option>THB</option></select>
   <label for="sRate">How many yen for 1 <span id="sCurL">USD</span>?</label><input id="sRate" inputmode="decimal">
   <p class="muted" style="margin-top:6px">Check today's rate once and type it here. The app works offline, so it doesn't fetch rates.</p>
-  <div class="row" style="margin-top:18px"><button class="btn ghost" id="sReset">Start a new trip</button><button class="btn grow" id="sSave">Save</button></div>
+  <div class="row" style="margin-top:18px"><button class="btn ghost" id="sReset">Finish trip &amp; start new</button><button class="btn grow" id="sSave">Save</button></div>
 </div></div>
 <div class="toast" id="toast"></div>
 <div class="demo"><div><b>Free demo</b>Nothing you enter is saved.</div><a href="https://buy.stripe.com/3cIbJ2dpv30R12r1II9IU1T">Get the app · $4.99</a></div>
@@ -131,6 +132,7 @@ function settle(){const net={};S.people.forEach(p=>net[p]=0);
  const cr=Object.entries(net).filter(x=>x[1]>0.5).sort((a,b)=>b[1]-a[1]),db=Object.entries(net).filter(x=>x[1]<-0.5).map(x=>[x[0],-x[1]]).sort((a,b)=>b[1]-a[1]);const out=[];
  let i=0,j=0;while(i<db.length&&j<cr.length){const v=Math.min(db[i][1],cr[j][1]);out.push([db[i][0],cr[j][0],v]);db[i][1]-=v;cr[j][1]-=v;if(db[i][1]<0.5)i++;if(cr[j][1]<0.5)j++}return out}
 function render(){const tot=S.items.reduce((a,b)=>a+b.amt,0),n=Math.max(1,S.people.length);
+ const P=S.past||[];$('#pastW').innerHTML=P.length?`<div class="h">Past trips</div><div class="card"><div class="muted">Japan, all trips: <b style="color:var(--ink)">${yen(P.reduce((a,b)=>a+b.tot,0)+tot)}</b> over ${P.length+(S.items.length?1:0)} trip${P.length+(S.items.length?1:0)>1?'s':''}</div>${P.map(t=>`<div class="st"><span>${esc(t.name)}<br><small class="muted">${t.end} · ${t.people.map(esc).join(', ')} · ${t.cats.filter(c=>c[1]).map(c=>c[0]).join('')}</small></span><span class="v">${yen(t.tot)}<br><small class="muted">${t.rate>0?(t.tot/t.rate).toLocaleString('en-US',{style:'currency',currency:t.cur,maximumFractionDigits:0}):''}</small></span></div>`).join('')}</div>`:'';
  $('#tTot').textContent=yen(tot);$('#tConv').textContent=cv(tot);$('#tPer').textContent=yen(tot/n);$('#tPerC').textContent=cv(tot/n);
  $('#ppl').innerHTML=S.people.length?S.people.map(p=>`<span class="pp">${esc(p)}<button data-rm="${esc(p)}" aria-label="Remove ${esc(p)}">×</button></span>`).join(''):'<span class="muted">Add everyone on the trip first.</span>';
  const st=settle();$('#settle').innerHTML=st.length?st.map(([a,b,v])=>`<div class="st">${esc(a)} <span class="arrow">→</span> ${esc(b)}<span class="v">${yen(v)} <small class="muted">${cv(v)}</small></span></div>`).join(''):'<div class="muted">Everyone is even. 🎉</div>';
@@ -160,7 +162,7 @@ document.querySelectorAll('.sheet').forEach(s=>s.addEventListener('click',e=>{if
 $('#setBtn').onclick=()=>{$('#sCur').value=S.cur;$('#sRate').value=S.rate;$('#sCurL').textContent=S.cur;$('#sset').classList.add('open')};
 $('#sCur').onchange=e=>$('#sCurL').textContent=e.target.value;
 $('#sSave').onclick=()=>{S.cur=$('#sCur').value;S.rate=+$('#sRate').value||S.rate;save();render();$('#sset').classList.remove('open')};
-$('#sReset').onclick=()=>{if(!confirm('Clear all travelers and expenses?'))return;S.items=[];S.people=[];save();render();$('#sset').classList.remove('open')};
+$('#sReset').onclick=()=>{if(!confirm('Save this trip to your history and start a new one?'))return;if(S.items.length){const nm=prompt('Name this trip','Japan '+new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'}));S.past=[{name:(nm||'Trip').slice(0,40),end:new Date().toISOString().slice(0,10),tot:S.items.reduce((a,b)=>a+b.amt,0),people:[...S.people],cur:S.cur,rate:S.rate,n:S.items.length,cats:CATS.map(c=>[c[1],S.items.filter(i=>i.cat===c[0]).reduce((a,b)=>a+b.amt,0)])},...(S.past||[])]}S.items=[];save();render();$('#sset').classList.remove('open')};
 if(!FULL)document.body.classList.add('isdemo');
 render();
 /*SWSLOT*/

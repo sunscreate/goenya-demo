@@ -63,6 +63,10 @@ label{display:block;font-size:13px;font-weight:700;color:var(--sub);margin:10px 
 .it.lock{opacity:.45}
 .it .dt{font-size:10.5px;color:var(--shu);font-weight:700;min-height:13px}
 .add{border-style:dashed;color:var(--sub);justify-content:center}
+.banner{display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--card);border:1px dashed var(--shu);font-size:14px;cursor:pointer}.banner b{color:var(--shu)}
+.pref{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pref .chip{justify-content:center;text-align:center}.rg{font-size:12px;color:var(--sub);margin:14px 0 6px;font-weight:700}
+.mem{border-left:3px solid var(--shu);padding:2px 0 2px 12px;margin:10px 0}.mem small{color:var(--sub)}.trip{font-weight:700;margin:18px 0 4px}
+.it.want::after{content:"♡";position:absolute;right:8px;top:6px;color:var(--shu);font-size:14px}
 .stars{display:flex;gap:6px;font-size:28px}.stars span{cursor:pointer;opacity:.3}.stars span.on{opacity:1}
 </style></head>
 <body>
@@ -70,6 +74,7 @@ label{display:block;font-size:13px;font-weight:700;color:var(--sub);margin:10px 
 <main>
   <div class="card prog"><svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--line)" stroke-width="4"/><circle id="arc" cx="18" cy="18" r="15.5" fill="none" stroke="var(--shu)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0 100" pathLength="100" transform="rotate(-90 18 18)"/></svg>
     <div><b id="cnt">0 / 45</b><div class="muted" id="lvl">Tap anything you've done to stamp it.</div></div></div>
+  <div id="ban"></div>
   <div class="tabs" id="tabs"></div>
   <div class="grid" id="grid"></div>
   <p class="foot">Data stays on this phone. No account, no ads. · <a href="../">Tabi Pocket</a></p>
@@ -81,6 +86,7 @@ label{display:block;font-size:13px;font-weight:700;color:var(--sub);margin:10px 
   <label for="dWhere">Where</label><input id="dWhere" placeholder="e.g. Ichiran, Shibuya" maxlength="60">
   <label>Rating</label><div class="stars" id="dStars"></div>
   <label for="dNote">Note</label><textarea id="dNote" rows="3" maxlength="300" placeholder="What was it like?"></textarea>
+  <button class="btn ghost" id="dWant" style="width:100%;margin-top:12px">♡ Want to try next time</button>
   <div class="row" style="margin-top:16px"><button class="btn ghost" id="dUn">Remove stamp</button><button class="btn grow" id="dSave">Stamp it 判</button></div>
 </div></div>
 <div class="sheet" id="shAdd"><div class="in">
@@ -140,10 +146,13 @@ const L=[
 ['do','🕹️','Game center','ゲームセンター','Try the crane games — good luck!'],
 ['do','🎰','Capsule toys','ガチャ','Hundreds of machines in Akihabara and Ikebukuro.'],
 ['do','🔮','Omikuji fortune','おみくじ','Bad fortune? Tie it on the rack and leave it behind.']].map((x,i)=>({id:'b'+i,cat:x[0],em:x[1],t:x[2],j:x[3],tip:x[4]}));
-const TABS=[['all','All'],['food','🍜 Eat'],['see','⛩️ See'],['do','♨️ Do'],['mine','⭐ Mine']];
+const TABS=[['all','All'],['food','🍜 Eat'],['see','⛩️ See'],['do','♨️ Do'],['mine','⭐ Mine'],['want','♡ Next time'],['mem','📖 Memories'],['pref','🗾 47']];
+const PF=[['Hokkaido & Tohoku','Hokkaido,Aomori,Iwate,Miyagi,Akita,Yamagata,Fukushima'],['Kanto','Ibaraki,Tochigi,Gunma,Saitama,Chiba,Tokyo,Kanagawa'],['Chubu','Niigata,Toyama,Ishikawa,Fukui,Yamanashi,Nagano,Gifu,Shizuoka,Aichi'],['Kansai','Mie,Shiga,Kyoto,Osaka,Hyogo,Nara,Wakayama'],['Chugoku & Shikoku','Tottori,Shimane,Okayama,Hiroshima,Yamaguchi,Tokushima,Kagawa,Ehime,Kochi'],['Kyushu & Okinawa','Fukuoka,Saga,Nagasaki,Kumamoto,Oita,Miyazaki,Kagoshima,Okinawa']].map(r=>[r[0],r[1].split(',')]);
+const PN=PF.flatMap(r=>r[1]);
 let S;try{S=FULL?JSON.parse(localStorage.getItem(K)||'null'):null}catch(e){S=null}
 if(!S)S={st:{},own:[]};
-if(!FULL)S={st:{b0:{d:'2026-03-28',w:'Ichiran, Shibuya',r:5,n:'Ordered extra noodles!'},b20:{d:'2026-03-29',w:'Kawaguchiko',r:5,n:''},b30:{d:'2026-03-30',w:'Hakone',r:4,n:''}},own:[]};
+if(!FULL)S={st:{b0:{d:'2026-03-28',w:'Ichiran, Shibuya',r:5,n:'Ordered extra noodles!'},b20:{d:'2026-03-29',w:'Kawaguchiko',r:5,n:''},b30:{d:'2026-03-30',w:'Hakone',r:4,n:''}},own:[],want:['b5','b40'],pref:[5,25,26],next:''};
+S.want=S.want||[];S.pref=S.pref||[];S.next=S.next||'';
 const save=()=>{if(!FULL)return;try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600)}
@@ -153,17 +162,46 @@ function render(){const A=all(),n=Object.keys(S.st).filter(k=>A.some(a=>a.id===k
  $('#cnt').textContent=`${n} / ${A.length}`;$('#arc').setAttribute('stroke-dasharray',`${A.length?n/A.length*100:0} 100`);
  $('#lvl').textContent=n===0?'Tap anything you’ve done to stamp it.':n<10?'Nice start! Keep collecting.':n<25?'Seasoned traveler 🎌':'Japan expert! 🏆';
  $('#tabs').innerHTML=TABS.map(t=>`<span class="chip${t[0]===tab?' on':''}" data-t="${t[0]}">${t[1]}</span>`).join('');
- const it=A.filter(a=>tab==='all'||a.cat===tab||(tab==='mine'&&a.cat==='mine'));
- $('#grid').innerHTML=it.map(a=>{const s=S.st[a.id];return `<div class="it${s?' on':''}${a.id===popId?' pop':''}" data-id="${a.id}"><span class="em">${a.em}</span><b>${esc(a.t)}</b><span class="jp">${esc(a.j||'')}</span><span class="dt">${s&&s.d?s.d.slice(5).replace('-','/'):''}</span><span class="hk jp">${esc(hk(a))}</span></div>`}).join('')+((tab==='all'||tab==='mine')?'<div class="it add" id="addOwn"><span class="em">＋</span><b>Add your own</b></div>':'');popId=null}
+ banner();if(tab==='mem'){memories();return}if(tab==='pref'){prefs();return}
+ const it=A.filter(a=>tab==='all'||a.cat===tab||(tab==='want'&&S.want.includes(a.id)));
+ if(tab==='want'&&!it.length){$('#grid').innerHTML='<p class="muted" style="grid-column:1/-1">Open anything you haven’t done yet and tap “♡ Want to try next time”. Your list for the next trip lives here.</p>';return}
+ $('#grid').innerHTML=it.map(a=>{const s=S.st[a.id];return `<div class="it${s?' on':''}${a.id===popId?' pop':''}${!s&&S.want.includes(a.id)?' want':''}" data-id="${a.id}"><span class="em">${a.em}</span><b>${esc(a.t)}</b><span class="jp">${esc(a.j||'')}</span><span class="dt">${s&&s.d?s.d.slice(5).replace('-','/'):''}</span><span class="hk jp">${esc(hk(a))}</span></div>`}).join('')+((tab==='all'||tab==='mine')?'<div class="it add" id="addOwn"><span class="em">＋</span><b>Add your own</b></div>':'');popId=null}
+const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const stamped=()=>{const A=all();return Object.entries(S.st).map(([id,v])=>({a:A.find(x=>x.id===id),...v})).filter(x=>x.a&&x.d).sort((x,y)=>y.d.localeCompare(x.d))};
+function banner(){const t=today(),st=stamped(),h=$('#ban');
+ const otd=st.find(x=>x.d.slice(5)===t.slice(5)&&x.d<t.slice(0,4));
+ if(S.next&&S.next>=t){const d=Math.round((new Date(S.next)-new Date(t))/864e5);h.innerHTML=`<div class="banner" data-go="want">🗾 <span><b>${d} day${d===1?'':'s'}</b> until Japan · ${S.want.length} on your next-time list</span></div>`}
+ else if(otd){const y=+t.slice(0,4)-+otd.d.slice(0,4);h.innerHTML=`<div class="banner" data-go="mem">📖 <span><b>On this day ${y} year${y>1?'s':''} ago:</b> ${otd.a.em} ${esc(otd.a.t)}${otd.w?' in '+esc(otd.w):''}</span></div>`}
+ else if(st.length&&st[0].d<new Date(Date.now()-7*864e5).toISOString().slice(0,10))h.innerHTML='<div class="banner" data-go="mem">✈️ <span><b>Missing Japan?</b> Look back at your trip and set a date for the next one.</span></div>';
+ else h.innerHTML=''}
+$('#ban').onclick=e=>{const g=e.target.closest('[data-go]');if(g){tab=g.dataset.go;render()}};
+function memories(){const st=stamped();let h=`<div class="card" style="grid-column:1/-1"><label for="nx" style="margin-top:0">Next Japan trip</label><input type="date" id="nx" value="${S.next}"><p class="muted" style="margin:6px 0 0">We’ll count down the days.</p>
+ <button class="btn" id="shareCard" style="width:100%;margin-top:12px">Share my trip card 判</button></div>`;
+ if(!st.length)h+='<p class="muted" style="grid-column:1/-1">Stamp something and it shows up here with the date and your note.</p>';
+ let last=null;st.forEach(x=>{if(!last||(new Date(last)-new Date(x.d))/864e5>14){const n=st.filter(y=>y.d.slice(0,7)===x.d.slice(0,7)).length;h+=`<div class="trip" style="grid-column:1/-1">${new Date(x.d+'T00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'})}</div>`}last=x.d;
+  h+=`<div class="mem" style="grid-column:1/-1" data-id="${x.a.id}">${x.a.em} <b>${esc(x.a.t)}</b> ${x.r?'<span style="color:var(--shu)">'+'★'.repeat(x.r)+'</span>':''}<br><small>${x.d}${x.w?' · '+esc(x.w):''}</small>${x.n?'<div>'+esc(x.n)+'</div>':''}</div>`});
+ $('#grid').innerHTML=h;$('#nx').onchange=e=>{S.next=e.target.value;save();banner();toast(S.next?'Countdown set ✈️':'Cleared')};$('#shareCard').onclick=card}
+function prefs(){$('#grid').innerHTML=`<div style="grid-column:1/-1"><div class="card"><b style="font-size:22px">${S.pref.length} / 47</b> <span class="muted">prefectures visited — a lifetime goal. Tap the ones you’ve been to, on any trip.</span></div>${PF.map(r=>`<div class="rg">${r[0]}</div><div class="pref">${r[1].map(n=>{const i=PN.indexOf(n);return `<span class="chip${S.pref.includes(i)?' on':''}" data-pf="${i}">${n}</span>`}).join('')}</div>`).join('')}</div>`}
+function card(){const c=document.createElement('canvas');c.width=1080;c.height=1350;const x=c.getContext('2d'),st=stamped(),A=all();
+ x.fillStyle='#faf6ef';x.fillRect(0,0,1080,1350);x.strokeStyle='#d9482b';x.lineWidth=14;x.strokeRect(40,40,1000,1270);
+ x.fillStyle='#1f1d1a';x.textAlign='center';x.font='700 64px system-ui,sans-serif';x.fillText('My Japan Stamp Book',540,170);
+ x.fillStyle='#d9482b';x.font='900 200px system-ui,sans-serif';x.fillText(Object.keys(S.st).length,540,400);
+ x.fillStyle='#5f594f';x.font='500 44px system-ui,sans-serif';x.fillText(`of ${A.length} stamps · ${S.pref.length} / 47 prefectures`,540,470);
+ x.font='86px sans-serif';const E=st.slice(0,24);E.forEach((s,i)=>{const r=Math.floor(i/6),k=Math.min(6,E.length-r*6);x.fillText(s.a.em,540+((i%6)-(k-1)/2)*144,640+r*140)});
+ x.fillStyle='#1f1d1a';x.font='500 38px system-ui,sans-serif';x.fillText('How many have you done?',540,1200);x.fillStyle='#d9482b';x.font='700 34px system-ui,sans-serif';x.fillText('tabipocket.vercel.app',540,1255);
+ c.toBlob(async b=>{const f=new File([b],'japan-stamp-book.png',{type:'image/png'});try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:'My Japan Stamp Book 判'});return}}catch(e){if(e.name==='AbortError')return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;a.click()},'image/png')}
 $('#tabs').onclick=e=>{const c=e.target.closest('[data-t]');if(c){tab=c.dataset.t;render()}};
-$('#grid').onclick=e=>{if(e.target.closest('#addOwn')){$('#aT').value='';$('#aE').value='';$('#shAdd').classList.add('open');return}
+$('#grid').onclick=e=>{const pf=e.target.closest('[data-pf]');if(pf){const i=+pf.dataset.pf;S.pref=S.pref.includes(i)?S.pref.filter(x=>x!==i):[...S.pref,i];save();render();return}
+ if(e.target.closest('#addOwn')){$('#aT').value='';$('#aE').value='';$('#shAdd').classList.add('open');return}
  const c=e.target.closest('[data-id]');if(!c)return;cur=all().find(a=>a.id===c.dataset.id);const s=S.st[cur.id]||{};
  $('#dEm').textContent=cur.em;$('#dT').textContent=cur.t;$('#dJ').textContent=cur.j||'';$('#dTip').textContent=cur.tip||'';
  $('#dDate').value=s.d||new Date().toISOString().slice(0,10);$('#dWhere').value=s.w||'';$('#dNote').value=s.n||'';stars=s.r||0;drawStars();
- $('#dUn').style.display=S.st[cur.id]?'':'none';$('#dSave').textContent=S.st[cur.id]?'Save':'Stamp it 判';$('#sh').classList.add('open')};
+ $('#dUn').style.display=S.st[cur.id]?'':'none';$('#dWant').style.display=S.st[cur.id]?'none':'';$('#dWant').textContent=S.want.includes(cur.id)?'♥ On your next-time list':'♡ Want to try next time';$('#dSave').textContent=S.st[cur.id]?'Save':'Stamp it 判';$('#sh').classList.add('open')};
 function drawStars(){$('#dStars').innerHTML=[1,2,3,4,5].map(i=>`<span data-s="${i}" class="${i<=stars?'on':''}">★</span>`).join('')}
 $('#dStars').onclick=e=>{const s=e.target.closest('[data-s]');if(s){stars=+s.dataset.s;drawStars()}};
-$('#dSave').onclick=()=>{const was=!!S.st[cur.id];S.st[cur.id]={d:$('#dDate').value,w:$('#dWhere').value.trim(),r:stars,n:$('#dNote').value.trim()};if(!was)popId=cur.id;save();render();$('#sh').classList.remove('open');if(!was)toast(FULL?'Stamped! 判':'Stamped (demo — not saved)');if(!was&&navigator.vibrate)navigator.vibrate(30)};
+$('#dSave').onclick=()=>{const was=!!S.st[cur.id];S.want=S.want.filter(x=>x!==cur.id);S.st[cur.id]={d:$('#dDate').value,w:$('#dWhere').value.trim(),r:stars,n:$('#dNote').value.trim()};if(!was)popId=cur.id;save();render();$('#sh').classList.remove('open');if(!was)toast(FULL?'Stamped! 判':'Stamped (demo — not saved)');if(!was&&navigator.vibrate)navigator.vibrate(30)};
+$('#dWant').onclick=()=>{S.want=S.want.includes(cur.id)?S.want.filter(x=>x!==cur.id):[...S.want,cur.id];save();render();$('#sh').classList.remove('open');toast(S.want.includes(cur.id)?'Added to next time ♡':'Removed')};
 $('#dUn').onclick=()=>{delete S.st[cur.id];save();render();$('#sh').classList.remove('open')};
 $('#aSave').onclick=()=>{const t=$('#aT').value.trim();if(!t)return;S.own.push({id:'o'+Date.now(),cat:'mine',em:$('#aE').value.trim()||'⭐',t,j:'',tip:''});save();tab='mine';render();$('#shAdd').classList.remove('open')};
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>b.closest('.sheet').classList.remove('open'));
