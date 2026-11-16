@@ -6,7 +6,7 @@
 <pre id="p"></pre>
 <script>
 (async()=>{const P=await (await fetch('posts.json')).json();const q=new URLSearchParams(location.search);
-let i=q.has('i')?+q.get('i'):Math.floor((Date.now()+9*36e5)/864e5-Math.floor(Date.UTC(2026,10,16)/864e5))%P.length;i=((i%P.length)+P.length)%P.length;
+let i=q.has('i')?+q.get('i'):Math.floor((Date.now()+9*36e5)/864e5-Math.floor(Date.UTC(2026,10,15)/864e5))%P.length;i=((i%P.length)+P.length)%P.length;
 const e=P[i];h.textContent='Today: '+e.v;p.textContent=e.tt;const F={};
 for(const k of ['silent','voice']){const f=`en_${e.v}_${k}.mp4`;F[k]=new File([await (await fetch(f)).blob()],f,{type:'video/mp4'})}s.textContent='Ready';
 sv.onclick=()=>navigator.share({files:[F.silent]}).catch(x=>s.textContent=x.message);vv.onclick=()=>navigator.share({files:[F.voice]}).catch(x=>s.textContent=x.message);
