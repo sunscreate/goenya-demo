@@ -1,0 +1,73 @@
+/* 見本アプリのページ：最初の画面で「何のアプリか」と「触れる」が分かる → できること → 料金 → 頼む */
+:root{--line2:#e2ded5;--sub2:#5f6b74;--ink3:#1f2a33;--card2:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--line2:#323a40;--sub2:#a4afb8;--ink3:#e9edf0;--card2:#1d2226}}
+:root[data-theme="dark"]{--line2:#323a40;--sub2:#a4afb8;--ink3:#e9edf0;--card2:#1d2226}
+.crumb{font-size:14px;color:var(--sub2);padding-top:18px}
+.tg{display:inline-block;font:700 13px "Zen Kaku Gothic New";color:#fff;background:var(--c,#c8553d);border-radius:99px;padding:4px 12px}
+.mh{padding-block:24px 40px}
+.mh .g{display:grid;grid-template-columns:1.1fr .9fr;gap:28px 48px;align-items:center}
+@media (max-width:860px){.mh .g{grid-template-columns:1fr}}
+.mh h1,.ih{font:900 clamp(30px,4.6vw,48px)/1.3 "Zen Kaku Gothic New",var(--body);color:var(--ink3);margin:14px 0 10px}
+.mh .lead,.sec2 .lead{font-size:17px;color:var(--sub2);max-width:34em}
+.fl{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0;padding:0;list-style:none}
+.fl li{font:700 14px "Zen Kaku Gothic New";color:var(--ink3);border:1.5px solid var(--c);background:var(--card2);border-radius:99px;padding:5px 14px}
+.ctas2{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.note{font-size:13px;color:var(--sub2);margin-top:12px}
+.phone{justify-self:center;text-align:center}
+.phone .scr{width:330px;max-width:86vw;border:10px solid #1b1f23;border-radius:42px;overflow:hidden;box-shadow:0 22px 44px color-mix(in srgb,var(--c) 30%,transparent);text-align:left}
+.hint{font:700 14px "Zen Kaku Gothic New";color:var(--sub2);margin-top:12px}
+/* アプリの画面（見本） */
+.app{font-family:"Zen Maru Gothic","Zen Kaku Gothic New",sans-serif;color:#3f3437;background:color-mix(in srgb,var(--c) 10%,#fffaf6);padding-bottom:14px;position:relative}
+.app .bar{display:flex;align-items:center;gap:10px;padding:18px 16px 12px;background:var(--c);color:#fff}
+.app .ic{width:38px;height:38px;border-radius:11px;background:#fff;display:grid;place-items:center;font-size:22px}
+.app .bar b{font-size:19px;font-weight:900}
+.app .dt{margin-left:auto;font-size:11px;font-weight:700;background:rgba(255,255,255,.25);border-radius:99px;padding:2px 8px}
+.app .sum{margin:12px 12px 8px;background:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 5px 14px rgba(0,0,0,.07)}
+.app .sum p{font-size:12px;font-weight:700;color:#8a7c80;margin:0}
+.app .sum b{display:block;font-size:30px;font-weight:900;color:var(--c);font-variant-numeric:tabular-nums}
+.app .pg{height:8px;border-radius:8px;background:color-mix(in srgb,var(--c) 12%,#fff);margin-top:6px;overflow:hidden}
+.app .pg i{display:block;height:100%;background:var(--c);border-radius:8px;transition:width .3s}
+.app .rows{display:grid;gap:7px;padding:0 12px}
+.app .row{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:10px;background:#fff;border-radius:15px;padding:8px 12px;box-shadow:0 3px 9px rgba(0,0,0,.05);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.app .row:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+.app .t{flex:1;min-width:0}
+.app .t b{display:block;font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .t small{display:block;font-size:11px;font-weight:700;color:#9a8c90}
+.app .ck{display:grid;justify-items:center;gap:1px}
+.app .ck i{width:34px;height:34px;border-radius:50%;border:3px solid #ddd2d4;display:grid;place-items:center;font-style:normal;font-weight:900;color:transparent;transition:.15s}
+.app .ck em{font-size:9px;font-style:normal;font-weight:900;color:#b3a6a9}
+.app .row.on .ck i{background:var(--c);border-color:var(--c);color:#fff;transform:scale(1.05)}
+.app .row.on .t b{color:#a89a9e}
+.app .row.nudge:not(.on) .ck i{animation:nd 1.4s ease-in-out infinite}
+@keyframes nd{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 55%,transparent)}50%{box-shadow:0 0 0 8px transparent}}
+@media (prefers-reduced-motion:reduce){.app .row.nudge .ck i{animation:none}}
+.app .pop{position:absolute;left:12px;right:12px;bottom:18px;margin:0;text-align:center;font-weight:900;font-size:17px;color:var(--c);background:#fff;border-radius:16px;padding:10px;box-shadow:0 10px 24px rgba(0,0,0,.18);opacity:0;transform:translateY(-6px) scale(.96);transition:.2s;pointer-events:none}
+.app .pop.ok{background:var(--c);color:#fff}
+.app .pop.show{opacity:1;transform:none}
+.sec2{padding-block:40px}
+.sec2 h2{font:900 clamp(22px,3vw,30px)/1.35 "Zen Kaku Gothic New",var(--body);color:var(--ink3);margin-bottom:8px}
+.cards3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:20px}
+@media (max-width:760px){.cards3{grid-template-columns:1fr}}
+.cards3 div{background:var(--card2);border:1px solid var(--line2);border-top:5px solid var(--c);border-radius:16px;padding:16px 18px}
+.cards3 b{font:900 18px "Zen Kaku Gothic New";color:var(--ink3)}
+.cards3 p{font-size:14.5px;color:var(--sub2);margin-top:6px}
+.price3{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:center;margin-top:24px;background:var(--card2);border:2px solid var(--ink3);border-radius:16px;padding:18px 22px}
+.price3 .p{font:700 15px "Zen Kaku Gothic New";color:var(--sub2);margin:0}
+.price3 .p b{font:900 30px "Zen Kaku Gothic New";color:var(--ink3);margin:0 2px}
+.price3 small{color:var(--sub2);font-size:13.5px}
+.ideas{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ideas button{font:700 14px var(--body);border:1.5px solid color-mix(in srgb,var(--paper) 45%,transparent);background:transparent;color:var(--paper);border-radius:99px;padding:6px 14px;cursor:pointer}
+.rel,.mgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:18px}
+@media (max-width:760px){.rel{grid-template-columns:1fr 1fr}}
+.rel a{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;text-decoration:none;background:var(--card2);border:1px solid var(--line2);border-radius:14px;padding:12px 14px;color:var(--ink3)}
+.rel a span{grid-row:span 2;font-size:28px}
+.rel a b{font:900 15px "Zen Kaku Gothic New"}
+.rel a small{font-size:12.5px;color:var(--sub2)}
+.mgrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:26px}
+.mc{display:grid;gap:4px;text-decoration:none;color:var(--ink3);background:var(--card2);border:1px solid var(--line2);border-top:6px solid var(--c);border-radius:16px;padding:14px 16px;transition:transform .15s,box-shadow .15s}
+.mc:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.08)}
+.mc .ic{font-size:30px}
+.mc .no{font:700 11px var(--mono);color:var(--c);letter-spacing:.08em}
+.mc b{font:900 18px "Zen Kaku Gothic New"}
+.mc small{font-size:14px;color:var(--ink3);font-weight:700}
+.mc em{font-style:normal;font-size:12.5px;color:var(--sub2)}

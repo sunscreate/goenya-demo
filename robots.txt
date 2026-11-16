@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /promo/
+Disallow: /demo/
+
+Sitemap: https://sunscreate-works.vercel.app/sitemap.xml
