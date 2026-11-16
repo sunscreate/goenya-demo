@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://tabi-pocket.vercel.app/sitemap.xml

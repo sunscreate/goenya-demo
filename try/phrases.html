@@ -1,0 +1,140 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<title>Point &amp; Show Japan — show it, don't say it</title>
+<meta name="description" content="Big, clear Japanese cards to show staff: food allergies, restaurants, trains, pharmacy and emergencies. Works offline.">
+<meta name="theme-color" content="#d9482b">
+<link rel="canonical" href="https://tabi-pocket.vercel.app/try/phrases.html">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>:root{--paper:#faf6ef;--card:#fff;--ink:#1f1d1a;--sub:#6b655c;--line:#e7dfd2;--shu:#d9482b;--shu2:#fbe4dc;--ai:#27466e;--ok:#2f8a5b;--r:18px}
+@media (prefers-color-scheme:dark){:root{--paper:#16130f;--card:#221e19;--ink:#f3eee6;--sub:#b3aa9c;--line:#3a332b;--shu2:#4a2318}}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:"DM Sans","Zen Kaku Gothic New",system-ui,sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding-bottom:calc(84px + env(safe-area-inset-bottom));touch-action:manipulation}
+button,input,select,textarea{font:inherit;color:inherit}
+.jp{font-family:"Zen Kaku Gothic New",system-ui,sans-serif}
+header.top{position:sticky;top:0;z-index:5;background:var(--paper);padding:calc(14px + env(safe-area-inset-top)) 18px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line)}
+header.top .logo{width:34px;height:34px;border-radius:10px;background:var(--shu);color:#fff;display:grid;place-items:center;font-weight:700;font-size:18px}
+header.top h1{font-size:19px;font-weight:700;letter-spacing:-.01em}
+header.top small{display:block;font-size:11.5px;color:var(--sub);font-weight:500}
+main{max-width:560px;margin:0 auto;padding:14px 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:12px}
+.h{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin:18px 4px 8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:14px;background:var(--shu);color:#fff;font-weight:700;padding:12px 18px;cursor:pointer;min-height:46px}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.sm{min-height:36px;padding:7px 12px;border-radius:11px;font-size:14px}
+.btn:active{transform:scale(.98)}
+input,select,textarea{width:100%;border:1.5px solid var(--line);background:var(--paper);border-radius:12px;padding:11px 12px;font-size:16px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--shu);border-color:transparent}
+label{display:block;font-size:13px;font-weight:700;color:var(--sub);margin:10px 0 5px}
+.row{display:flex;gap:10px;align-items:center}
+.grow{flex:1;min-width:0}
+.muted{color:var(--sub);font-size:13.5px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:99px;padding:7px 12px;font-size:14px;font-weight:600;background:var(--card);cursor:pointer;user-select:none}
+.chip.on{background:var(--shu);border-color:var(--shu);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(20,15,10,.45);display:none;align-items:flex-end;justify-content:center}
+.sheet.open{display:flex}
+.sheet .in{background:var(--card);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;animation:up .2s ease}
+@keyframes up{from{transform:translateY(30px);opacity:.6}}
+.demo{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--ai);color:#fff;padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;font-size:13.5px}
+.demo b{display:block;font-size:14.5px}
+.demo a{margin-left:auto;background:#fff;color:var(--ai);font-weight:700;border-radius:11px;padding:9px 13px;text-decoration:none;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-weight:600;font-size:14px;opacity:0;transition:.2s;pointer-events:none;z-index:30}
+.toast.show{opacity:1}
+.foot{text-align:center;font-size:12px;color:var(--sub);margin:26px 0 8px}
+.foot a{color:var(--sub)}
+
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px}
+.cat{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:10px 4px;text-align:center;cursor:pointer;font-size:12.5px;font-weight:700;position:relative}
+.cat span{display:block;font-size:24px;margin-bottom:3px}
+.cat.on{border-color:var(--shu);background:var(--shu2)}
+.cat.lock{opacity:.5}.cat.lock:after{content:"🔒";position:absolute;top:4px;right:6px;font-size:11px}
+.ph{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
+.ph:first-child{border-top:0}
+.ph .tx{flex:1;min-width:0}
+.ph b{display:block;font-size:15.5px}
+.ph .j{font-size:17px;font-weight:700;color:var(--shu);margin-top:2px}
+.ph .r{font-size:12.5px;color:var(--sub)}
+.fav{border:0;background:none;font-size:22px;cursor:pointer;color:var(--line);width:38px;height:38px}
+.fav.on{color:#e6a700}
+.al{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.al .chip{justify-content:center;flex-direction:column;border-radius:14px;padding:8px 4px;font-size:12.5px;gap:0;text-align:center}
+.al .chip .jp{font-size:13px;font-weight:700}
+.show{position:fixed;inset:0;z-index:40;background:#fff;color:#111;display:none;flex-direction:column;padding:calc(18px + env(safe-area-inset-top)) 22px calc(22px + env(safe-area-inset-bottom))}
+.show.open{display:flex}
+.show .bigj{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-family:"Zen Kaku Gothic New",sans-serif;font-weight:900;line-height:1.35;word-break:break-word;overflow:hidden}
+.show .lbl{font-size:13px;font-weight:700;color:#d9482b;text-align:center;letter-spacing:.04em}
+.show .en{font-size:15px;color:#555;text-align:center;margin-top:8px}
+.show .rr{font-size:13.5px;color:#888;text-align:center;margin-top:4px}
+.show .bar{display:flex;gap:10px;margin-top:16px}
+.note{background:var(--shu2);border-radius:14px;padding:12px 14px;font-size:13.5px;margin-top:10px}
+</style></head>
+<body>
+<header class="top"><div class="logo jp">話</div><div><h1>Point &amp; Show Japan</h1><small>Show the screen — no need to speak</small></div></header>
+<main>
+  <div class="cats" id="cats"></div>
+  <div id="body"></div>
+  <p class="foot">Japanese checked by a native speaker in Japan. No account, no ads. · <a href="../">Tabi Pocket</a></p>
+</main>
+<div class="show" id="show" role="dialog" aria-label="Show this to staff">
+  <div class="lbl jp">すみません、こちらをご覧ください</div>
+  <div class="bigj" id="sJ"></div>
+  <div class="en" id="sE"></div><div class="rr" id="sR"></div>
+  <div class="bar"><button class="btn ghost" id="sSpeak" style="color:#111;border-color:#ddd">🔊 Play</button><button class="btn" style="flex:1" id="sClose">Done</button></div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="demo"><div><b>Free demo</b>Nothing you enter is saved.</div><a href="../#apps">Get the app · $4.99</a></div>
+<script>
+const FULL=false;
+const K='tabi-phrase-v1',$=s=>document.querySelector(s);
+const C=[
+{id:'allergy',ic:'⚠️',n:'Allergy',free:1},
+{id:'food',ic:'🍽️',n:'Restaurant',free:1,p:[
+['Table for one, please.','1人です。','Hitori desu.'],['Table for two, please.','2人です。','Futari desu.'],['Table for three, please.','3人です。','San-nin desu.'],['Table for four, please.','4人です。','Yo-nin desu.'],
+['Do you have an English menu?','英語のメニューはありますか？','Eigo no menyū wa arimasu ka?'],['What do you recommend?','おすすめは何ですか？','Osusume wa nan desu ka?'],['This one, please.','これをください。','Kore o kudasai.'],['Water, please.','お水をください。','Omizu o kudasai.'],['The check, please.','お会計をお願いします。','Okaikei o onegaishimasu.'],['Can I pay by card?','カードで払えますか？','Kādo de haraemasu ka?'],['Can I take this to go?','持ち帰りできますか？','Mochikaeri dekimasu ka?'],['It was delicious. Thank you!','おいしかったです。ごちそうさまでした。','Oishikatta desu. Gochisōsama deshita.']]},
+{id:'diet',ic:'🥗',n:'Diet',p:[
+['I am vegetarian. I can’t eat meat or fish.','私はベジタリアンです。肉と魚は食べられません。','Watashi wa bejitarian desu. Niku to sakana wa taberaremasen.'],['Is there meat or fish broth (dashi) in this?','これに肉や魚のだしは入っていますか？','Kore ni niku ya sakana no dashi wa haitte imasu ka?'],['I can’t eat pork.','豚肉は食べられません。','Butaniku wa taberaremasen.'],['I can’t drink alcohol.','お酒は飲めません。','Osake wa nomemasen.'],['Is this spicy?','これは辛いですか？','Kore wa karai desu ka?']]},
+{id:'move',ic:'🚃',n:'Getting around',p:[
+['Where is the station?','駅はどこですか？','Eki wa doko desu ka?'],['Where is the restroom?','トイレはどこですか？','Toire wa doko desu ka?'],['I want to go to this address.','この住所に行きたいです。','Kono jūsho ni ikitai desu.'],['Please take me here. (taxi)','ここまでお願いします。','Koko made onegaishimasu.'],['Which platform is this train?','この電車は何番線ですか？','Kono densha wa nanban-sen desu ka?'],['Where can I buy a ticket?','切符はどこで買えますか？','Kippu wa doko de kaemasu ka?'],['I am lost.','道に迷いました。','Michi ni mayoimashita.']]},
+{id:'shop',ic:'🛍️',n:'Shopping',p:[
+['How much is this?','これはいくらですか？','Kore wa ikura desu ka?'],['Tax-free, please.','免税でお願いします。','Menzei de onegaishimasu.'],['Do you have a bigger size?','大きいサイズはありますか？','Ōkii saizu wa arimasu ka?'],['Do you have a smaller size?','小さいサイズはありますか？','Chiisai saizu wa arimasu ka?'],['I don’t need a bag.','袋はいりません。','Fukuro wa irimasen.'],['Just looking, thank you.','見ているだけです。ありがとうございます。','Mite iru dake desu. Arigatō gozaimasu.']]},
+{id:'hotel',ic:'🏨',n:'Hotel',p:[
+['I have a reservation.','予約しています。','Yoyaku shite imasu.'],['Can you keep my luggage?','荷物を預かってもらえますか？','Nimotsu o azukatte moraemasu ka?'],['What time is check-out?','チェックアウトは何時ですか？','Chekkuauto wa nanji desu ka?'],['What is the Wi-Fi password?','Wi-Fiのパスワードを教えてください。','Wai-fai no pasuwādo o oshiete kudasai.'],['Could you call a taxi for me?','タクシーを呼んでもらえますか？','Takushī o yonde moraemasu ka?']]},
+{id:'health',ic:'💊',n:'Pharmacy',p:[
+['I have a headache.','頭が痛いです。','Atama ga itai desu.'],['I have a stomachache.','お腹が痛いです。','Onaka ga itai desu.'],['I have a fever.','熱があります。','Netsu ga arimasu.'],['I have a cold.','風邪をひきました。','Kaze o hikimashita.'],['Do you have medicine for this?','これに効く薬はありますか？','Kore ni kiku kusuri wa arimasu ka?'],['Is there a pharmacy nearby?','近くに薬局はありますか？','Chikaku ni yakkyoku wa arimasu ka?'],['I want to see a doctor.','病院に行きたいです。','Byōin ni ikitai desu.']]},
+{id:'sos',ic:'🚨',n:'Emergency',p:[
+['Help!','助けてください！','Tasukete kudasai!'],['Please call an ambulance.','救急車を呼んでください。','Kyūkyūsha o yonde kudasai.'],['Please call the police.','警察を呼んでください。','Keisatsu o yonde kudasai.'],['I lost my wallet.','財布をなくしました。','Saifu o nakushimashita.'],['I lost my passport.','パスポートをなくしました。','Pasupōto o nakushimashita.']]},
+{id:'fav',ic:'⭐',n:'Saved'}];
+const AL=[['Peanuts','落花生','rakkasei'],['Tree nuts','ナッツ類','nattsu-rui'],['Wheat','小麦','komugi'],['Egg','卵','tamago'],['Milk / dairy','乳製品','nyūseihin'],['Shrimp','えび','ebi'],['Crab','かに','kani'],['Buckwheat (soba)','そば','soba'],['Sesame','ごま','goma'],['Fish','魚','sakana'],['Shellfish','貝類','kai-rui'],['Soy','大豆','daizu']];
+let S;try{S=FULL?JSON.parse(localStorage.getItem(K)||'null'):null}catch(e){S=null}if(!S)S={fav:[],al:[]};if(!FULL)S={fav:[],al:[3,5]};
+const save=()=>{if(!FULL)return;try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800)}
+const open=c=>FULL||c.free;let cur='allergy';
+function allergy(){if(!S.al.length)return null;const L=S.al.map(i=>AL[i]);
+ return [`I am allergic to ${L.map(a=>a[0].toLowerCase()).join(', ')}. I can’t eat even a small amount. Is it in this dish?`,`私は${L.map(a=>a[1]).join('・')}のアレルギーがあります。少しでも入っていると食べられません。この料理に入っていますか？`,`Watashi wa ${L.map(a=>a[2]).join(', ')} no arerugī ga arimasu. Sukoshi demo haitte iru to taberaremasen. Kono ryōri ni haitte imasu ka?`]}
+const phRow=p=>{const key=p[1],on=S.fav.includes(key);return `<div class="ph" data-k="${esc(key)}"><div class="tx"><b>${esc(p[0])}</b><div class="j jp">${esc(p[1])}</div><div class="r">${esc(p[2])}</div></div><button class="fav${on?' on':''}" data-f="${esc(key)}" aria-label="Save">★</button></div>`};
+const allP=()=>C.flatMap(c=>c.p||[]);
+function render(){$('#cats').innerHTML=C.map(c=>`<div class="cat${c.id===cur?' on':''}${open(c)?'':' lock'}" data-c="${c.id}"><span>${c.ic}</span>${c.n}</div>`).join('');
+ const c=C.find(x=>x.id===cur);let h='';
+ if(cur==='allergy'){const a=allergy();h=`<div class="card"><b>Tap your allergies</b><p class="muted" style="margin:4px 0 10px">We build one clear sentence for restaurant staff.</p><div class="al">${AL.map((x,i)=>`<span class="chip${S.al.includes(i)?' on':''}" data-a="${i}">${x[0]}<span class="jp">${x[1]}</span></span>`).join('')}</div>
+ ${a?`<div class="ph" data-al="1" style="margin-top:12px;border-top:1px solid var(--line)"><div class="tx"><b>${esc(a[0])}</b><div class="j jp">${esc(a[1])}</div></div></div><button class="btn" style="width:100%;margin-top:8px" data-al="1">Show to staff</button>`:''}
+ <div class="note">Allergy rules differ by restaurant. When in doubt, ask to see the allergen chart (アレルギー表).</div></div>`}
+ else if(cur==='fav'){const f=allP().filter(p=>S.fav.includes(p[1]));h=`<div class="card">${f.length?f.map(phRow).join(''):'<p class="muted">Tap ★ on any phrase to keep it here.</p>'}</div>`}
+ else h=`<div class="card">${c.p.map(phRow).join('')}</div>`+(cur==='sos'?'<div class="note"><b>Japan emergency numbers:</b> Police 110 · Ambulance / Fire 119</div>':'');
+ $('#body').innerHTML=h}
+$('#cats').onclick=e=>{const x=e.target.closest('[data-c]');if(!x)return;const c=C.find(y=>y.id===x.dataset.c);if(!open(c)){toast('Unlock all 8 categories in the full app');return}cur=c.id;render()};
+$('#body').onclick=e=>{const f=e.target.closest('[data-f]');if(f){if(!FULL){toast('Saving needs the full app');return}const k=f.dataset.f;S.fav=S.fav.includes(k)?S.fav.filter(x=>x!==k):[...S.fav,k];save();render();return}
+ const a=e.target.closest('[data-a]');if(a){const i=+a.dataset.a;S.al=S.al.includes(i)?S.al.filter(x=>x!==i):[...S.al,i];save();render();return}
+ if(e.target.closest('[data-al]')){show(allergy());return}
+ const r=e.target.closest('[data-k]');if(r)show(allP().find(p=>p[1]===r.dataset.k))};
+let curP=null;
+function show(p){if(!p)return;curP=p;$('#sJ').textContent=p[1];$('#sE').textContent=p[0];$('#sR').textContent=p[2];$('#show').classList.add('open');fit()}
+function fit(){const el=$('#sJ');let f=Math.min(innerWidth/5,92);el.style.fontSize=f+'px';while((el.scrollHeight>el.clientHeight||el.scrollWidth>el.clientWidth)&&f>20){f-=3;el.style.fontSize=f+'px'}}
+addEventListener('resize',()=>{if($('#show').classList.contains('open'))fit()});
+$('#sClose').onclick=()=>{$('#show').classList.remove('open');speechSynthesis&&speechSynthesis.cancel()};
+$('#sSpeak').onclick=()=>{if(!('speechSynthesis' in window)){toast('Audio not supported on this phone');return}const u=new SpeechSynthesisUtterance(curP[1]);u.lang='ja-JP';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)};
+render();
+
+</script></body></html>
