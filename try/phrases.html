@@ -136,5 +136,5 @@ addEventListener('resize',()=>{if($('#show').classList.contains('open'))fit()});
 $('#sClose').onclick=()=>{$('#show').classList.remove('open');speechSynthesis&&speechSynthesis.cancel()};
 $('#sSpeak').onclick=()=>{if(!('speechSynthesis' in window)){toast('Audio not supported on this phone');return}const u=new SpeechSynthesisUtterance(curP[1]);u.lang='ja-JP';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)};
 render();
-
+/*SWSLOT*/
 </script></body></html>
