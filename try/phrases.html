@@ -123,7 +123,7 @@ function render(){$('#cats').innerHTML=C.map(c=>`<div class="cat${c.id===cur?' o
  ${a?`<div class="ph" data-al="1" style="margin-top:12px;border-top:1px solid var(--line)"><div class="tx"><b>${esc(a[0])}</b><div class="j jp">${esc(a[1])}</div></div></div><button class="btn" style="width:100%;margin-top:8px" data-al="1">Show to staff</button>`:''}
  <div class="note">Allergy rules differ by restaurant. When in doubt, ask to see the allergen chart (アレルギー表).</div></div>`}
  else if(cur==='fav'){const f=allP().filter(p=>S.fav.includes(p[1]));h=`<div class="card">${f.length?f.map(phRow).join(''):'<p class="muted">Tap ★ on any phrase to keep it here.</p>'}</div>`}
- else h=`<div class="card">${c.p.map(phRow).join('')}</div>`+(cur==='sos'?'<div class="note"><b>Japan emergency numbers:</b> Police 110 · Ambulance / Fire 119</div>':'');
+ else h=(cur==='food'?'<a class="note" style="display:block;text-decoration:none;color:inherit;margin-bottom:10px" href="https://tabipocket.vercel.app/table/"><b>🍣 Restaurant only takes phone bookings?</b> A native speaker calls for you — $19, full refund if we can’t book it. →</a>':'')+`<div class="card">${c.p.map(phRow).join('')}</div>`+(cur==='sos'?'<div class="note"><b>Japan emergency numbers:</b> Police 110 · Ambulance / Fire 119</div>':'');
  $('#body').innerHTML=h}
 $('#cats').onclick=e=>{const x=e.target.closest('[data-c]');if(!x)return;const c=C.find(y=>y.id===x.dataset.c);if(!open(c)){toast('Unlock all 8 categories in the full app');return}cur=c.id;render()};
 $('#body').onclick=e=>{const f=e.target.closest('[data-f]');if(f){if(!FULL){toast('Saving needs the full app');return}const k=f.dataset.f;S.fav=S.fav.includes(k)?S.fav.filter(x=>x!==k):[...S.fav,k];save();render();return}
