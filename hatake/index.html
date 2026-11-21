@@ -390,32 +390,52 @@ function plotSVG(pk,W,L){
   const t=todayS();const lay=layoutPlot(pk,W,L);const sc=Math.max(20,Math.min(46,640/Math.max(W,L)));const pad=22;
   const fw=W*sc,fh=L*sc;const parts=[];let maxX=fw,maxY=fh;
   for(const {bd:b,len,wid,a,b:bb} of lay.beds){
-    const x=lay.dir==='v'?a*sc:bb*sc,y=lay.dir==='v'?bb*sc:a*sc,rw=(lay.dir==='v'?wid:len)*sc,rh=(lay.dir==='v'?len:wid)*sc;
+    const P=b.pos;const d=P?(P.d==='h'?'h':'v'):lay.dir;
+    const x=P?P.x*sc:(lay.dir==='v'?a*sc:bb*sc),y=P?P.y*sc:(lay.dir==='v'?bb*sc:a*sc),rw=(d==='v'?wid:len)*sc,rh=(d==='v'?len:wid)*sc;
     maxX=Math.max(maxX,x+rw);maxY=Math.max(maxY,y+rh);
     const cur=S.plan.find(e=>e.bed===b.id&&e.start<=t&&e.end>=t);const nx=S.plan.filter(e=>e.bed===b.id&&e.start>t).sort((p,q)=>p.start<q.start?-1:1)[0];
     const c=cur&&CBY[cur.crop];const col=c?FAM[c.fam]:'var(--soil)';
     const nowN=[...new Set(S.plan.filter(e=>e.bed===b.id&&e.start<=t&&e.end>=t).sort((p,q)=>p.start<q.start?-1:1).map(e=>CBY[e.crop]?.n).filter(Boolean))];
     const lab=nowN.length?nowN.join('・'):(nx?'→'+(CBY[nx.crop]?.n||''):'空き');const n=[...lab].length;
-    const isBad=lay.bad.includes(b);const X=pad+x,Y=pad+y;
-    const txt=lay.dir==='v'
+    const isBad=P?(x<-1||y<-1||x+rw>fw+1||y+rh>fh+1):lay.bad.includes(b);const X=pad+x,Y=pad+y;
+    const txt=d==='v'
       ?`<text x="${X+rw/2}" y="${Y+15}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${esc(b.name)}</text><text x="${X+rw/2}" y="${Y+26}" font-size="${Math.max(8,Math.min(12,Math.floor((rh-32)/Math.max(1,n))))}" fill="#fff" style="writing-mode:vertical-rl" writing-mode="tb">${esc(lab)}</text>`
       :`<text x="${X+8}" y="${Y+rh/2+4}" font-size="${Math.max(8,Math.min(12,rh-6))}" fill="#fff"><tspan font-weight="700">${esc(b.name)}</tspan>　${esc(lab)}</text>`;
-    parts.push(`<g data-bed="${b.id}" style="cursor:pointer"><rect x="${X}" y="${Y}" width="${rw}" height="${rh}" rx="6" fill="${col}" opacity="${c?0.9:0.4}" ${isBad?'stroke="var(--warn)" stroke-width="3"':b.use==='imo'?'stroke="var(--soil)" stroke-width="3" stroke-dasharray="6 4"':''}/>${txt}</g>`)}
+    parts.push(`<g data-bed="${b.id}" data-dir="${d}" style="cursor:${S.moveMode?'move':'pointer'}"><rect x="${X}" y="${Y}" width="${rw}" height="${rh}" rx="6" fill="${col}" opacity="${c?0.9:0.4}" ${isBad?'stroke="var(--warn)" stroke-width="3"':b.use==='imo'?'stroke="var(--soil)" stroke-width="3" stroke-dasharray="6 4"':''}/>${txt}</g>`)}
   const w=Math.max(fw,maxX)+pad*2,h=Math.max(fh,maxY)+pad*2+16;
-  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" role="img" aria-label="${esc(pn(pk))}の畝の配置"><rect x="${pad}" y="${pad}" width="${fw}" height="${fh}" rx="6" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="${pad}" y="${h-8}" font-size="11" fill="var(--sub)">横${W}m × 縦${L}m・通路${Math.round(lay.P*100)}cm・畝は${lay.dir==='v'?'縦':'横'}向き</text>${parts.join('')}</svg>`;
+  return `<svg viewBox="0 0 ${w} ${h}" ${S.moveMode?'style="width:100%;height:auto;touch-action:none"':`width="${w}"`} data-pk="${pk}" data-sc="${sc}" data-pad="${pad}" role="img" aria-label="${esc(pn(pk))}の畝の配置"><rect x="${pad}" y="${pad}" width="${fw}" height="${fh}" rx="6" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="${pad}" y="${h-8}" font-size="11" fill="var(--sub)">横${W}m × 縦${L}m・通路${Math.round(lay.P*100)}cm・畝は${lay.dir==='v'?'縦':'横'}向き</text>${parts.join('')}</svg>`;
 }
-function plotWarn(pk,W,L){const lay=layoutPlot(pk,W,L);const m=[];
+function plotWarn(pk,W,L){const bs=sortedBeds().filter(b=>(b.plot||'A')===pk);if(bs.length&&bs.every(b=>b.pos)){const out=bs.filter(b=>{const P=b.pos,lw=P.d==='h'?[b.l/100,b.w/100]:[b.w/100,b.l/100];return P.x<-0.01||P.y<-0.01||P.x+lw[0]>W+0.01||P.y+lw[1]>L+0.01});return out.length?`<p class="muted" style="color:var(--warn);margin:6px 0 0">⚠ ${esc(out.map(b=>b.name).join('・'))}が畑からはみ出しています。</p>`:''}
+  const lay=layoutPlot(pk,W,L);const m=[];
   if(lay.bad.length)m.push(`${lay.bad.map(b=>`${b.name}（長さ${b.l/100}m）`).join('・')}は、${lay.dir==='v'?'縦'+L:'横'+W}mの畑に入りません。畝の長さを短くするか、「畑の名前・広さ」で畝の向きを変えてください。`);
   if(lay.over)m.push(`畝を並べると${lay.dir==='v'?'縦':'横'}に${lay.usedAlong.toFixed(1)}m必要で、畑（${lay.dir==='v'?L:W}m）からはみ出します。`);
   return m.length?`<p class="muted" style="color:var(--warn);margin:6px 0 0">⚠ ${esc(m.join(' '))}</p>`:''}
+function moveHint(pk){return `<div class="row" style="justify-content:space-between;margin:4px 0 6px"><span class="muted" style="font-size:14px">畝を指でドラッグして移動／トンと押すと縦横を変える（5cm単位）</span><button class="btn warn sm" data-autolay="${pk}">自動の配置に戻す</button></div>`}
+/* ドラッグで畝を動かす（「配置を動かす」のときだけ） */
+let DR=null;
+const svgPt=(svg,ev)=>{const m=svg.getScreenCTM().inverse();return {x:m.a*ev.clientX+m.c*ev.clientY+m.e,y:m.b*ev.clientX+m.d*ev.clientY+m.f}};
+document.addEventListener('pointerdown',ev=>{if(!S.moveMode)return;const g=ev.target.closest&&ev.target.closest('svg g[data-bed]');if(!g)return;ev.preventDefault();
+  const svg=g.ownerSVGElement,p=svgPt(svg,ev),r=g.querySelector('rect');DR={g,svg,id:g.dataset.bed,pk:svg.dataset.pk,sc:+svg.dataset.sc,pad:+svg.dataset.pad,x0:p.x,y0:p.y,rx:+r.getAttribute('x'),ry:+r.getAttribute('y'),rw:+r.getAttribute('width'),rh:+r.getAttribute('height'),dx:0,dy:0,moved:false};
+  try{svg.setPointerCapture(ev.pointerId)}catch(e){}});
+document.addEventListener('pointermove',ev=>{if(!DR)return;ev.preventDefault();const p=svgPt(DR.svg,ev);DR.dx=p.x-DR.x0;DR.dy=p.y-DR.y0;if(Math.hypot(DR.dx,DR.dy)>4)DR.moved=true;if(DR.moved)DR.g.setAttribute('transform',`translate(${DR.dx},${DR.dy})`)});
+document.addEventListener('pointerup',async ev=>{if(!DR)return;const D=DR;DR=null;S.skipClick=Date.now();
+  const snap=v=>Math.round(v*20)/20;const toM=v=>(v-D.pad)/D.sc;
+  // 初めて動かすときは、同じ畑の畝を全部いまの位置で固定する（ほかの畝が勝手に動かないように）
+  const all=[...D.svg.querySelectorAll('g[data-bed]')];
+  for(const g of all){const b=S.beds.find(x=>x.id===g.dataset.bed);if(!b||b.pos)continue;const r=g.querySelector('rect');b.pos={x:snap(toM(+r.getAttribute('x'))),y:snap(toM(+r.getAttribute('y'))),d:g.dataset.dir}}
+  const b=S.beds.find(x=>x.id===D.id);if(!b)return;
+  if(D.moved){b.pos={...b.pos,x:snap(toM(D.rx+D.dx)),y:snap(toM(D.ry+D.dy))}}
+  else{const cx=toM(D.rx+D.rw/2),cy=toM(D.ry+D.rh/2),nd=b.pos.d==='h'?'v':'h',L=b.l/100,Wd=b.w/100,nw=nd==='v'?Wd:L,nh=nd==='v'?L:Wd;b.pos={x:snap(cx-nw/2),y:snap(cy-nh/2),d:nd}}
+  for(const g of all){const x=S.beds.find(y=>y.id===g.dataset.bed);if(x)await put('beds',x.id,x)}
+  render()});
 function vMap(){
   if(!S.beds.length)return emptyStart();const cf=S.cfg;
   const leg=Object.entries(FAM).filter(([f])=>S.plan.some(e=>CBY[e.crop]?.fam===f)).map(([f,c])=>`<span><span class="dot" style="background:${c}"></span>${f}</span>`).join('');
   const hasB=S.beds.some(b=>b.plot==='B');
-  return `<div class="plot-h"><h2>${esc(pn('A'))}（${(cf.aW*cf.aL)|0}㎡）</h2><button class="btn ghost sm" data-cfg="1">名前を変える</button></div>
-  <div class="plot">${plotSVG('A',cf.aW,cf.aL)}</div>${plotWarn('A',cf.aW,cf.aL)}
-  <div class="plot-h"><h2>${esc(pn('B'))}（${(cf.bW*cf.bL)|0}㎡・${md(cf.bFrom)}から）</h2><button class="btn ghost sm" data-cfg="1">名前を変える</button></div>
-  ${hasB?plotWarn('B',cf.bW,cf.bL):''}<div class="plot">${hasB?plotSVG('B',cf.bW,cf.bL):'<p class="muted" style="margin:6px">畝を登録するときに場所で「'+esc(pn('B'))+'」を選ぶと、ここに出ます。</p>'}</div>
+  return `<div class="plot-h"><h2>${esc(pn('A'))}（${(cf.aW*cf.aL)|0}㎡）</h2><div class="row" style="gap:6px"><button class="btn ${S.moveMode?'':'ghost'} sm" data-movemode="1">${S.moveMode?'動かし終わる':'配置を動かす'}</button><button class="btn ghost sm" data-cfg="1">名前を変える</button></div></div>
+  ${S.moveMode?moveHint('A'):''}<div class="plot">${plotSVG('A',cf.aW,cf.aL)}</div>${plotWarn('A',cf.aW,cf.aL)}
+  <div class="plot-h"><h2>${esc(pn('B'))}（${(cf.bW*cf.bL)|0}㎡・${md(cf.bFrom)}から）</h2><div class="row" style="gap:6px"><button class="btn ${S.moveMode?'':'ghost'} sm" data-movemode="1">${S.moveMode?'動かし終わる':'配置を動かす'}</button><button class="btn ghost sm" data-cfg="1">名前を変える</button></div></div>
+  ${hasB?plotWarn('B',cf.bW,cf.bL):''}${S.moveMode&&hasB?moveHint('B'):''}<div class="plot">${hasB?plotSVG('B',cf.bW,cf.bL):'<p class="muted" style="margin:6px">畝を登録するときに場所で「'+esc(pn('B'))+'」を選ぶと、ここに出ます。</p>'}</div>
   <div class="legend">${leg}<span><span class="dot" style="border:2px dashed var(--soil)"></span>芋専用の畝</span></div>
   <div class="row" style="margin-top:8px"><button class="btn" data-newbed="1">畝を足す</button><button class="btn ghost" data-cfg="1">畑の名前・広さ・計画のきまり</button></div>
   <h2>畝の一覧</h2><div class="grid">${sortedBeds().map(b=>{const n=S.plan.filter(e=>e.bed===b.id).length;return `<div class="card row" data-bed="${b.id}" style="cursor:pointer;justify-content:space-between"><div><b>${esc(b.name)}</b> <span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span> <span class="chip soil">${esc(pn(b.plot==='B'?'B':'A'))}</span> <span class="chip">${esc(METHODS[bedMethod(b)].n)}</span><div class="muted">長さ${(b.l/100).toFixed(1)}m・幅${b.w}cm・高さ${b.h}cm　計画 ${n}作</div></div><span class="muted">詳しく ›</span></div>`}).join('')}</div>`;
@@ -492,7 +512,7 @@ function bedInfo(b){if(!b)return;const t=todayS();const M=METHODS[bedMethod(b)];
   <div class="row" style="margin-top:12px"><button class="btn" data-growing="${b.id}">いま育てている野菜を入れる</button><button class="btn soft" data-addent="${b.id}">この畝に予定を足す</button></div>
   <div class="row" style="margin-top:10px"><button class="btn ghost sm" data-editbed="${b.id}">畝の大きさ・農法・名前を直す</button><button class="btn ghost sm" data-dupbed="${b.id}">複製</button></div>`)}
 function bedSheet(b,tpl){
-  const isNew=!b;b=b||(tpl?{...tpl,id:nid(),name:`畝${S.beds.length+1}`,order:S.beds.length+1}:{id:nid(),name:`畝${S.beds.length+1}`,plot:'A',l:500,w:90,h:30,use:'',note:'',order:S.beds.length+1});
+  const isNew=!b;b=b||(tpl?{...tpl,pos:undefined,id:nid(),name:`畝${S.beds.length+1}`,order:S.beds.length+1}:{id:nid(),name:`畝${S.beds.length+1}`,plot:'A',l:500,w:90,h:30,use:'',note:'',order:S.beds.length+1});
   const es=S.plan.filter(e=>e.bed===b.id).sort((a,c)=>a.start<c.start?-1:1);
   const comp=[...new Set(es.flatMap(e=>CBY[e.crop]?.comp||[]))].map(id=>CBY[id]?.n).filter(Boolean);
   sheet(`<div class="bar"><h3>${isNew?'畝を登録':'畝の編集'}</h3><button class="x" data-close aria-label="閉じる">×</button></div>
@@ -564,6 +584,9 @@ document.addEventListener('click',async ev=>{
   if(v=g('data-go2'))return go(v);
   if(g('data-newbed'))return bedSheet(null);
   if(v=g('data-dupbed'))return bedSheet(null,S.beds.find(x=>x.id===v));
+  if(g('data-movemode')){S.moveMode=!S.moveMode;return render()}
+  if(v=g('data-autolay')){for(const b of S.beds.filter(b=>(b.plot||'A')===v&&b.pos)){const x={...b};delete x.pos;await put('beds',x.id,x)}return toast('自動の配置に戻しました')}
+  if(S.moveMode&&t.closest('svg'))return;
   if(v=g('data-bed'))return bedInfo(S.beds.find(b=>b.id===v));
   if(v=g('data-editbed'))return bedSheet(S.beds.find(b=>b.id===v));
   if(g('data-cfg'))return cfgSheet();
@@ -576,7 +599,7 @@ document.addEventListener('click',async ev=>{
   if(g('data-clearpick')){S.picks=[];return savePicks()}
   if(g('data-make'))return makePlan();
   if(g('data-demo')){for(let i=0;i<6;i++){const id=nid();await put('beds',id,{id,name:`例 A${i+1}`,plot:'A',l:600,w:90,h:30,use:i===5?'imo':'',note:'例（消してかまいません）',order:i+1})}return toast('例の畝を入れました')}
-  if(v=g('data-savebed')){const b={id:v,method:$('#b-method').value,name:$('#b-name').value.trim()||'畝',plot:$('#b-plot').value,use:$('#b-use').value,l:Math.round(+$('#b-l').value*100)||500,w:+$('#b-w').value||90,h:+$('#b-h').value||30,note:$('#b-note').value,order:(S.beds.find(x=>x.id===v)||{}).order??S.beds.length+1};await put('beds',v,b);closeSheet();return toast('保存しました')}
+  if(v=g('data-savebed')){const b={id:v,method:$('#b-method').value,name:$('#b-name').value.trim()||'畝',plot:$('#b-plot').value,use:$('#b-use').value,l:Math.round(+$('#b-l').value*100)||500,w:+$('#b-w').value||90,h:+$('#b-h').value||30,note:$('#b-note').value,order:(S.beds.find(x=>x.id===v)||{}).order??S.beds.length+1};{const old=S.beds.find(x=>x.id===v);if(old&&old.pos&&old.plot===b.plot)b.pos=old.pos;else if(!old){const sib=S.beds.filter(x=>(x.plot||'A')===b.plot&&x.pos);if(sib.length){const cf=S.cfg;b.pos={x:0,y:0,d:sib[0].pos.d}}}}await put('beds',v,b);closeSheet();return toast('保存しました')}
   if(v=g('data-delbed')){const btn=t.closest('[data-delbed]');if(btn.dataset.sure!=='1'){btn.dataset.sure='1';btn.textContent='もう一度押すと消えます（予定も消えます）';return}
     for(const e of S.plan.filter(e=>e.bed===v))await del('plan',e.id);await del('beds',v);closeSheet();return toast('消しました')}
   if(v=g('data-move')){const [id,d]=v.split('|');const arr=sortedBeds();const i=arr.findIndex(b=>b.id===id);const j=i+ +d;if(j<0||j>=arr.length)return;
