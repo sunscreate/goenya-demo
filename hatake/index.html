@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="theme-color" content="#2f7a45"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="畝ごよみ"><link rel="manifest" href="/hatake/manifest.json"><link rel="icon" href="/hatake/icon.svg"><link rel="apple-touch-icon" href="/hatake/icon.svg">
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="robots" content="noindex"><meta name="theme-color" content="#2f7a45"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="畝ごよみ"><link rel="manifest" href="/hatake/manifest.json"><link rel="icon" href="/hatake/icon.svg"><link rel="apple-touch-icon" href="/hatake/icon.svg">
 <title>畝ごよみ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap">
@@ -43,7 +43,7 @@ h3{font-size:16px}
 .chip.soil{background:var(--soil-2);color:var(--soil)}
 .chip.warn{background:var(--warn-2);color:var(--warn)}
 label.f{display:block;font-size:12px;color:var(--sub);font-weight:700;margin:10px 0 4px}
-input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+input,select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
 textarea{min-height:80px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
@@ -457,7 +457,7 @@ function cfgSheet(){const c=S.cfg;
   <label class="f" for="c-strict">連作の守り方</label><select id="c-strict"><option value="1" ${c.strict?'selected':''}>しっかり守る（科ごとの休む年数どおり）</option><option value="0" ${!c.strict?'selected':''}>ゆるめ（同じ科を4か月以上あけるだけ）</option></select>
   <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-savecfg="1">保存</button></div>
   <h3 style="margin-top:18px">ほかの端末（スマホ・PC）でも使う</h3><p class="muted" style="margin-top:0">このリンクをもう一方の端末で開くと、同じ畑のデータを見られます。人には教えないでください。</p>
-  <div class="row"><button class="btn ghost sm" data-copylink="1">リンクをコピー</button></div>`)}
+  <div class="row"><button class="btn ghost sm" data-copylink="1">リンクをコピー</button><button class="btn ghost sm" data-keyset="1">合言葉を入れ直す</button></div>`)}
 
 /* --- 計画を作る --- */
 async function makePlan(){
@@ -473,7 +473,9 @@ async function makePlan(){
 /* --- 押したとき --- */
 document.addEventListener('click',async ev=>{
   const t=ev.target;const g=k=>t.closest(`[${k}]`)?.getAttribute(k);
+  if(t.id==='sh'&&!KEY.v)return;
   if(t.id==='sh'||t.closest('[data-close]'))return closeSheet();
+  if(g('data-keyset'))return keySheet();
   let v;
   if(v=g('data-go2'))return go(v);
   if(g('data-newbed'))return bedSheet(null);
@@ -578,11 +580,11 @@ const DBS={doc(p){const [c,id]=p.split('/');return{set:async d=>{local(c,id,d);q
   collection(c){return{onSnapshot(f){(ST.ls[c]=ST.ls[c]||[]).push(f);f(snap(c));return()=>{}}}}};
 
 /* --- 合言葉 --- */
-function keySheet(msg){sheet(`<div class="bar"><h3>畑の合言葉</h3></div><p class="muted" style="margin-top:0">${esc(msg||'最初に一度だけ、合言葉（またはもらったリンク）を入れてください。この端末に覚えます。')}</p>
+function keySheet(msg){sheet(`<div class="bar"><h3>畑の合言葉</h3></div><p class="muted" style="margin-top:0">${esc(msg||'最初に一度だけ、合言葉かリンク（https://…/hatake/#k=… の全部）を貼り付けて「つなぐ」を押してください。この端末が覚えるので、次からは入れなくて大丈夫です。')}</p>
   <label class="f" for="k-in">合言葉またはリンク</label><input id="k-in" autocomplete="off"><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-savekey="1">つなぐ</button></div>`)}
 async function saveKey(){let v=$('#k-in').value.trim();const m=/[#&]k=([\w-]+)/.exec(v);if(m)v=m[1];
   try{if(!(await rpc('hatake_check',{k:v})))return toast('合言葉が違います');}catch(e){return toast('つながりません')}
-  KEY.v=v;try{localStorage.setItem('ug-key',v)}catch(e){}S.sample=true;S.imgOK=true;closeSheet();await pull();loadWx();render()}
+  KEY.v=v;try{localStorage.setItem('ug-key',v)}catch(e){}setSync('つないでいます…');S.sample=true;S.imgOK=true;closeSheet();await pull();loadWx();render()}
 
 /* --- 天気（7日） --- */
 const WX=c=>c===0?'☀️':c<=2?'🌤️':c===3?'☁️':c<=48?'🌫️':c<=67||(c>=80&&c<=82)?'☔':c<=77||c===85||c===86?'❄️':c>=95?'⛈️':'☁️';
@@ -638,7 +640,7 @@ DBS.collection('beds').onSnapshot(q=>{S.beds=q.docs.map(d=>d.data());if(!documen
 DBS.collection('plan').onSnapshot(q=>{S.plan=q.docs.map(d=>d.data());if(!document.querySelector('.sheet'))render()});
 DBS.collection('diag').onSnapshot(q=>{S.diag=q.docs.map(d=>d.data());if(S.tab==='ask'&&!document.activeElement?.closest('#view'))render()});
 render();
-if(!KEY.v){setSync('合言葉が未設定');keySheet()}else{setSync('読み込み中…');pull().then(()=>loadWx())}
+if(!KEY.v){$('#sync').innerHTML='<button class="btn sm" data-keyset="1">合言葉を入れる</button>';keySheet()}else{setSync('読み込み中…');pull().then(()=>loadWx())}
 setInterval(()=>{if(!document.hidden)pull()},60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
 window.addEventListener('online',()=>pull());
