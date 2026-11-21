@@ -387,7 +387,7 @@ function layoutDir(pk,W,L,dir){const beds=sortedBeds().filter(b=>(b.plot||'A')==
   const offB=Math.max(0,(along-usedAlong)/2);for(const o of out){o.a+=Math.max(0,(across-lineW[o.line])/2);o.b+=offB+(lineL[o.line]-o.len)/2}
   return {dir,beds:out,bad,over:usedAlong>along+0.005,usedAlong,P}}
 function plotSVG(pk,W,L){
-  const t=todayS();const lay=layoutPlot(pk,W,L);const sc=Math.max(20,Math.min(46,640/Math.max(W,L)));const pad=22;
+  const t=todayS();const lay=layoutPlot(pk,W,L);const pad=14;const avail=Math.max(260,($('#view')?.clientWidth||600)-22);const sc=Math.max(8,Math.min(46,(avail-pad*2)/W));// 画面の幅にぴったり（拡大・縮小しない）
   const fw=W*sc,fh=L*sc;const parts=[];let maxX=fw,maxY=fh;
   for(const {bd:b,len,wid,a,b:bb} of lay.beds){
     const P=b.pos;const d=P?(P.d==='h'?'h':'v'):lay.dir;
@@ -403,7 +403,7 @@ function plotSVG(pk,W,L){
       :`<text x="${X+8}" y="${Y+rh/2+4}" font-size="${Math.max(8,Math.min(12,rh-6))}" fill="#fff"><tspan font-weight="700">${esc(b.name)}</tspan>　${esc(lab)}</text>`;
     parts.push(`<g data-bed="${b.id}" data-dir="${d}" style="cursor:${S.moveMode?'move':'pointer'}"><rect x="${X}" y="${Y}" width="${rw}" height="${rh}" rx="6" fill="${col}" opacity="${c?0.9:0.4}" ${isBad?'stroke="var(--warn)" stroke-width="3"':b.use==='imo'?'stroke="var(--soil)" stroke-width="3" stroke-dasharray="6 4"':''}/>${txt}</g>`)}
   const w=Math.max(fw,maxX)+pad*2,h=Math.max(fh,maxY)+pad*2+16;
-  return `<svg viewBox="0 0 ${w} ${h}" ${S.moveMode?'style="width:100%;height:auto;touch-action:none"':`width="${w}"`} data-pk="${pk}" data-sc="${sc}" data-pad="${pad}" role="img" aria-label="${esc(pn(pk))}の畝の配置"><rect x="${pad}" y="${pad}" width="${fw}" height="${fh}" rx="6" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="${pad}" y="${h-8}" font-size="11" fill="var(--sub)">横${W}m × 縦${L}m・通路${Math.round(lay.P*100)}cm・畝は${lay.dir==='v'?'縦':'横'}向き</text>${parts.join('')}</svg>`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" ${S.moveMode?'style="touch-action:none"':''} data-pk="${pk}" data-sc="${sc}" data-pad="${pad}" role="img" aria-label="${esc(pn(pk))}の畝の配置"><rect x="${pad}" y="${pad}" width="${fw}" height="${fh}" rx="6" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="${pad}" y="${h-8}" font-size="11" fill="var(--sub)">横${W}m × 縦${L}m・通路${Math.round(lay.P*100)}cm・畝は${lay.dir==='v'?'縦':'横'}向き</text>${parts.join('')}</svg>`;
 }
 function plotWarn(pk,W,L){const bs=sortedBeds().filter(b=>(b.plot||'A')===pk);if(bs.length&&bs.every(b=>b.pos)){const out=bs.filter(b=>{const P=b.pos,lw=P.d==='h'?[b.l/100,b.w/100]:[b.w/100,b.l/100];return P.x<-0.01||P.y<-0.01||P.x+lw[0]>W+0.01||P.y+lw[1]>L+0.01});return out.length?`<p class="muted" style="color:var(--warn);margin:6px 0 0">⚠ ${esc(out.map(b=>b.name).join('・'))}が畑からはみ出しています。</p>`:''}
   const lay=layoutPlot(pk,W,L);const m=[];
@@ -494,7 +494,8 @@ function vAsk(){
   ${S.diag.length?`<h2>これまでの相談</h2><div class="grid">${[...S.diag].sort((a,b)=>a.at<b.at?1:-1).slice(0,20).map(d=>`<details class="card diag"><summary class="row" style="cursor:pointer">${d.thumb?`<img src="${d.thumb}" alt="">`:''}<span><b>${esc(d.q||'写真の相談')}</b><br><span class="muted">${md(d.at.slice(0,10))}・${esc(bedName(d.bed))}</span></span></summary><div class="ans" style="margin-top:8px">${esc(d.a)}</div></details>`).join('')}</div>`:''}`;
 }
 
-function render(){navR();const v={today:vToday,map:vMap,year:vYear,pick:vPick,ask:vAsk}[S.tab]||vToday;$('#view').innerHTML=v();}
+function render(){navR();const v={today:vToday,map:vMap,year:vYear,pick:vPick,ask:vAsk}[S.tab]||vToday;const y=window.scrollY;$('#view').innerHTML=v();if(y&&Math.abs(window.scrollY-y)>1)window.scrollTo(0,y)}
+let rzT;window.addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{if(S.tab==='map'&&!document.querySelector('.sheet'))render()},200)});
 
 /* --- シート（畝・作付けの編集） --- */
 function sheet(html){$('#sheet').innerHTML=`<div class="sheet" id="sh"><div class="in" role="dialog" aria-modal="true">${html}</div></div>`;}
