@@ -512,6 +512,18 @@ function bedInfo(b){if(!b)return;const t=todayS();const M=METHODS[bedMethod(b)];
   <p class="muted" style="margin-top:10px">野菜を押すと、日にちを直したり消したりできます。</p>
   <div class="row" style="margin-top:12px"><button class="btn" data-growing="${b.id}">いま育てている野菜を入れる</button><button class="btn soft" data-addent="${b.id}">この畝に予定を足す</button></div>
   <div class="row" style="margin-top:10px"><button class="btn ghost sm" data-editbed="${b.id}">畝の大きさ・農法・名前を直す</button><button class="btn ghost sm" data-dupbed="${b.id}">複製</button></div>`)}
+async function placeDup(b,src){
+    if(src&&(src.plot||'A')===b.plot){// 複製は元の畝のすぐ横に
+      const P=((+S.cfg.path)||40)/100;if(src.pos){const sw=src.w/100,step=Math.round((b.w/100+P)*20)/20,hz=src.pos.d==='h';b.pos=hz?{x:src.pos.x,y:Math.round((src.pos.y+sw+P)*20)/20,d:'h'}:{x:Math.round((src.pos.x+sw+P)*20)/20,y:src.pos.y,d:'v'};
+        // 元の畝より先にある畝は、1本分ずらして場所をあける
+        for(const x of S.beds){if(x.id===src.id||!x.pos||(x.plot||'A')!==b.plot)continue;if(hz?x.pos.y>src.pos.y+0.001:x.pos.x>src.pos.x+0.001){const np=hz?{...x.pos,y:Math.round((x.pos.y+step)*20)/20}:{...x.pos,x:Math.round((x.pos.x+step)*20)/20};await put('beds',x.id,{...x,pos:np})}}}
+      const v=b.id;const list=sortedBeds().filter(x=>x.id!==v);const i=list.findIndex(x=>x.id===src.id);list.splice(i+1,0,b);
+      for(let k=0;k<list.length;k++){const x=list[k];if(x.id===v){b.order=k+1;continue}if(x.order!==k+1)await put('beds',x.id,{...x,order:k+1})}}
+}
+async function dupBed(id){const src=S.beds.find(x=>x.id===id);if(!src)return;
+  const used=new Set(S.beds.map(x=>x.name));let k=S.beds.length+1;while(used.has('畝'+k))k++;
+  const b={...src,id:nid(),name:'畝'+k,order:S.beds.length+1};delete b.pos;
+  await placeDup(b,src);await put('beds',b.id,b);closeSheet();toast(`${src.name}を複製して「${b.name}」を横に並べました`)}
 function bedSheet(b,tpl){S.dupFrom=!b&&tpl?tpl.id:null;
   const isNew=!b;b=b||(tpl?{...tpl,pos:undefined,id:nid(),name:`畝${S.beds.length+1}`,order:S.beds.length+1}:{id:nid(),name:`畝${S.beds.length+1}`,plot:'A',l:500,w:90,h:30,use:'',note:'',order:S.beds.length+1});
   const es=S.plan.filter(e=>e.bed===b.id).sort((a,c)=>a.start<c.start?-1:1);
@@ -584,7 +596,7 @@ document.addEventListener('click',async ev=>{
   let v;
   if(v=g('data-go2'))return go(v);
   if(g('data-newbed'))return bedSheet(null);
-  if(v=g('data-dupbed'))return bedSheet(null,S.beds.find(x=>x.id===v));
+  if(v=g('data-dupbed'))return dupBed(v);
   if(g('data-movemode')){S.moveMode=!S.moveMode;return render()}
   if(v=g('data-autolay')){for(const b of S.beds.filter(b=>(b.plot||'A')===v&&b.pos)){const x={...b};delete x.pos;await put('beds',x.id,x)}return toast('自動の配置に戻しました')}
   if(S.moveMode&&t.closest('svg'))return;
@@ -601,13 +613,7 @@ document.addEventListener('click',async ev=>{
   if(g('data-make'))return makePlan();
   if(g('data-demo')){for(let i=0;i<6;i++){const id=nid();await put('beds',id,{id,name:`例 A${i+1}`,plot:'A',l:600,w:90,h:30,use:i===5?'imo':'',note:'例（消してかまいません）',order:i+1})}return toast('例の畝を入れました')}
   if(v=g('data-savebed')){const b={id:v,method:$('#b-method').value,name:$('#b-name').value.trim()||'畝',plot:$('#b-plot').value,use:$('#b-use').value,l:Math.round(+$('#b-l').value*100)||500,w:+$('#b-w').value||90,h:+$('#b-h').value||30,note:$('#b-note').value,order:(S.beds.find(x=>x.id===v)||{}).order??S.beds.length+1};{const old=S.beds.find(x=>x.id===v);if(old&&old.pos&&old.plot===b.plot)b.pos=old.pos;else if(!old){const sib=S.beds.filter(x=>(x.plot||'A')===b.plot&&x.pos);if(sib.length){b.pos={x:0,y:0,d:sib[0].pos.d}}}}
-    const src=!S.beds.find(x=>x.id===v)&&S.dupFrom&&S.beds.find(x=>x.id===S.dupFrom);
-    if(src&&(src.plot||'A')===b.plot){// 複製は元の畝のすぐ横に
-      const P=((+S.cfg.path)||40)/100;if(src.pos){const sw=src.w/100,step=Math.round((b.w/100+P)*20)/20,hz=src.pos.d==='h';b.pos=hz?{x:src.pos.x,y:Math.round((src.pos.y+sw+P)*20)/20,d:'h'}:{x:Math.round((src.pos.x+sw+P)*20)/20,y:src.pos.y,d:'v'};
-        // 元の畝より先にある畝は、1本分ずらして場所をあける
-        for(const x of S.beds){if(x.id===src.id||!x.pos||(x.plot||'A')!==b.plot)continue;if(hz?x.pos.y>src.pos.y+0.001:x.pos.x>src.pos.x+0.001){const np=hz?{...x.pos,y:Math.round((x.pos.y+step)*20)/20}:{...x.pos,x:Math.round((x.pos.x+step)*20)/20};await put('beds',x.id,{...x,pos:np})}}}
-      const list=sortedBeds().filter(x=>x.id!==v);const i=list.findIndex(x=>x.id===src.id);list.splice(i+1,0,b);
-      for(let k=0;k<list.length;k++){const x=list[k];if(x.id===v){b.order=k+1;continue}if(x.order!==k+1)await put('beds',x.id,{...x,order:k+1})}}
+    const src=!S.beds.find(x=>x.id===v)&&S.dupFrom&&S.beds.find(x=>x.id===S.dupFrom);if(src)await placeDup(b,src);
     S.dupFrom=null;await put('beds',v,b);closeSheet();return toast('保存しました')}
   if(v=g('data-delbed')){const btn=t.closest('[data-delbed]');if(btn.dataset.sure!=='1'){btn.dataset.sure='1';btn.textContent='もう一度押すと消えます（予定も消えます）';return}
     for(const e of S.plan.filter(e=>e.bed===v))await del('plan',e.id);await del('beds',v);closeSheet();return toast('消しました')}
