@@ -95,6 +95,7 @@ nav.tabs button[aria-current="page"]{color:var(--leaf)}
 .crop .hd b{font-size:16px}
 .crop .kin{margin-left:auto}
 .crop .note{font-size:13px;color:var(--sub)}
+.step input.qty{width:64px;text-align:center;padding:6px 4px;border-radius:8px}
 .mth{display:grid;gap:8px}.mth button{text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px;cursor:pointer}.mth button.on{border-color:var(--leaf);box-shadow:0 0 0 3px var(--leaf-2)}.mth b{font-size:16px}.mth span{display:block;color:var(--sub);font-size:14px;margin-top:4px}
 .slot{font-size:12px;border:1.5px solid var(--line);border-radius:999px;padding:2px 9px;background:transparent;color:var(--sub);cursor:pointer;font-weight:700;font-family:inherit}
 .slot.on{border-color:var(--leaf);color:var(--leaf);background:var(--leaf-2)}
@@ -224,51 +225,65 @@ function sowCandidates(slot,from,to,step){
   }
   return out;
 }
-function bedFree(entries,bed,o,rest){if(bed.rest!=null)rest=bed.rest;
+/* 株数：株間・列から、その畝に何株入るか（capOf）。1つの作付けは畝の一部（frac）を使う */
+function spOf(c){const s=c.sp||'';let m;
+  if(m=/1株に約(\d+(?:\.\d+)?)畳/.exec(s))return {area:+m[1]*1.65};
+  const a=/株間(\d+)cm/.exec(s),j=/条間(\d+)cm/.exec(s),r=/(\d+)(?:〜\d+)?列/.exec(s);
+  return {sp:a?+a[1]:j?10:30,rows:r?+r[1]:null}}
+function capOf(c,b){const w=(b&&b.w)||90,l=(b&&b.l)||500,x=spOf(c);
+  if(x.area)return Math.max(1,Math.floor(l*w/1e4/x.area));
+  const rows=x.rows||(x.sp>=60?1:x.sp>=30?2:x.sp>=15?3:4);const rr=Math.max(1,Math.min(rows,Math.floor(w/15)));
+  return Math.max(1,rr*Math.floor(l/x.sp))}
+const fracOf=e=>e.frac!=null?e.frac:1;
+function bedAvail(entries,bed,o,rest){if(bed.rest!=null)rest=bed.rest;
+  if(bed.plot==='B'&&bed.from&&o.start<bed.from)return 0;let used=0;
   for(const e of entries){if(e.bed!==bed.id)continue;
-    if(!(toD(o.end)+rest*DAY<=toD(e.start)||toD(e.end)+rest*DAY<=toD(o.start)))return false}
-  if(bed.plot==='B'&&bed.from&&o.start<bed.from)return false;
-  return true;
-}
+    if(!(toD(o.end)+rest*DAY<=toD(e.start)||toD(e.end)+rest*DAY<=toD(o.start)))used+=fracOf(e)}
+  return Math.max(0,1-used)}
+function bedFree(entries,bed,o,rest){return bedAvail(entries,bed,o,rest)>=fracOf(o)-1e-9}
 function rotationOK(entries,bed,o,strict){
   const c=CBY[o.crop];
   for(const e of entries){if(e.bed!==bed.id||e.crop===o.crop&&e.sow===o.sow)continue;const ec=CBY[e.crop];if(!ec||ec.fam!==c.fam)continue;
-    const gap=e.end<=o.start?diffD(o.start,e.end):e.start>=o.end?diffD(e.start,o.end):0;
+    if(e.start<o.end&&o.start<e.end)continue;// 同じ時期に並べて植えるのは連作ではない
+    const gap=e.end<=o.start?diffD(o.start,e.end):diffD(e.start,o.end);
     const years=Math.max(c.rot,ec.rot);
     if(years===0)continue;
     if(strict){if(gap<years*365)return false}else if(gap<120)return false;}
   return true;
 }
+const typBed=beds=>(beds||[]).find(b=>b.use!=='imo')||(beds||[])[0]||{l:500,w:90};
 function plan({beds,picks,locked,from,rest=14,strict=true}){
   const to=addD(from,364);const entries=[...locked];const miss=[];
   const hasImo=beds.some(b=>b.use==='imo');
   const okBed=(b,c)=>hasImo?(c.imo?b.use==='imo':b.use!=='imo'):true;
   const occs=[];
   for(const p of picks){const c=CBY[p.id];if(!c)continue;
-    c.slots.forEach((sl,i)=>{if(p.off&&p.off.includes(i))return;for(let k=0;k<(p.n||1);k++)occs.push({c,sl,i})})}
+    const q=p.q||(p.n||1)*capOf(c,typBed(beds));c.slots.forEach((sl,i)=>{if(p.off&&p.off.includes(i))return;occs.push({c,sl,i,q})})}
   const dur=o=>o.sl[3]+o.sl[4]+o.sl[5]*7;
   occs.sort((a,b)=>(b.c.imo?1:0)-(a.c.imo?1:0)||dur(b)-dur(a));
-  const place=(c,sl,i,cands,tag)=>{
-    let best=null;
+  const place=(c,sl,i,cands,tag,q)=>{let rem=q;const placed=[];
+   while(rem>0){let best=null;
     for(const sow of cands){const o=occOf(c,sl,sow);if(o.start>to)continue;
-      for(const b of beds){if(!okBed(b,c))continue;if(!bedFree(entries,b,o,rest))continue;if(!rotationOK(entries,b,o,strict))continue;
+      for(const b of beds){if(!okBed(b,c))continue;const cap=capOf(c,b),av=bedAvail(entries,b,o,rest);const k=Math.min(rem,Math.floor(av*cap+1e-9));if(k<1)continue;if(!rotationOK(entries,b,o,strict))continue;
         const prev=entries.filter(e=>e.bed===b.id&&e.end<=o.start).sort((x,y)=>y.end<x.end?-1:1)[0];
         const idle=prev?diffD(o.start,prev.end):diffD(o.start,from);
         const comp=entries.some(e=>e.bed!==b.id&&Math.abs((beds.find(x=>x.id===e.bed)||{}).order-b.order)===1&&(c.comp||[]).includes(e.crop)&&e.start<o.end&&o.start<e.end)?20:0;
-        const score=-diffD(sow,cands[0])*0.6-Math.min(idle,200)*0.25+comp;
-        if(!best||score>best.score)best={score,o:{...o,bed:b.id,slot:i,tag}}}}
-    if(best){entries.push(best.o);return best.o}
-    return null;
+        const score=-diffD(sow,cands[0])*0.6-Math.min(idle,200)*0.25+comp+(av<1?6:0)+(k===rem?25:10*k/rem)+(placed.length&&sow===placed[0].sow?15:0);
+        if(!best||score>best.score)best={score,o:{...o,bed:b.id,slot:i,tag,qty:k,frac:k/cap}}}}
+    if(!best)break;entries.push(best.o);placed.push(best.o);rem-=best.o.qty}
+   return {placed,rem};
   };
   for(const x of occs){const cands=sowCandidates(x.sl,from,to,5);
     if(!cands.length){miss.push({crop:x.c.id,why:'この1年の計画期間に種まきの時期がありません'});continue}
-    if(!place(x.c,x.sl,x.i,cands,''))miss.push({crop:x.c.id,why:`${x.sl[6]}作：空いている畝が足りません（連作・休みの日数を守ると入りません）`})}
+    const r=place(x.c,x.sl,x.i,cands,'',x.q);
+    if(r.rem>0)miss.push({crop:x.c.id,why:r.placed.length?`${x.sl[6]}作：${x.q}株のうち${r.rem}株が入りません`:`${x.sl[6]}作：空いている畝が足りません（連作・休みの日数を守ると入りません）`})}
   // つなぎ：短い作物は、時期をずらしてもう一度まいて長く取る
   for(const p of picks){const c=CBY[p.id];if(!c)continue;
     c.slots.forEach((sl,i)=>{if(p.off&&p.off.includes(i))return;if(sl[3]+sl[4]+sl[5]*7>80)return;
+      const q=p.q||(p.n||1)*capOf(c,typBed(beds));
       for(let extra=0;extra<2;extra++){const mine=entries.filter(e=>e.crop===c.id&&e.slot===i).map(e=>e.sow).sort();if(!mine.length)break;
         const next=addD(mine[mine.length-1],21);const cands=sowCandidates(sl,next,to,5).filter(d=>d>=next);if(!cands.length)break;
-        if(!place(c,sl,i,cands,'ずらしまき'))break}})}
+        const r=place(c,sl,i,cands,'ずらしまき',q);if(!r.placed.length)break}})}
   return {entries:entries.filter(e=>!e.locked),miss};
 }
 /* 予定（やること）を作る */
@@ -281,7 +296,7 @@ function events(entries,beds){
       const prev=entries.filter(x=>x.bed===e.bed&&x.end<=e.start).sort((a,b)=>a.end<b.end?1:-1)[0];
       const M=METHODS[bedMethod(beds.find(b=>b.id===e.bed))];
       ev.push({d:addD(e.start,-14),k:'prep',e,t:`${bn(e.bed)}の畝の準備`,s:(prev?`${CBY[prev.crop]?.n||''}を片付けて、`:'')+M.prep});}
-    ev.push({d:e.start,k:'start',e,t:`${c.n}を${e.method==='育苗'?'植え付け':e.method==='植付'?'植え付け':'種まき'}`,s:`${bn(e.bed)}　${c.sp}`});
+    ev.push({d:e.start,k:'start',e,t:`${c.n}${e.qty?`（${e.qty}株）`:''}を${e.method==='育苗'?'植え付け':e.method==='植付'?'植え付け':'種まき'}`,s:`${bn(e.bed)}　${c.sp}`});
     ev.push({d:e.harvest,k:'harvest',e,t:`${c.n}の収穫はじめ`,s:`${bn(e.bed)}　${md(e.end)}ごろまで`});
     ev.push({d:e.end,k:'end',e,t:`${c.n}を片付け`,s:nextOn?`次は${CBY[nextOn.crop]?.n||''}（${md(nextOn.start)}〜）${['kin','shizen','tanso'].includes(bedMethod(beds.find(b=>b.id===e.bed)))?'。畝は壊さず、残さは刻んで畝に戻す':''}`:'次の作付けは未定。空いた畝は「野菜を選ぶ」で埋められます'});
   }
@@ -383,11 +398,11 @@ function vYear(){
   if(!S.beds.length)return emptyStart();
   const t=todayS();const from=t.slice(0,8)+'01';const span=365;const pct=d=>Math.max(0,Math.min(100,diffD(d,from)/span*100));
   const months=[...Array(12)].map((_,i)=>{const d=new Date(toD(from));d.setUTCMonth(d.getUTCMonth()+i);return `${d.getUTCMonth()+1}月`});
-  const rows=sortedBeds().map(b=>{const es=S.plan.filter(e=>e.bed===b.id&&e.end>=from);
+  const rows=sortedBeds().map(b=>{const es=S.plan.filter(e=>e.bed===b.id&&e.end>=from).sort((a,c)=>a.start<c.start?-1:1);const lanes=[];const lane={};for(const e of es){let k=lanes.findIndex(end=>end<e.start);if(k<0){k=lanes.length;lanes.push(e.end)}else lanes[k]=e.end;lane[e.id]=k}const nl=Math.max(1,lanes.length);
     const bars=es.map(e=>{const c=CBY[e.crop];if(!c)return'';const l=pct(e.start),r=pct(e.end);if(r<=0)return'';const w=Math.max(1.2,r-l);const hvL=Math.max(0,(pct(e.harvest)-l)/w*100);
-      const nur=e.nursery?`<div class="g-nursery" style="left:${pct(e.nursery)}%;width:${Math.max(0.6,pct(e.start)-pct(e.nursery))}%;background:${FAM[c.fam]}" title="育苗"></div>`:'';
-      return `${nur}<button class="g-bar" data-ent="${e.id}" style="left:${l}%;width:${w}%;background:${FAM[c.fam]}" title="${esc(c.n)} ${md(e.start)}〜${md(e.end)}"><div class="hv" style="left:${hvL}%"></div><span>${e.locked?'🔒':''}${esc(c.n)}${e.tag?'・'+e.tag:''}</span></button>`}).join('');
-    return `<div class="g-row"><div class="g-name" data-bed="${b.id}">${esc(b.name)}<small>${b.use==='imo'?'芋専用':b.plot==='B'?esc(pn('B')):''}</small></div><div class="g-track">${bars}</div></div>`}).join('');
+      const nur=e.nursery?`<div class="g-nursery" style="top:${22+lane[e.id]*40}px;left:${pct(e.nursery)}%;width:${Math.max(0.6,pct(e.start)-pct(e.nursery))}%;background:${FAM[c.fam]}" title="育苗"></div>`:'';
+      return `${nur}<button class="g-bar" data-ent="${e.id}" style="top:${8+lane[e.id]*40}px;left:${l}%;width:${w}%;background:${FAM[c.fam]}" title="${esc(c.n)} ${md(e.start)}〜${md(e.end)}"><div class="hv" style="left:${hvL}%"></div><span>${e.locked?'🔒':''}${esc(c.n)}${e.qty?' '+e.qty+'株':''}${e.tag?'・'+e.tag:''}</span></button>`}).join('');
+    return `<div class="g-row" style="min-height:${12+nl*40}px"><div class="g-name" data-bed="${b.id}">${esc(b.name)}<small>${b.use==='imo'?'芋専用':b.plot==='B'?esc(pn('B')):''}</small></div><div class="g-track">${bars}</div></div>`}).join('');
   const miss=S.lastMiss.length?`<div class="card" style="margin-top:10px;border-color:var(--warn)"><b style="color:var(--warn)">入りきらなかったもの</b><p style="margin:6px 0 0">${(()=>{const g={};for(const m of S.lastMiss){const k=m.why.includes('時期')?'t':'b';(g[k]=g[k]||new Set()).add(CBY[m.crop]?.n)}return (g.b?`<b>畝が足りない：</b>${esc([...g.b].join('・'))}<br>`:'')+(g.t?`<b>この1年に種まき時期がない：</b>${esc([...g.t].join('・'))}`:'')})()}</p><p class="muted" style="margin:6px 0 0">畝を足す・畝数を減らす・「畑の広さ・計画のきまり」で連作の守り方をゆるめると入ることがあります。</p></div>`:'';
   return `<div class="plot-h"><h2>1年の計画</h2><span class="muted">帯を押すと日付の変更・移動・固定</span></div>
   <div class="legend"><span><span class="dot" style="background:repeating-linear-gradient(45deg,#999 0 3px,#ccc 3px 6px)"></span>育苗（畑の外）</span><span><span class="dot" style="background:#777"></span>育っている</span><span><span class="dot" style="background:#444"></span>収穫期間（濃い部分）</span><span>🔒 固定（再計算しても動かさない）</span></div>
@@ -408,7 +423,7 @@ function vPick(){
   <div class="crops">${list.map(c=>{const p=pk[c.id];const on=!!p;return `<div class="crop ${on?'on':''}">
     <div class="hd"><input type="checkbox" id="pk-${c.id}" data-pick="${c.id}" ${on?'checked':''}><label for="pk-${c.id}"><b>${famDot(c)}${esc(c.n)}</b></label>${c.custom?'<span class="chip soil">自分で追加</span>':''}${isKin?`<span class="chip ${c.kin==='◎'?'':c.kin==='○'?'soil':'warn'} kin">${c.kin}</span>`:''}</div>
     <div class="row">${c.slots.map((s,i)=>`<button class="slot ${on&&!(p.off||[]).includes(i)?'on':''}" data-slot="${c.id}|${i}" title="${s[0]} ${s[1].replace('-','/')}〜${s[2].replace('-','/')}">${s[6]}：${s[0]} ${+s[1].slice(0,2)}〜${+s[2].slice(0,2)}月</button>`).join('')}</div>
-    ${on?`<div class="row"><span class="muted">畝の数</span><span class="step"><button data-cnt="${c.id}|-1" aria-label="減らす">−</button><span>${p.n||1}本</span><button data-cnt="${c.id}|1" aria-label="増やす">＋</button></span></div>`:''}
+    ${on?(()=>{const cap=capOf(c,typBed(sortedBeds())),q=qOf(p,c);return `<div class="row" style="gap:8px"><span class="muted">1回に植える株数</span><span class="step"><button data-cnt="${c.id}|-1" aria-label="減らす">−</button><input class="qty" type="number" inputmode="numeric" min="1" data-qty="${c.id}" value="${q}" aria-label="株数"><button data-cnt="${c.id}|1" aria-label="増やす">＋</button></span><span class="muted" style="font-size:13px">株（畝1本に約${cap}株）</span></div>`})():''}
     <div class="note">${esc(c.fam)}・${esc(c.sp)}${c.note?'。'+esc(c.note):''}</div>${c.custom?`<div><button class="btn ghost sm" data-delcrop="${c.id}">この野菜を消す</button></div>`:''}</div>`}).join('')}</div>
   <div class="sticky-go"><span><b>${n}</b> 種類を選択中</span><div class="row"><button class="btn ghost sm" data-clearpick="1" ${n?'':'disabled'}>選択を外す</button><button class="btn" data-make="1" ${n&&S.beds.length?'':'disabled'}>この野菜で計画を作る</button></div></div>`;
 }
@@ -438,7 +453,7 @@ function sheet(html){$('#sheet').innerHTML=`<div class="sheet" id="sh"><div clas
 function closeSheet(){const o=!!$('#sheet').innerHTML;$('#sheet').innerHTML='';if(o)render()}
 function bedInfo(b){if(!b)return;const t=todayS();const M=METHODS[bedMethod(b)];
   const es=S.plan.filter(e=>e.bed===b.id).sort((a,c)=>a.start<c.start?-1:1);const now=es.filter(e=>e.start<=t&&e.end>=t),later=es.filter(e=>e.start>t),past=es.filter(e=>e.end<t);
-  const it=e=>{const c=CBY[e.crop];return `<div class="it" data-ent="${e.id}" style="cursor:pointer">${famDot(c)}<b>${esc(c?.n)}</b><span class="muted">${md(e.start)}〜${md(e.end)}（収穫 ${md(e.harvest)}〜）</span>${e.locked?'🔒':''}</div>`};
+  const it=e=>{const c=CBY[e.crop];return `<div class="it" data-ent="${e.id}" style="cursor:pointer">${famDot(c)}<b>${esc(c?.n)}</b>${e.qty?`<span>${e.qty}株</span>`:''}<span class="muted">${md(e.start)}〜${md(e.end)}（収穫 ${md(e.harvest)}〜）</span>${e.locked?'🔒':''}</div>`};
   sheet(`<div class="bar"><h3>${esc(b.name)}</h3><button class="x" data-close aria-label="閉じる">×</button></div>
   <div class="row" style="gap:6px"><span class="chip soil">${esc(pn(b.plot==='B'?'B':'A'))}</span><span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span><span class="chip">${esc(M.n)}</span></div>
   <p class="muted" style="margin:8px 0 0">長さ${(b.l/100).toFixed(1)}m・幅${b.w}cm・高さ${b.h}cm${b.note?'　'+esc(b.note):''}</p>
@@ -476,6 +491,7 @@ function entSheet(e,bedId){
   <div class="two"><div><label class="f" for="e-slot">作型</label><select id="e-slot">${c.slots.map((s,i)=>`<option value="${i}" ${i===e.slot?'selected':''}>${s[6]}：${s[0]}</option>`).join('')}</select></div>
   <div><label class="f" for="e-sow">${'種まき（育苗は種をまく日）'}</label><input type="date" id="e-sow" value="${e.sow}"></div></div>
   <div class="two"><div><label class="f" for="e-hv">収穫はじめ（変えるときだけ）</label><input type="date" id="e-hv" value="${e.harvest||''}"></div><div><label class="f" for="e-end">片付け（変えるときだけ）</label><input type="date" id="e-end" value="${e.end||''}"></div></div>
+  <label class="f" for="e-qty">株数（空欄なら畝いっぱい）</label><input id="e-qty" type="number" inputmode="numeric" min="1" value="${e.qty||''}">
   <label class="row" style="margin-top:10px;gap:6px"><input type="checkbox" id="e-lock" style="width:20px;height:20px" ${e.locked?'checked':''}> 固定する（再計算しても動かさない。今育てている物はこれ）</label>
   <div class="row" style="margin-top:14px;justify-content:space-between">${!isNew?`<button class="btn warn sm" data-delent="${e.id}">消す</button>`:'<span></span>'}<button class="btn" data-saveent="${e.id}" data-new="${isNew?1:''}">保存</button></div>`);
   $('#e-crop').onchange=ev=>{const cc=CBY[ev.target.value];$('#e-slot').innerHTML=cc.slots.map((s,i)=>`<option value="${i}">${s[6]}：${s[0]}</option>`).join('');$('#e-hv').value='';$('#e-end').value=''};
@@ -525,8 +541,8 @@ document.addEventListener('click',async ev=>{
   if((v=g('data-addent'))!==null&&v!==undefined){closeSheet();return entSheet(null,v==='1'?null:v)}
   if(v=g('data-done')){const [id,k]=v.split('|');const e=S.plan.find(x=>x.id===id);if(!e)return;await put('plan',id,{...e,done:{...(e.done||{}),[k]:true}});return toast('済みにしました')}
   if(v=g('data-filter')){S.filter=v;return render()}
-  if(v=g('data-slot')){const [id,i]=v.split('|');let p=S.picks.find(x=>x.id===id);if(!p){p={id,n:1,off:CBY[id].slots.map((_,j)=>j).filter(j=>j!=+i)};S.picks.push(p)}else{const off=new Set(p.off||[]);off.has(+i)?off.delete(+i):off.add(+i);p.off=[...off];if(p.off.length===CBY[id].slots.length)S.picks=S.picks.filter(x=>x.id!==id)}return savePicks()}
-  if(v=g('data-cnt')){const [id,d]=v.split('|');const p=S.picks.find(x=>x.id===id);if(p){p.n=Math.max(1,Math.min(6,(p.n||1)+ +d));savePicks()}return}
+  if(v=g('data-slot')){const [id,i]=v.split('|');let p=S.picks.find(x=>x.id===id);if(!p){p={id,q:defQ(CBY[id]),off:CBY[id].slots.map((_,j)=>j).filter(j=>j!=+i)};S.picks.push(p)}else{const off=new Set(p.off||[]);off.has(+i)?off.delete(+i):off.add(+i);p.off=[...off];if(p.off.length===CBY[id].slots.length)S.picks=S.picks.filter(x=>x.id!==id)}return savePicks()}
+  if(v=g('data-cnt')){const [id,d]=v.split('|');const p=S.picks.find(x=>x.id===id);if(p){const c=CBY[id];p.q=Math.max(1,qOf(p,c)+ +d*qStep(c));delete p.n;savePicks()}return}
   if(g('data-clearpick')){S.picks=[];return savePicks()}
   if(g('data-make'))return makePlan();
   if(g('data-demo')){for(let i=0;i<6;i++){const id=nid();await put('beds',id,{id,name:`例 A${i+1}`,plot:'A',l:600,w:90,h:30,use:i===5?'imo':'',note:'例（消してかまいません）',order:i+1})}return toast('例の畝を入れました')}
@@ -538,7 +554,7 @@ document.addEventListener('click',async ev=>{
   if(v=g('data-saveent')){const crop=$('#e-crop').value,c=CBY[crop],slot=+$('#e-slot').value,sow=$('#e-sow').value;if(!sow)return toast('日付を入れてください');
     const o=occOf(c,c.slots[slot],sow);const old=S.plan.find(e=>e.id===v)||{};
     const hv=$('#e-hv').value,en=$('#e-end').value;
-    const e={...old,...o,id:v,bed:$('#e-bed').value,slot,locked:$('#e-lock').checked,done:old.done||{},tag:''};
+    const e={...old,...o,id:v,bed:$('#e-bed').value,slot,locked:$('#e-lock').checked,done:old.done||{},tag:''};{const qv=Math.round(+$('#e-qty').value);const bb=S.beds.find(b=>b.id===e.bed);if(qv>0){e.qty=qv;e.frac=Math.min(1,qv/capOf(c,bb))}else{delete e.qty;delete e.frac}}
     if(hv&&old.crop===crop)e.harvest=hv;if(en&&old.crop===crop)e.end=en;
     await put('plan',v,e);closeSheet();return toast('保存しました')}
   if(v=g('data-delent')){await del('plan',v);closeSheet();return toast('消しました')}
@@ -557,7 +573,10 @@ document.addEventListener('click',async ev=>{
   if(t.id==='p-go')return askPlan();
   if(v=g('data-useplan'))return usePlan();
 });
-document.addEventListener('change',ev=>{const t=ev.target;if(t.id==='b-copy'){return bedSheet(null,S.beds.find(x=>x.id===t.value)||null)}if(t.id==='b-method'){$('#b-mdesc').textContent=METHODS[mKey(t.value||S.cfg.method)].d;return}if(t.dataset.pick){const id=t.dataset.pick;if(t.checked)S.picks.push({id,n:1,off:[]});else S.picks=S.picks.filter(p=>p.id!==id);savePicks()}});
+document.addEventListener('change',ev=>{const t=ev.target;if(t.id==='b-copy'){return bedSheet(null,S.beds.find(x=>x.id===t.value)||null)}if(t.id==='b-method'){$('#b-mdesc').textContent=METHODS[mKey(t.value||S.cfg.method)].d;return}if(t.dataset.qty){const p=S.picks.find(x=>x.id===t.dataset.qty);if(p){p.q=Math.max(1,Math.round(+t.value)||1);delete p.n;savePicks()}return}if(t.dataset.pick){const id=t.dataset.pick;if(t.checked)S.picks.push({id,q:defQ(CBY[id]),off:[]});else S.picks=S.picks.filter(p=>p.id!==id);savePicks()}});
+const qOf=(p,c)=>p.q||(p.n||1)*capOf(c,typBed(sortedBeds()));
+const qStep=c=>{const k=capOf(c,typBed(sortedBeds()));return k>=100?10:k>=20?5:k>=8?2:1};
+const defQ=c=>{const k=capOf(c,typBed(sortedBeds()));return k>=40?Math.round(k/2/5)*5||k:k};
 let pickTimer;function savePicks(){render();clearTimeout(pickTimer);pickTimer=setTimeout(()=>put('meta','picks',{list:S.picks}),400)}
 
 /* --- Claudeに相談 --- */
@@ -566,7 +585,7 @@ function ctxText(){
   const loc=P?`場所は${P.label}（標高${P.elev}m、年平均気温${P.annual}℃、気候区分「${S.cfg.zone}」、霜の目安は春${P.lastFrost||'不明'}ごろまで・秋${P.firstFrost||'不明'}ごろから）`:`場所は未登録（関東の平地＝中間地として考える）`;
   const wx=S.wx?.days?.length?`\nこの先の天気：${S.wx.days.map(d=>`${d.d.slice(5)} ${Math.round(d.lo)}〜${Math.round(d.hi)}℃ 雨${d.rain}mm`).join('／')}`:'';
   const beds=sortedBeds().map(b=>`- ${b.name}（id:${b.id}）${METHODS[bedMethod(b)].n}・休み${METHODS[bedMethod(b)].rest}日・${b.plot==='B'?pn('B')+'・'+S.cfg.bFrom+'から':pn('A')}・${b.use==='imo'?'芋専用':'ふつう'}・長さ${b.l/100}m 幅${b.w}cm 高さ${b.h}cm${b.note?'・'+b.note:''}`).join('\n');
-  const pl=[...S.plan].sort((a,b)=>a.start<b.start?-1:1).map(e=>`- ${bedName(e.bed)}：${CBY[e.crop]?.n}（${e.method}）種まき${e.sow} 畑へ${e.start} 収穫${e.harvest}〜${e.end}${e.locked?' 固定':''}`).join('\n');
+  const pl=[...S.plan].sort((a,b)=>a.start<b.start?-1:1).map(e=>`- ${bedName(e.bed)}：${CBY[e.crop]?.n}${e.qty?' '+e.qty+'株':''}（${e.method}）種まき${e.sow} 畑へ${e.start} 収穫${e.harvest}〜${e.end}${e.locked?' 固定':''}`).join('\n');
   return `今日は${t}。${loc}。${wx}\n家庭菜園。畑の基本の農法は「${METHODS[bedMethod(null)].n}」（${METHODS[bedMethod(null)].d}）。畝ごとに農法が違う場合は畝の一覧に書いてある。掘り取る芋は専用の畝。\n去年の経験：夏野菜はほとんどうまくいったが、枝豆だけうまくいかなかった。\n\n畝：\n${beds||'（未登録）'}\n\n今の計画：\n${pl||'（なし）'}`;
 }
 const errMsg=e=>({bad_key:'合言葉が違います。設定からリンクを開き直してください。',no_api_key:'サーバーにClaudeのキーがありません。',bad_json:'答えの形が崩れていました。もう一度お試しください。',not_granted:'Claudeの利用が許可されていません。',rate_limited:'今は混み合っています。少し時間をおいてください。',image_rejected:'この写真は送れません。別の写真でお試しください。',refused:'この内容には答えられませんでした。',session_expired:'Claudeにもう一度ログインしてください。'}[e?.code]||'うまく相談できませんでした。もう一度お試しください。');
@@ -584,12 +603,12 @@ async function askPhoto(){
 let proposal=null;
 async function askPlan(){
   const want=$('#p-q').value.trim();const out=$('#p-out');out.innerHTML='<p class="muted">考えています…（30秒〜1分ほど）</p>';$('#p-go').disabled=true;
-  const picks=S.picks.map(p=>CBY[p.id]?.n).filter(Boolean);
+  const picks=S.picks.filter(p=>CBY[p.id]).map(p=>`${CBY[p.id].n}${qOf(p,CBY[p.id])}株`);
   const dbtxt=CROPS.map(c=>`${c.id}=${c.n}(${c.fam},菌ちゃん向き${c.kin},休む年${c.rot}${c.imo?',芋':''};${c.slots.map((s,i)=>`作型${i}:${s[6]}${s[0]} 種まき${s[1]}〜${s[2]} 育苗${s[3]}日 収穫まで${s[4]}日 ${s[5]}週`).join('/')})`).join('\n');
-  const prompt=`${ctxText()}\n\n作りたい野菜：${picks.join('・')||'（未選択）'}\n希望：${want||'なし'}\n\n野菜のデータ（id=名前(科,向き,連作で休む年;作型)）:\n${dbtxt}\n\nお願い：この畑の1年分（${todayS()}から365日）の作付け計画を見直してください。守ること：同じ畝で前の作物の片付けから次を入れるまで、その畝の農法の日数（畝の一覧に書いた休み）以上あける／同じ科の連作を避ける／芋は芋専用の畝／「固定」の作付けは動かさない／種まき日は各作型の種まき期間の中。そのうえで、畝が空く期間を減らし、収穫できる期間がなるべく長く続くようにし、各畝の農法での向き・去年の経験（枝豆）も考えてください。\n\n返事はJSONだけ：{"advice":"変えた点と理由を日本語で3〜6行","entries":[{"bed":"畝id","crop":"野菜id","slot":作型番号,"sow":"YYYY-MM-DD"}]}。entriesには固定以外の作付けをすべて入れる。`;
+  const prompt=`${ctxText()}\n\n作りたい野菜：${picks.join('・')||'（未選択）'}\n希望：${want||'なし'}\n\n野菜のデータ（id=名前(科,向き,連作で休む年;作型)）:\n${dbtxt}\n\nお願い：この畑の1年分（${todayS()}から365日）の作付け計画を見直してください。守ること：同じ畝で前の作物の片付けから次を入れるまで、その畝の農法の日数（畝の一覧に書いた休み）以上あける／同じ科の連作を避ける／芋は芋専用の畝／「固定」の作付けは動かさない／種まき日は各作型の種まき期間の中。そのうえで、畝が空く期間を減らし、収穫できる期間がなるべく長く続くようにし、各畝の農法での向き・去年の経験（枝豆）も考えてください。\n\n返事はJSONだけ：{"advice":"変えた点と理由を日本語で3〜6行","entries":[{"bed":"畝id","crop":"野菜id","slot":作型番号,"sow":"YYYY-MM-DD","qty":株数}]}。entriesには固定以外の作付けをすべて入れる。`;
   try{const r=await api('plan',{prompt});
     const ok=(r.entries||[]).filter(x=>CBY[x.crop]&&S.beds.some(b=>b.id===x.bed)&&CBY[x.crop].slots[+x.slot]&&/^\d{4}-\d{2}-\d{2}$/.test(x.sow));
-    proposal=ok.map(x=>({...occOf(CBY[x.crop],CBY[x.crop].slots[+x.slot],x.sow),bed:x.bed,slot:+x.slot}));
+    proposal=ok.map(x=>{const q=Math.round(+x.qty)||0,bb=S.beds.find(b=>b.id===x.bed);return {...occOf(CBY[x.crop],CBY[x.crop].slots[+x.slot],x.sow),bed:x.bed,slot:+x.slot,...(q>0?{qty:q,frac:Math.min(1,q/capOf(CBY[x.crop],bb))}:{})}});
     out.innerHTML=`<div class="ans">${esc(r.advice||'')}</div><div class="list-plan">${proposal.sort((a,b)=>a.start<b.start?-1:1).map(e=>`<div class="it">${famDot(CBY[e.crop])}<b>${esc(bedName(e.bed))}</b>${esc(CBY[e.crop].n)}<span class="muted">${md(e.start)}〜${md(e.end)}</span></div>`).join('')}</div><div class="row" style="margin-top:10px"><button class="btn" data-useplan="1" ${proposal.length?'':'disabled'}>この案にする（固定以外を入れ替え）</button></div>`;
   }catch(e){out.innerHTML=`<p class="muted">${esc(errMsg(e))}</p>`}
   finally{$('#p-go')&&($('#p-go').disabled=false)}
@@ -668,7 +687,7 @@ async function addCrop(){const name=$('#nc-name').value.trim();if(!name)return t
     const okSlot=x=>Array.isArray(x)&&x.length>=7&&['直播','育苗','植付'].includes(x[0])&&/^\d\d-\d\d$/.test(x[1])&&/^\d\d-\d\d$/.test(x[2])&&[3,4,5].every(i=>Number.isFinite(+x[i]));
     const slots=(r.slots||[]).filter(okSlot).map(x=>[x[0],x[1],x[2],+x[3],+x[4],+x[5],String(x[6])]);if(!slots.length)throw Object.assign(new Error(''),{code:'bad_json'});
     const id='u'+nid();const c={id,n:String(r.n||name).slice(0,20),fam:String(r.fam||'その他'),cat:['実','葉','根','芋','豆','香'].includes(r.cat)?r.cat:'葉',kin:['◎','○','△'].includes(r.kin)?r.kin:'○',rot:Math.max(0,Math.min(5,+r.rot||0)),imo:r.imo?1:0,sp:String(r.sp||''),note:String(r.note||''),comp:[],slots,custom:true};
-    await put('crops',id,c);S.picks=S.picks.filter(p=>p.id!==id);S.picks.push({id,n:1,off:[]});S.filter='all';savePicks();toast(`${c.n}を足して、選びました`);
+    await put('crops',id,c);S.picks=S.picks.filter(p=>p.id!==id);S.picks.push({id,q:defQ(c),off:[]});S.filter='all';savePicks();toast(`${c.n}を足して、選びました`);
   }catch(e){msg.textContent=errMsg(e)}finally{const b=$('#nc-go');if(b)b.disabled=false}}
 
 /* --- いま育てている野菜 --- */
@@ -680,6 +699,7 @@ function growSheet(bedId){const t=todayS();S.added=[];
   <div class="two"><div><label class="f" for="g-start">畑に入れた日（種まき・植え付け）</label><input type="date" id="g-start" value="${addD(t,-30)}" max="${t}"></div>
   <div><label class="f" for="g-stage">いまの様子</label><select id="g-stage"><option value="grow">育っている（まだ収穫前）</option><option value="harvest">収穫している</option></select></div></div>
   <div class="two"><div><label class="f" for="g-hv">収穫はじめ（自動・変えてOK）</label><input type="date" id="g-hv"></div><div><label class="f" for="g-end">片付けの予定（自動・変えてOK）</label><input type="date" id="g-end"></div></div>
+  <label class="f" for="g-qty">株数（わからなければ空欄＝畝いっぱい）</label><input id="g-qty" type="number" inputmode="numeric" min="1">
   <p class="muted" id="g-hint" style="margin:6px 0 0"></p>
   <div id="g-list" class="list-plan"></div>
   <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn ghost" data-savegrow="more">続けて入れる</button><button class="btn" data-savegrow="close">入れて閉じる</button></div>`);
@@ -692,10 +712,10 @@ function growSheet(bedId){const t=todayS();S.added=[];
 async function saveGrow(mode){const crop=$('#g-crop').value,c=CBY[crop],bed=$('#g-bed').value,st=$('#g-start').value,hv=$('#g-hv').value,en=$('#g-end').value;
   if(!bed)return toast('畝を登録してください');if(!st||!hv||!en)return toast('日付を入れてください');if(hv<st||en<hv)return toast('日付の順番を確かめてください');
   const i=bestSlot(c,st),x=c.slots[i],id=nid();const stage=$('#g-stage').value;
-  const e={id,crop,bed,slot:i,method:x[0],sow:addD(st,-x[3]),start:st,harvest:hv,end:en,nursery:x[3]>0?addD(st,-x[3]):null,locked:true,tag:'育成中',done:{nursery:true,prep:true,start:true,...(stage==='harvest'?{harvest:true}:{})}};
+  const qv=Math.round(+$('#g-qty').value),bb=S.beds.find(b=>b.id===bed);const e={id,crop,bed,slot:i,method:x[0],sow:addD(st,-x[3]),start:st,harvest:hv,end:en,nursery:x[3]>0?addD(st,-x[3]):null,locked:true,tag:'育成中',...(qv>0?{qty:qv,frac:Math.min(1,qv/capOf(c,bb))}:{}),done:{nursery:true,prep:true,start:true,...(stage==='harvest'?{harvest:true}:{})}};
   await put('plan',id,e);
   if(mode==='close'){closeSheet();toast('入れました。計画を作り直すと、空いている時期に合わせて並べ直します');return}
-  S.added.push(e);$('#g-list').innerHTML='<p class="muted" style="margin:8px 0 0">入れたもの：</p>'+S.added.map(a=>`<div class="it">${famDot(CBY[a.crop])}<b>${esc(CBY[a.crop].n)}</b>${esc(bedName(a.bed))}<span class="muted">収穫 ${md(a.harvest)}〜${md(a.end)}</span>🔒</div>`).join('');toast('入れました。続けてどうぞ')}
+  S.added.push(e);$('#g-qty').value='';$('#g-list').innerHTML='<p class="muted" style="margin:8px 0 0">入れたもの：</p>'+S.added.map(a=>`<div class="it">${famDot(CBY[a.crop])}<b>${esc(CBY[a.crop].n)}</b>${esc(bedName(a.bed))}<span class="muted">収穫 ${md(a.harvest)}〜${md(a.end)}</span>🔒</div>`).join('');toast('入れました。続けてどうぞ')}
 
 /* --- 起動 --- */
 (()=>{const m=/[#&]k=([\w-]+)/.exec(location.hash);if(m){try{localStorage.setItem('ug-key',m[1])}catch(e){}KEY.v=m[1];history.replaceState(null,'',location.pathname)}
