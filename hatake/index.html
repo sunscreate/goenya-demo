@@ -353,15 +353,14 @@ function plotSVG(pk,W,L){
   const beds=sortedBeds().filter(b=>(b.plot||'A')===pk);const t=todayS();const sc=46;// 1m=46px
   const pad=24,w=W*sc+pad*2,h=L*sc+pad*2;let x=pad+14,y=pad+14,rowH=0;const parts=[];
   for(const b of beds){const bw=(b.w||90)/100*sc,bl=(b.l||500)/100*sc;
-    if(x+bw>w-pad){x=pad+14;y+=rowH+30;rowH=0}
     const cur=S.plan.find(e=>e.bed===b.id&&e.start<=t&&e.end>=t);const nx=S.plan.filter(e=>e.bed===b.id&&e.start>t).sort((a,c)=>a.start<c.start?-1:1)[0];
     const c=cur&&CBY[cur.crop];const col=c?FAM[c.fam]:'var(--soil)';
     parts.push(`<g data-bed="${b.id}" style="cursor:pointer"><rect x="${x}" y="${y}" width="${bw}" height="${bl}" rx="8" fill="${col}" opacity="${c?0.9:0.35}" ${b.use==='imo'?'stroke="var(--soil)" stroke-width="3" stroke-dasharray="6 4"':''}/>
       <text x="${x+bw/2}" y="${y+16}" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">${esc(b.name)}</text>
       <text x="${x+bw/2}" y="${y+bl/2}" text-anchor="middle" font-size="12" fill="#fff" writing-mode="tb">${esc(c?c.n:(nx?'→'+(CBY[nx.crop]?.n||''):'空き'))}</text></g>`);
     x+=bw+26;rowH=Math.max(rowH,bl)}
-  const H=Math.max(h,y+rowH+pad);
-  return `<svg viewBox="0 0 ${w} ${H}" width="${w}" role="img" aria-label="畑${pk}の畝の配置"><rect x="4" y="4" width="${w-8}" height="${H-8}" rx="14" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="16" y="20" font-size="11" fill="var(--soil)">${W}m × ${L}m</text>${parts.join('')}</svg>`;
+  const H=Math.max(h,y+rowH+pad),Wd=Math.max(w,x-26+14+pad);
+  return `<svg viewBox="0 0 ${Wd} ${H}" width="${Wd}" role="img" aria-label="畑${pk}の畝の配置"><rect x="4" y="4" width="${Wd-8}" height="${H-8}" rx="14" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="16" y="20" font-size="11" fill="var(--soil)">${W}m × ${L}m</text>${parts.join('')}</svg>`;
 }
 function vMap(){
   if(!S.beds.length)return emptyStart();const cf=S.cfg;
@@ -434,11 +433,12 @@ function render(){navR();const v={today:vToday,map:vMap,year:vYear,pick:vPick,as
 /* --- シート（畝・作付けの編集） --- */
 function sheet(html){$('#sheet').innerHTML=`<div class="sheet" id="sh"><div class="in" role="dialog" aria-modal="true">${html}</div></div>`;}
 function closeSheet(){const o=!!$('#sheet').innerHTML;$('#sheet').innerHTML='';if(o)render()}
-function bedSheet(b){
-  const isNew=!b;b=b||{id:nid(),name:`畝${S.beds.length+1}`,plot:'A',l:500,w:90,h:30,use:'',note:'',order:S.beds.length+1};
+function bedSheet(b,tpl){
+  const isNew=!b;b=b||(tpl?{...tpl,id:nid(),name:`畝${S.beds.length+1}`,order:S.beds.length+1}:{id:nid(),name:`畝${S.beds.length+1}`,plot:'A',l:500,w:90,h:30,use:'',note:'',order:S.beds.length+1});
   const es=S.plan.filter(e=>e.bed===b.id).sort((a,c)=>a.start<c.start?-1:1);
   const comp=[...new Set(es.flatMap(e=>CBY[e.crop]?.comp||[]))].map(id=>CBY[id]?.n).filter(Boolean);
   sheet(`<div class="bar"><h3>${isNew?'畝を登録':'畝の編集'}</h3><button class="x" data-close aria-label="閉じる">×</button></div>
+  ${isNew&&S.beds.length?`<label class="f" for="b-copy">今ある畝を複製する</label><select id="b-copy"><option value="">複製しない（新しく入れる）</option>${sortedBeds().map(x=>`<option value="${x.id}" ${tpl&&tpl.id===x.id?'selected':''}>${esc(x.name)}（長さ${(x.l/100).toFixed(1)}m・幅${x.w}cm・高さ${x.h}cm）</option>`).join('')}</select>${tpl?`<p class="muted" style="margin:6px 0 0">「${esc(tpl.name)}」の大きさ・使い方・農法・メモを写しました。名前だけ確かめて保存してください。</p>`:''}`:''}
   <label class="f" for="b-name">名前</label><input id="b-name" value="${esc(b.name)}">
   <div class="two"><div><label class="f" for="b-plot">場所</label><select id="b-plot"><option value="A" ${b.plot!=='B'?'selected':''}>いまの畑</option><option value="B" ${b.plot==='B'?'selected':''}>新しい畑（${md(S.cfg.bFrom)}から）</option></select></div>
   <div><label class="f" for="b-use">使い方</label><select id="b-use"><option value="">ふつう（畝は壊さず続けて使う）</option><option value="imo" ${b.use==='imo'?'selected':''}>芋専用（掘り取る）</option></select></div></div>
@@ -446,7 +446,7 @@ function bedSheet(b){
   <label class="f" for="b-method">この畝の農法</label><select id="b-method"><option value="">畑の基本と同じ（${esc(METHODS[bedMethod(null)].n)}）</option>${Object.entries(METHODS).map(([k,m])=>`<option value="${k}" ${b.method===k?'selected':''}>${m.n}</option>`).join('')}</select>
   <p class="muted" id="b-mdesc" style="margin:6px 0 0">${esc(METHODS[bedMethod(b)].d)}</p>
   <label class="f" for="b-note">メモ（日当たり・水はけなど）</label><input id="b-note" value="${esc(b.note||'')}">
-  <div class="row" style="margin-top:14px;justify-content:space-between"><div class="row">${!isNew?`<button class="btn warn sm" data-delbed="${b.id}">この畝を消す</button>`:''}${!isNew?`<button class="btn ghost sm" data-move="${b.id}|-1">↑ 前へ</button><button class="btn ghost sm" data-move="${b.id}|1">↓ 後へ</button>`:''}</div><button class="btn" data-savebed="${b.id}" data-new="${isNew?1:''}">保存</button></div>
+  <div class="row" style="margin-top:14px;justify-content:space-between"><div class="row">${!isNew?`<button class="btn warn sm" data-delbed="${b.id}">この畝を消す</button>`:''}${!isNew?`<button class="btn ghost sm" data-dupbed="${b.id}">複製</button><button class="btn ghost sm" data-move="${b.id}|-1">↑ 前へ</button><button class="btn ghost sm" data-move="${b.id}|1">↓ 後へ</button>`:''}</div><button class="btn" data-savebed="${b.id}" data-new="${isNew?1:''}">保存</button></div>
   ${!isNew?`<h3 style="margin-top:18px">この畝の1年</h3><div class="list-plan">${es.length?es.map(e=>{const c=CBY[e.crop];return `<div class="it" data-ent="${e.id}" style="cursor:pointer">${famDot(c)}<b>${esc(c?.n)}</b><span class="muted">${md(e.start)}〜${md(e.end)}（収穫 ${md(e.harvest)}〜）</span>${e.locked?'🔒':''}</div>`}).join(''):'<p class="muted">まだ計画がありません。</p>'}</div>
   ${comp.length?`<p class="muted">一緒に植えると相性が良いといわれるもの：${esc(comp.join('・'))}</p>`:''}
   <button class="btn soft sm" style="margin-top:8px" data-addent="${b.id}">この畝に1作足す</button>`:''}`);
@@ -500,6 +500,7 @@ document.addEventListener('click',async ev=>{
   let v;
   if(v=g('data-go2'))return go(v);
   if(g('data-newbed'))return bedSheet(null);
+  if(v=g('data-dupbed'))return bedSheet(null,S.beds.find(x=>x.id===v));
   if(v=g('data-bed'))return bedSheet(S.beds.find(b=>b.id===v));
   if(g('data-cfg'))return cfgSheet();
   if(v=g('data-ent')){closeSheet();return entSheet(S.plan.find(e=>e.id===v))}
@@ -538,7 +539,7 @@ document.addEventListener('click',async ev=>{
   if(t.id==='p-go')return askPlan();
   if(v=g('data-useplan'))return usePlan();
 });
-document.addEventListener('change',ev=>{const t=ev.target;if(t.id==='b-method'){$('#b-mdesc').textContent=METHODS[mKey(t.value||S.cfg.method)].d;return}if(t.dataset.pick){const id=t.dataset.pick;if(t.checked)S.picks.push({id,n:1,off:[]});else S.picks=S.picks.filter(p=>p.id!==id);savePicks()}});
+document.addEventListener('change',ev=>{const t=ev.target;if(t.id==='b-copy'){return bedSheet(null,S.beds.find(x=>x.id===t.value)||null)}if(t.id==='b-method'){$('#b-mdesc').textContent=METHODS[mKey(t.value||S.cfg.method)].d;return}if(t.dataset.pick){const id=t.dataset.pick;if(t.checked)S.picks.push({id,n:1,off:[]});else S.picks=S.picks.filter(p=>p.id!==id);savePicks()}});
 let pickTimer;function savePicks(){render();clearTimeout(pickTimer);pickTimer=setTimeout(()=>put('meta','picks',{list:S.picks}),400)}
 
 /* --- Claudeに相談 --- */
