@@ -377,12 +377,14 @@ function layoutPlot(pk,W,L){const dirSet=pk==='B'?S.cfg.bDir:S.cfg.aDir;
   return tries.sort((x,y)=>sc(x)-sc(y))[0]}
 function layoutDir(pk,W,L,dir){const beds=sortedBeds().filter(b=>(b.plot||'A')===pk);const P=((+S.cfg.path)||40)/100;
   // v：畝は縦（Lの向き）に伸び、横に並ぶ。h：畝は横（Wの向き）に伸び、縦に並ぶ
-  const across=dir==='v'?W:L,along=dir==='v'?L:W;let a=0,b=0,lineMax=0;const out=[];const bad=[];
+  const across=dir==='v'?W:L,along=dir==='v'?L:W;let a=0,b=0,lineMax=0,line=0;const lineW=[],lineL=[];const out=[];const bad=[];
   for(const bd of beds){const len=(bd.l||500)/100,wid=(bd.w||90)/100;
     if(len>along+0.005)bad.push(bd);
-    if(a>0&&a+wid>across+0.005){a=0;b+=lineMax+P;lineMax=0}
-    out.push({bd,len,wid,a,b});a+=wid+P;lineMax=Math.max(lineMax,len)}
+    if(a>0&&a+wid>across+0.005){a=0;b+=lineMax+P;lineMax=0;line++}
+    out.push({bd,len,wid,a,b,line});a+=wid+P;lineMax=Math.max(lineMax,len);lineW[line]=a-P;lineL[line]=lineMax}
   const usedAlong=b+lineMax;
+  // 真ん中に寄せる（外周にも通路が残る）
+  const offB=Math.max(0,(along-usedAlong)/2);for(const o of out){o.a+=Math.max(0,(across-lineW[o.line])/2);o.b+=offB+(lineL[o.line]-o.len)/2}
   return {dir,beds:out,bad,over:usedAlong>along+0.005,usedAlong,P}}
 function plotSVG(pk,W,L){
   const t=todayS();const lay=layoutPlot(pk,W,L);const sc=Math.max(20,Math.min(46,640/Math.max(W,L)));const pad=22;
