@@ -196,6 +196,11 @@ const METHODS={
  saibai:{n:'自然栽培（木村秋則式）',rest:7,d:'肥料も農薬も使わない（有機肥料も入れない）。耕して土に残った肥料分や未熟な有機物を抜き、作物と土の力で育てる。大豆などで土を作ることもある。',prep:'軽く耕して畝を整える（肥料は入れない）'},
  tanso:{n:'炭素循環農法',rest:14,d:'窒素の少ない高炭素の資材（もみ殻・廃菌床・竹チップ・木くずなど）を土の浅い所に入れ、微生物を増やして土をつくる。肥料・農薬は使わない。',prep:'もみ殻・廃菌床・竹チップなど高炭素の資材を浅くすき込む'}};
 const pn=k=>{const c=typeof S!=='undefined'?S.cfg:{};return (k==='B'?c.bName:c.aName)||(k==='B'?'新しい畑':'いまの畑')};
+/* 50音順：漢字は読みで並べる */
+const YOMI={tomato:'おおだまとまと',edamame:'えだまめ',satoimo:'さといも',ginger:'しょうが',daikon:'だいこん',carrot:'にんじん',komatsuna:'こまつな',mizuna:'みずな',chingensai:'ちんげんさい',shungiku:'しゅんぎく',hakusai:'はくさい',nabana:'なばな',kuushinsai:'くうしんさい',onion:'たまねぎ',negi:'ながねぎ',shiso:'おおば'};
+const kana=t=>String(t||'').replace(/[ァ-ヶ]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0x60));
+const yomiOf=c=>kana(YOMI[c.id]||c.y||c.n);
+const by50=(a,b)=>yomiOf(a).localeCompare(yomiOf(b),'ja');
 const mKey=k=>METHODS[k]?k:'kin';
 function bedMethod(b){return mKey((b&&b.method)||(typeof S!=='undefined'&&S.cfg.method)||'kin')}
 const CATS=[['all','すべて'],['実','実もの'],['葉','葉もの'],['根','根もの'],['芋','芋'],['豆','豆'],['香','ネギ・香り']];
@@ -415,7 +420,7 @@ function vYear(){
 function vPick(){
   const pk=Object.fromEntries(S.picks.map(p=>[p.id,p]));const f=S.filter;
   const isKin=bedMethod(null)==='kin';
-  const list=CROPS.filter(c=>f==='all'||c.cat===f).sort((a,b)=>(b.custom?1:0)-(a.custom?1:0)||(isKin?('◎○△'.indexOf(a.kin))-('◎○△'.indexOf(b.kin)):a.n.localeCompare(b.n,'ja')));
+  const list=CROPS.filter(c=>f==='all'||c.cat===f).sort(by50);
   const n=S.picks.length;
   return `<h2>作りたい野菜を選ぶ</h2><p class="muted" style="margin-top:-4px">チェックした野菜を、連作・畝の休み（${esc(METHODS[bedMethod(null)].n)}は${METHODS[bedMethod(null)].rest}日）・芋専用の畝を守りながら、なるべく畝が空かず長く取れるように1年分並べます。${isKin?'<span class="chip">◎</span>菌ちゃん農法によく向く <span class="chip soil">○</span>向く <span class="chip warn">△</span>工夫が要る（目安）':''}<br>種まきの時期は「${esc(S.cfg.zone||'中間地')}」に合わせています${S.cfg.place?'':'（畑の場所を入れると地域に合わせます）'}。</p>
   <div class="card" style="margin-bottom:12px"><label class="f" for="nc-name" style="margin-top:0">リストにない野菜を足す</label><div class="row"><input id="nc-name" placeholder="例：モロヘイヤ、ズッキーニ、聖護院かぶ" style="flex:1;min-width:0"><button class="btn sm" id="nc-go">調べて足す</button></div><p class="muted" id="nc-msg" style="margin:6px 0 0">名前を入れると、Claudeが科・種まき時期・収穫までの日数などを調べて、下のカードに足します。</p></div>
@@ -486,7 +491,7 @@ function entSheet(e,bedId){
   const c=CBY[e.crop];
   sheet(`<div class="bar"><h3>${isNew?'予定を自分で1つ足す':'予定を直す'}</h3><button class="x" data-close aria-label="閉じる">×</button></div>
   ${isNew?'<p class="muted" style="margin-top:0">自動の計画とは別に、「どの畝に・何を・いつまくか」を自分で決めて1つ入れます。すでに畑にある野菜なら「いま育てている野菜を入れる」のほうが簡単です。</p>':''}
-  <div class="two"><div><label class="f" for="e-crop">野菜</label><select id="e-crop">${CROPS.map(x=>`<option value="${x.id}" ${x.id===e.crop?'selected':''}>${esc(x.n)}</option>`).join('')}</select></div>
+  <div class="two"><div><label class="f" for="e-crop">野菜</label><select id="e-crop">${[...CROPS].sort(by50).map(x=>`<option value="${x.id}" ${x.id===e.crop?'selected':''}>${esc(x.n)}</option>`).join('')}</select></div>
   <div><label class="f" for="e-bed">畝</label><select id="e-bed">${sortedBeds().map(b=>`<option value="${b.id}" ${b.id===e.bed?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div></div>
   <div class="two"><div><label class="f" for="e-slot">作型</label><select id="e-slot">${c.slots.map((s,i)=>`<option value="${i}" ${i===e.slot?'selected':''}>${s[6]}：${s[0]}</option>`).join('')}</select></div>
   <div><label class="f" for="e-sow">${'種まき（育苗は種をまく日）'}</label><input type="date" id="e-sow" value="${e.sow}"></div></div>
@@ -682,11 +687,11 @@ async function addCrop(){const name=$('#nc-name').value.trim();if(!name)return t
   const same=CROPS.find(c=>c.n===name);if(same){toast('もうリストにあります');S.filter='all';return render()}
   const msg=$('#nc-msg'),go=$('#nc-go');msg.textContent='調べています…（20秒ほど）';go.disabled=true;
   const ex=JSON.stringify({n:'ミニトマト',fam:'ナス科',cat:'実',kin:'◎',rot:3,imo:0,sp:'株間50cm・1列',note:'わき芽かき。雨よけがあると割れにくい',slots:[['育苗','02-20','03-31',60,60,12,'春']]});
-  const prompt=`家庭菜園の作付け計画アプリに、野菜「${name}」のデータを足します。日本の中間地（関東の平地）の目安で、次の形のJSONだけを返してください。\n例：${ex}\n各項目：n=よく使う名前、fam=科（例：ナス科・ウリ科・アブラナ科・マメ科・セリ科・ネギ類・キク科・ヒユ科・イネ科・シソ科・アオイ科・ヒルガオ科・ナデシコ科・その他）、cat=「実」「葉」「根」「芋」「豆」「香」のどれか、kin=菌ちゃん農法（高畝・黒マルチ・有機物を糸状菌で分解・無肥料）での向き「◎」「○」「△」、rot=同じ科を続けて作らないほうがよい年数(0〜5)、imo=掘り取る芋なら1、sp=株間など植え方を短く、note=育て方のこつを1文、slots=作型の配列（1〜3個）。作型は[方法(「直播」=畑に種まき/「育苗」=ポットで苗を作って植える/「植付」=種芋・苗・球根を植える), 種まき開始MM-DD, 種まき終わりMM-DD, 育苗日数(直播は0。植付で苗を買う場合も0), 畑に入れてから収穫はじめまでの日数, 収穫できる週数, 呼び名(「春」「夏」「秋」など)]。\nもし「${name}」が野菜・果菜・ハーブとして育てられないものなら {"error":"理由"} を返す。`;
+  const prompt=`家庭菜園の作付け計画アプリに、野菜「${name}」のデータを足します。日本の中間地（関東の平地）の目安で、次の形のJSONだけを返してください。\n例：${ex}\n各項目：n=よく使う名前、y=nの読みをひらがなで、fam=科（例：ナス科・ウリ科・アブラナ科・マメ科・セリ科・ネギ類・キク科・ヒユ科・イネ科・シソ科・アオイ科・ヒルガオ科・ナデシコ科・その他）、cat=「実」「葉」「根」「芋」「豆」「香」のどれか、kin=菌ちゃん農法（高畝・黒マルチ・有機物を糸状菌で分解・無肥料）での向き「◎」「○」「△」、rot=同じ科を続けて作らないほうがよい年数(0〜5)、imo=掘り取る芋なら1、sp=株間など植え方を短く、note=育て方のこつを1文、slots=作型の配列（1〜3個）。作型は[方法(「直播」=畑に種まき/「育苗」=ポットで苗を作って植える/「植付」=種芋・苗・球根を植える), 種まき開始MM-DD, 種まき終わりMM-DD, 育苗日数(直播は0。植付で苗を買う場合も0), 畑に入れてから収穫はじめまでの日数, 収穫できる週数, 呼び名(「春」「夏」「秋」など)]。\nもし「${name}」が野菜・果菜・ハーブとして育てられないものなら {"error":"理由"} を返す。`;
   try{const r=await api('plan',{prompt});if(r.error){msg.textContent='足せませんでした：'+r.error;return}
     const okSlot=x=>Array.isArray(x)&&x.length>=7&&['直播','育苗','植付'].includes(x[0])&&/^\d\d-\d\d$/.test(x[1])&&/^\d\d-\d\d$/.test(x[2])&&[3,4,5].every(i=>Number.isFinite(+x[i]));
     const slots=(r.slots||[]).filter(okSlot).map(x=>[x[0],x[1],x[2],+x[3],+x[4],+x[5],String(x[6])]);if(!slots.length)throw Object.assign(new Error(''),{code:'bad_json'});
-    const id='u'+nid();const c={id,n:String(r.n||name).slice(0,20),fam:String(r.fam||'その他'),cat:['実','葉','根','芋','豆','香'].includes(r.cat)?r.cat:'葉',kin:['◎','○','△'].includes(r.kin)?r.kin:'○',rot:Math.max(0,Math.min(5,+r.rot||0)),imo:r.imo?1:0,sp:String(r.sp||''),note:String(r.note||''),comp:[],slots,custom:true};
+    const id='u'+nid();const c={id,n:String(r.n||name).slice(0,20),y:String(r.y||''),fam:String(r.fam||'その他'),cat:['実','葉','根','芋','豆','香'].includes(r.cat)?r.cat:'葉',kin:['◎','○','△'].includes(r.kin)?r.kin:'○',rot:Math.max(0,Math.min(5,+r.rot||0)),imo:r.imo?1:0,sp:String(r.sp||''),note:String(r.note||''),comp:[],slots,custom:true};
     await put('crops',id,c);S.picks=S.picks.filter(p=>p.id!==id);S.picks.push({id,q:defQ(c),off:[]});S.filter='all';savePicks();toast(`${c.n}を足して、選びました`);
   }catch(e){msg.textContent=errMsg(e)}finally{const b=$('#nc-go');if(b)b.disabled=false}}
 
@@ -694,7 +699,7 @@ async function addCrop(){const name=$('#nc-name').value.trim();if(!name)return t
 function growSheet(bedId){const t=todayS();S.added=[];
   sheet(`<div class="bar"><h3>いま育てている野菜を入れる</h3><button class="x" data-close aria-label="閉じる">×</button></div>
   <p class="muted" style="margin-top:0">すでに畑にある野菜を入れると、収穫・片付けの予定が出ます。計画を作り直しても動きません（🔒固定）。続けて何件でも入れられます。</p>
-  <div class="two"><div><label class="f" for="g-crop">野菜</label><select id="g-crop">${[...CROPS].sort((a,b)=>a.n.localeCompare(b.n,'ja')).map(x=>`<option value="${x.id}">${esc(x.n)}</option>`).join('')}</select></div>
+  <div class="two"><div><label class="f" for="g-crop">野菜</label><select id="g-crop">${[...CROPS].sort(by50).map(x=>`<option value="${x.id}">${esc(x.n)}</option>`).join('')}</select></div>
   <div><label class="f" for="g-bed">畝</label><select id="g-bed">${sortedBeds().map(b=>`<option value="${b.id}" ${b.id===bedId?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div></div>
   <div class="two"><div><label class="f" for="g-start">畑に入れた日（種まき・植え付け）</label><input type="date" id="g-start" value="${addD(t,-30)}" max="${t}"></div>
   <div><label class="f" for="g-stage">いまの様子</label><select id="g-stage"><option value="grow">育っている（まだ収穫前）</option><option value="harvest">収穫している</option></select></div></div>
