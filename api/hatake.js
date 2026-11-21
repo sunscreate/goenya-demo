@@ -30,7 +30,7 @@ async function claude(content, { max = 2000, system } = {}) {
   return (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('');
 }
 
-const SYS = 'あなたは家庭菜園、とくに菌ちゃん農法（吉田俊道さんの方法：高畝に草・落ち葉・枝などの有機物を入れ、黒マルチで覆って糸状菌に分解させる。基本は肥料を入れない）に詳しい相談相手です。日本語で、やさしく具体的に答えます。';
+const SYS = 'あなたは家庭菜園と、菌ちゃん農法・慣行農法・有機農法・自然農・自然栽培・炭素循環農法などの農法に詳しい相談相手です。相談された畝の農法に合わせて、日本語でやさしく具体的に答えます。';
 
 async function place(address) {
   const g = await fetch('https://msearch.gsi.go.jp/address-search/AddressSearch?q=' + encodeURIComponent(address)).then(r => r.json());
