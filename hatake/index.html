@@ -355,9 +355,11 @@ function plotSVG(pk,W,L){
   for(const b of beds){const bw=(b.w||90)/100*sc,bl=(b.l||500)/100*sc;
     const cur=S.plan.find(e=>e.bed===b.id&&e.start<=t&&e.end>=t);const nx=S.plan.filter(e=>e.bed===b.id&&e.start>t).sort((a,c)=>a.start<c.start?-1:1)[0];
     const c=cur&&CBY[cur.crop];const col=c?FAM[c.fam]:'var(--soil)';
+    const nowN=[...new Set(S.plan.filter(e=>e.bed===b.id&&e.start<=t&&e.end>=t).sort((a,c)=>a.start<c.start?-1:1).map(e=>CBY[e.crop]?.n).filter(Boolean))];
+    const lab=nowN.length?nowN.join('・'):(nx?'→'+(CBY[nx.crop]?.n||''):'空き');const fs=Math.max(8,Math.min(12,Math.floor((bl-34)/Math.max(1,[...lab].length))));
     parts.push(`<g data-bed="${b.id}" style="cursor:pointer"><rect x="${x}" y="${y}" width="${bw}" height="${bl}" rx="8" fill="${col}" opacity="${c?0.9:0.35}" ${b.use==='imo'?'stroke="var(--soil)" stroke-width="3" stroke-dasharray="6 4"':''}/>
       <text x="${x+bw/2}" y="${y+16}" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">${esc(b.name)}</text>
-      <text x="${x+bw/2}" y="${y+bl/2}" text-anchor="middle" font-size="12" fill="#fff" writing-mode="tb">${esc(c?c.n:(nx?'→'+(CBY[nx.crop]?.n||''):'空き'))}</text></g>`);
+      <text x="${x+bw/2}" y="${y+28}" font-size="${fs}" fill="#fff" writing-mode="tb" style="writing-mode:vertical-rl">${esc(lab)}</text></g>`);
     x+=bw+26;rowH=Math.max(rowH,bl)}
   const H=Math.max(h,y+rowH+pad),Wd=Math.max(w,x-26+14+pad);
   return `<svg viewBox="0 0 ${Wd} ${H}" width="${Wd}" role="img" aria-label="畑${pk}の畝の配置"><rect x="4" y="4" width="${Wd-8}" height="${H-8}" rx="14" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="16" y="20" font-size="11" fill="var(--soil)">${W}m × ${L}m</text>${parts.join('')}</svg>`;
@@ -372,7 +374,7 @@ function vMap(){
   <div class="plot">${hasB?plotSVG('B',cf.bW,cf.bL):'<p class="muted" style="margin:6px">畝を登録するときに「新しい畑」を選ぶと、ここに出ます。</p>'}</div>
   <div class="legend">${leg}<span><span class="dot" style="border:2px dashed var(--soil)"></span>芋専用の畝</span></div>
   <div class="row" style="margin-top:8px"><button class="btn" data-newbed="1">畝を足す</button><button class="btn ghost" data-cfg="1">畑の広さ・計画のきまり</button></div>
-  <h2>畝の一覧</h2><div class="grid">${sortedBeds().map(b=>{const n=S.plan.filter(e=>e.bed===b.id).length;return `<div class="card row" data-bed="${b.id}" style="cursor:pointer;justify-content:space-between"><div><b>${esc(b.name)}</b> <span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span> <span class="chip soil">${b.plot==='B'?'新しい畑':'いまの畑'}</span> <span class="chip">${esc(METHODS[bedMethod(b)].n)}</span><div class="muted">長さ${(b.l/100).toFixed(1)}m・幅${b.w}cm・高さ${b.h}cm　計画 ${n}作</div></div><span class="muted">編集 ›</span></div>`}).join('')}</div>`;
+  <h2>畝の一覧</h2><div class="grid">${sortedBeds().map(b=>{const n=S.plan.filter(e=>e.bed===b.id).length;return `<div class="card row" data-bed="${b.id}" style="cursor:pointer;justify-content:space-between"><div><b>${esc(b.name)}</b> <span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span> <span class="chip soil">${b.plot==='B'?'新しい畑':'いまの畑'}</span> <span class="chip">${esc(METHODS[bedMethod(b)].n)}</span><div class="muted">長さ${(b.l/100).toFixed(1)}m・幅${b.w}cm・高さ${b.h}cm　計画 ${n}作</div></div><span class="muted">詳しく ›</span></div>`}).join('')}</div>`;
 }
 
 /* --- 年間 --- */
@@ -390,7 +392,7 @@ function vYear(){
   <div class="legend"><span><span class="dot" style="background:repeating-linear-gradient(45deg,#999 0 3px,#ccc 3px 6px)"></span>育苗（畑の外）</span><span><span class="dot" style="background:#777"></span>育っている</span><span><span class="dot" style="background:#444"></span>収穫期間（濃い部分）</span><span>🔒 固定（再計算しても動かさない）</span></div>
   <div class="gantt"><div class="g-in"><div class="g-months"><div></div>${months.map(m=>`<div>${m}</div>`).join('')}</div>${rows}<div class="g-today" style="left:calc(120px + (100% - 120px) * ${pct(t)/100})"></div></div></div>
   ${miss}
-  <div class="row" style="margin-top:12px"><button class="btn" data-go2="pick">野菜を選び直して再計算</button><button class="btn ghost" data-growing="1">いま育てている野菜を入れる</button><button class="btn ghost" data-addent="1">手で1作足す</button><button class="btn soft" data-go2="ask">Claudeに計画を見てもらう</button></div>`;
+  <div class="row" style="margin-top:12px"><button class="btn" data-go2="pick">野菜を選び直して再計算</button><button class="btn ghost" data-growing="1">いま育てている野菜を入れる</button><button class="btn ghost" data-addent="1">予定を自分で1つ足す</button><button class="btn soft" data-go2="ask">Claudeに計画を見てもらう</button></div>`;
 }
 
 /* --- 野菜を選ぶ --- */
@@ -433,6 +435,18 @@ function render(){navR();const v={today:vToday,map:vMap,year:vYear,pick:vPick,as
 /* --- シート（畝・作付けの編集） --- */
 function sheet(html){$('#sheet').innerHTML=`<div class="sheet" id="sh"><div class="in" role="dialog" aria-modal="true">${html}</div></div>`;}
 function closeSheet(){const o=!!$('#sheet').innerHTML;$('#sheet').innerHTML='';if(o)render()}
+function bedInfo(b){if(!b)return;const t=todayS();const M=METHODS[bedMethod(b)];
+  const es=S.plan.filter(e=>e.bed===b.id).sort((a,c)=>a.start<c.start?-1:1);const now=es.filter(e=>e.start<=t&&e.end>=t),later=es.filter(e=>e.start>t),past=es.filter(e=>e.end<t);
+  const it=e=>{const c=CBY[e.crop];return `<div class="it" data-ent="${e.id}" style="cursor:pointer">${famDot(c)}<b>${esc(c?.n)}</b><span class="muted">${md(e.start)}〜${md(e.end)}（収穫 ${md(e.harvest)}〜）</span>${e.locked?'🔒':''}</div>`};
+  sheet(`<div class="bar"><h3>${esc(b.name)}</h3><button class="x" data-close aria-label="閉じる">×</button></div>
+  <div class="row" style="gap:6px"><span class="chip soil">${b.plot==='B'?'新しい畑':'いまの畑'}</span><span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span><span class="chip">${esc(M.n)}</span></div>
+  <p class="muted" style="margin:8px 0 0">長さ${(b.l/100).toFixed(1)}m・幅${b.w}cm・高さ${b.h}cm${b.note?'　'+esc(b.note):''}</p>
+  <h3 style="margin-top:16px">いま入っている野菜</h3><div class="list-plan">${now.length?now.map(it).join(''):'<p class="muted">いまは空いています。</p>'}</div>
+  <h3 style="margin-top:16px">これからの予定</h3><div class="list-plan">${later.length?later.map(it).join(''):'<p class="muted">まだ予定がありません。</p>'}</div>
+  ${past.length?`<details style="margin-top:10px"><summary class="muted">終わった作付け（${past.length}）</summary><div class="list-plan">${past.map(it).join('')}</div></details>`:''}
+  <p class="muted" style="margin-top:10px">野菜を押すと、日にちを直したり消したりできます。</p>
+  <div class="row" style="margin-top:12px"><button class="btn" data-growing="${b.id}">いま育てている野菜を入れる</button><button class="btn soft" data-addent="${b.id}">この畝に予定を足す</button></div>
+  <div class="row" style="margin-top:10px"><button class="btn ghost sm" data-editbed="${b.id}">畝の大きさ・農法・名前を直す</button><button class="btn ghost sm" data-dupbed="${b.id}">複製</button></div>`)}
 function bedSheet(b,tpl){
   const isNew=!b;b=b||(tpl?{...tpl,id:nid(),name:`畝${S.beds.length+1}`,order:S.beds.length+1}:{id:nid(),name:`畝${S.beds.length+1}`,plot:'A',l:500,w:90,h:30,use:'',note:'',order:S.beds.length+1});
   const es=S.plan.filter(e=>e.bed===b.id).sort((a,c)=>a.start<c.start?-1:1);
@@ -449,12 +463,13 @@ function bedSheet(b,tpl){
   <div class="row" style="margin-top:14px;justify-content:space-between"><div class="row">${!isNew?`<button class="btn warn sm" data-delbed="${b.id}">この畝を消す</button>`:''}${!isNew?`<button class="btn ghost sm" data-dupbed="${b.id}">複製</button><button class="btn ghost sm" data-move="${b.id}|-1">↑ 前へ</button><button class="btn ghost sm" data-move="${b.id}|1">↓ 後へ</button>`:''}</div><button class="btn" data-savebed="${b.id}" data-new="${isNew?1:''}">保存</button></div>
   ${!isNew?`<h3 style="margin-top:18px">この畝の1年</h3><div class="list-plan">${es.length?es.map(e=>{const c=CBY[e.crop];return `<div class="it" data-ent="${e.id}" style="cursor:pointer">${famDot(c)}<b>${esc(c?.n)}</b><span class="muted">${md(e.start)}〜${md(e.end)}（収穫 ${md(e.harvest)}〜）</span>${e.locked?'🔒':''}</div>`}).join(''):'<p class="muted">まだ計画がありません。</p>'}</div>
   ${comp.length?`<p class="muted">一緒に植えると相性が良いといわれるもの：${esc(comp.join('・'))}</p>`:''}
-  <button class="btn soft sm" style="margin-top:8px" data-addent="${b.id}">この畝に1作足す</button>`:''}`);
+  <button class="btn soft sm" style="margin-top:8px" data-addent="${b.id}">この畝に予定を足す</button>`:''}`);
 }
 function entSheet(e,bedId){
   const isNew=!e;e=e||{id:nid(),bed:bedId||sortedBeds()[0]?.id,crop:'komatsuna',slot:0,sow:todayS(),locked:true};
   const c=CBY[e.crop];
-  sheet(`<div class="bar"><h3>${isNew?'作付けを足す':'作付けの編集'}</h3><button class="x" data-close aria-label="閉じる">×</button></div>
+  sheet(`<div class="bar"><h3>${isNew?'予定を自分で1つ足す':'予定を直す'}</h3><button class="x" data-close aria-label="閉じる">×</button></div>
+  ${isNew?'<p class="muted" style="margin-top:0">自動の計画とは別に、「どの畝に・何を・いつまくか」を自分で決めて1つ入れます。すでに畑にある野菜なら「いま育てている野菜を入れる」のほうが簡単です。</p>':''}
   <div class="two"><div><label class="f" for="e-crop">野菜</label><select id="e-crop">${CROPS.map(x=>`<option value="${x.id}" ${x.id===e.crop?'selected':''}>${esc(x.n)}</option>`).join('')}</select></div>
   <div><label class="f" for="e-bed">畝</label><select id="e-bed">${sortedBeds().map(b=>`<option value="${b.id}" ${b.id===e.bed?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div></div>
   <div class="two"><div><label class="f" for="e-slot">作型</label><select id="e-slot">${c.slots.map((s,i)=>`<option value="${i}" ${i===e.slot?'selected':''}>${s[6]}：${s[0]}</option>`).join('')}</select></div>
@@ -501,7 +516,8 @@ document.addEventListener('click',async ev=>{
   if(v=g('data-go2'))return go(v);
   if(g('data-newbed'))return bedSheet(null);
   if(v=g('data-dupbed'))return bedSheet(null,S.beds.find(x=>x.id===v));
-  if(v=g('data-bed'))return bedSheet(S.beds.find(b=>b.id===v));
+  if(v=g('data-bed'))return bedInfo(S.beds.find(b=>b.id===v));
+  if(v=g('data-editbed'))return bedSheet(S.beds.find(b=>b.id===v));
   if(g('data-cfg'))return cfgSheet();
   if(v=g('data-ent')){closeSheet();return entSheet(S.plan.find(e=>e.id===v))}
   if((v=g('data-addent'))!==null&&v!==undefined){closeSheet();return entSheet(null,v==='1'?null:v)}
@@ -525,7 +541,7 @@ document.addEventListener('click',async ev=>{
     await put('plan',v,e);closeSheet();return toast('保存しました')}
   if(v=g('data-delent')){await del('plan',v);closeSheet();return toast('消しました')}
   if(g('data-savecfg')){S.cfg={...S.cfg,addr:$('#c-addr').value.trim(),place:S.tmpPlace||S.cfg.place,zone:$('#c-zone').value,aW:+$('#c-aW').value||9,aL:+$('#c-aL').value||8,bW:+$('#c-bW').value||10,bL:+$('#c-bL').value||6,bFrom:$('#c-bF').value||'2027-01-01',rest:+$('#c-rest').value||14,strict:$('#c-strict').value==='1'};applyZone(S.cfg.zone);await put('meta','cfg',S.cfg);closeSheet();loadWx(true);render();return toast('保存しました')}
-  if(g('data-growing'))return growSheet();
+  if(v=g('data-growing'))return growSheet(v==='1'?null:v);
   if(g('data-methods'))return methodSheet();
   if(v=g('data-setmethod')){S.cfg={...S.cfg,method:v};await put('meta','cfg',S.cfg);closeSheet();return toast(METHODS[v].n+'にしました')}
   if(v=g('data-delcrop')){const btn=t.closest('[data-delcrop]');if(btn.dataset.sure!=='1'){btn.dataset.sure='1';btn.textContent='もう一度押すと消えます';return}S.picks=S.picks.filter(p=>p.id!==v);await del('crops',v);savePicks();return toast('消しました')}
@@ -654,11 +670,11 @@ async function addCrop(){const name=$('#nc-name').value.trim();if(!name)return t
   }catch(e){msg.textContent=errMsg(e)}finally{const b=$('#nc-go');if(b)b.disabled=false}}
 
 /* --- いま育てている野菜 --- */
-function growSheet(){const t=todayS();S.added=[];
+function growSheet(bedId){const t=todayS();S.added=[];
   sheet(`<div class="bar"><h3>いま育てている野菜を入れる</h3><button class="x" data-close aria-label="閉じる">×</button></div>
   <p class="muted" style="margin-top:0">すでに畑にある野菜を入れると、収穫・片付けの予定が出ます。計画を作り直しても動きません（🔒固定）。続けて何件でも入れられます。</p>
   <div class="two"><div><label class="f" for="g-crop">野菜</label><select id="g-crop">${[...CROPS].sort((a,b)=>a.n.localeCompare(b.n,'ja')).map(x=>`<option value="${x.id}">${esc(x.n)}</option>`).join('')}</select></div>
-  <div><label class="f" for="g-bed">畝</label><select id="g-bed">${sortedBeds().map(b=>`<option value="${b.id}">${esc(b.name)}</option>`).join('')}</select></div></div>
+  <div><label class="f" for="g-bed">畝</label><select id="g-bed">${sortedBeds().map(b=>`<option value="${b.id}" ${b.id===bedId?'selected':''}>${esc(b.name)}</option>`).join('')}</select></div></div>
   <div class="two"><div><label class="f" for="g-start">畑に入れた日（種まき・植え付け）</label><input type="date" id="g-start" value="${addD(t,-30)}" max="${t}"></div>
   <div><label class="f" for="g-stage">いまの様子</label><select id="g-stage"><option value="grow">育っている（まだ収穫前）</option><option value="harvest">収穫している</option></select></div></div>
   <div class="two"><div><label class="f" for="g-hv">収穫はじめ（自動・変えてOK）</label><input type="date" id="g-hv"></div><div><label class="f" for="g-end">片付けの予定（自動・変えてOK）</label><input type="date" id="g-end"></div></div>
