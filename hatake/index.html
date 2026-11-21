@@ -194,6 +194,7 @@ const METHODS={
  shizen:{n:'自然農（川口由一式）',rest:3,d:'耕さない・肥料も農薬も使わない・草や虫を敵としない。草は刈ってその場に敷き、植える所だけ草を分けて種をまく。手間は少ないが、最初の数年は育ちがゆっくり。',prep:'植える所の草を刈り、刈った草はその場に敷く（耕さない）'},
  saibai:{n:'自然栽培（木村秋則式）',rest:7,d:'肥料も農薬も使わない（有機肥料も入れない）。耕して土に残った肥料分や未熟な有機物を抜き、作物と土の力で育てる。大豆などで土を作ることもある。',prep:'軽く耕して畝を整える（肥料は入れない）'},
  tanso:{n:'炭素循環農法',rest:14,d:'窒素の少ない高炭素の資材（もみ殻・廃菌床・竹チップ・木くずなど）を土の浅い所に入れ、微生物を増やして土をつくる。肥料・農薬は使わない。',prep:'もみ殻・廃菌床・竹チップなど高炭素の資材を浅くすき込む'}};
+const pn=k=>{const c=typeof S!=='undefined'?S.cfg:{};return (k==='B'?c.bName:c.aName)||(k==='B'?'新しい畑':'いまの畑')};
 const mKey=k=>METHODS[k]?k:'kin';
 function bedMethod(b){return mKey((b&&b.method)||(typeof S!=='undefined'&&S.cfg.method)||'kin')}
 const CATS=[['all','すべて'],['実','実もの'],['葉','葉もの'],['根','根もの'],['芋','芋'],['豆','豆'],['香','ネギ・香り']];
@@ -368,13 +369,13 @@ function vMap(){
   if(!S.beds.length)return emptyStart();const cf=S.cfg;
   const leg=Object.entries(FAM).filter(([f])=>S.plan.some(e=>CBY[e.crop]?.fam===f)).map(([f,c])=>`<span><span class="dot" style="background:${c}"></span>${f}</span>`).join('');
   const hasB=S.beds.some(b=>b.plot==='B');
-  return `<div class="plot-h"><h2>いまの畑（${(cf.aW*cf.aL)|0}㎡）</h2><span class="muted">畝を押すと編集・その畝の予定</span></div>
+  return `<div class="plot-h"><h2>${esc(pn('A'))}（${(cf.aW*cf.aL)|0}㎡）</h2><button class="btn ghost sm" data-cfg="1">名前を変える</button></div>
   <div class="plot">${plotSVG('A',cf.aW,cf.aL)}</div>
-  <div class="plot-h"><h2>新しい畑（${(cf.bW*cf.bL)|0}㎡・${md(cf.bFrom)}から）</h2></div>
-  <div class="plot">${hasB?plotSVG('B',cf.bW,cf.bL):'<p class="muted" style="margin:6px">畝を登録するときに「新しい畑」を選ぶと、ここに出ます。</p>'}</div>
+  <div class="plot-h"><h2>${esc(pn('B'))}（${(cf.bW*cf.bL)|0}㎡・${md(cf.bFrom)}から）</h2><button class="btn ghost sm" data-cfg="1">名前を変える</button></div>
+  <div class="plot">${hasB?plotSVG('B',cf.bW,cf.bL):'<p class="muted" style="margin:6px">畝を登録するときに場所で「'+esc(pn('B'))+'」を選ぶと、ここに出ます。</p>'}</div>
   <div class="legend">${leg}<span><span class="dot" style="border:2px dashed var(--soil)"></span>芋専用の畝</span></div>
-  <div class="row" style="margin-top:8px"><button class="btn" data-newbed="1">畝を足す</button><button class="btn ghost" data-cfg="1">畑の広さ・計画のきまり</button></div>
-  <h2>畝の一覧</h2><div class="grid">${sortedBeds().map(b=>{const n=S.plan.filter(e=>e.bed===b.id).length;return `<div class="card row" data-bed="${b.id}" style="cursor:pointer;justify-content:space-between"><div><b>${esc(b.name)}</b> <span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span> <span class="chip soil">${b.plot==='B'?'新しい畑':'いまの畑'}</span> <span class="chip">${esc(METHODS[bedMethod(b)].n)}</span><div class="muted">長さ${(b.l/100).toFixed(1)}m・幅${b.w}cm・高さ${b.h}cm　計画 ${n}作</div></div><span class="muted">詳しく ›</span></div>`}).join('')}</div>`;
+  <div class="row" style="margin-top:8px"><button class="btn" data-newbed="1">畝を足す</button><button class="btn ghost" data-cfg="1">畑の名前・広さ・計画のきまり</button></div>
+  <h2>畝の一覧</h2><div class="grid">${sortedBeds().map(b=>{const n=S.plan.filter(e=>e.bed===b.id).length;return `<div class="card row" data-bed="${b.id}" style="cursor:pointer;justify-content:space-between"><div><b>${esc(b.name)}</b> <span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span> <span class="chip soil">${esc(pn(b.plot==='B'?'B':'A'))}</span> <span class="chip">${esc(METHODS[bedMethod(b)].n)}</span><div class="muted">長さ${(b.l/100).toFixed(1)}m・幅${b.w}cm・高さ${b.h}cm　計画 ${n}作</div></div><span class="muted">詳しく ›</span></div>`}).join('')}</div>`;
 }
 
 /* --- 年間 --- */
@@ -386,7 +387,7 @@ function vYear(){
     const bars=es.map(e=>{const c=CBY[e.crop];if(!c)return'';const l=pct(e.start),r=pct(e.end);if(r<=0)return'';const w=Math.max(1.2,r-l);const hvL=Math.max(0,(pct(e.harvest)-l)/w*100);
       const nur=e.nursery?`<div class="g-nursery" style="left:${pct(e.nursery)}%;width:${Math.max(0.6,pct(e.start)-pct(e.nursery))}%;background:${FAM[c.fam]}" title="育苗"></div>`:'';
       return `${nur}<button class="g-bar" data-ent="${e.id}" style="left:${l}%;width:${w}%;background:${FAM[c.fam]}" title="${esc(c.n)} ${md(e.start)}〜${md(e.end)}"><div class="hv" style="left:${hvL}%"></div><span>${e.locked?'🔒':''}${esc(c.n)}${e.tag?'・'+e.tag:''}</span></button>`}).join('');
-    return `<div class="g-row"><div class="g-name" data-bed="${b.id}">${esc(b.name)}<small>${b.use==='imo'?'芋専用':b.plot==='B'?'新しい畑':''}</small></div><div class="g-track">${bars}</div></div>`}).join('');
+    return `<div class="g-row"><div class="g-name" data-bed="${b.id}">${esc(b.name)}<small>${b.use==='imo'?'芋専用':b.plot==='B'?esc(pn('B')):''}</small></div><div class="g-track">${bars}</div></div>`}).join('');
   const miss=S.lastMiss.length?`<div class="card" style="margin-top:10px;border-color:var(--warn)"><b style="color:var(--warn)">入りきらなかったもの</b><p style="margin:6px 0 0">${(()=>{const g={};for(const m of S.lastMiss){const k=m.why.includes('時期')?'t':'b';(g[k]=g[k]||new Set()).add(CBY[m.crop]?.n)}return (g.b?`<b>畝が足りない：</b>${esc([...g.b].join('・'))}<br>`:'')+(g.t?`<b>この1年に種まき時期がない：</b>${esc([...g.t].join('・'))}`:'')})()}</p><p class="muted" style="margin:6px 0 0">畝を足す・畝数を減らす・「畑の広さ・計画のきまり」で連作の守り方をゆるめると入ることがあります。</p></div>`:'';
   return `<div class="plot-h"><h2>1年の計画</h2><span class="muted">帯を押すと日付の変更・移動・固定</span></div>
   <div class="legend"><span><span class="dot" style="background:repeating-linear-gradient(45deg,#999 0 3px,#ccc 3px 6px)"></span>育苗（畑の外）</span><span><span class="dot" style="background:#777"></span>育っている</span><span><span class="dot" style="background:#444"></span>収穫期間（濃い部分）</span><span>🔒 固定（再計算しても動かさない）</span></div>
@@ -439,7 +440,7 @@ function bedInfo(b){if(!b)return;const t=todayS();const M=METHODS[bedMethod(b)];
   const es=S.plan.filter(e=>e.bed===b.id).sort((a,c)=>a.start<c.start?-1:1);const now=es.filter(e=>e.start<=t&&e.end>=t),later=es.filter(e=>e.start>t),past=es.filter(e=>e.end<t);
   const it=e=>{const c=CBY[e.crop];return `<div class="it" data-ent="${e.id}" style="cursor:pointer">${famDot(c)}<b>${esc(c?.n)}</b><span class="muted">${md(e.start)}〜${md(e.end)}（収穫 ${md(e.harvest)}〜）</span>${e.locked?'🔒':''}</div>`};
   sheet(`<div class="bar"><h3>${esc(b.name)}</h3><button class="x" data-close aria-label="閉じる">×</button></div>
-  <div class="row" style="gap:6px"><span class="chip soil">${b.plot==='B'?'新しい畑':'いまの畑'}</span><span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span><span class="chip">${esc(M.n)}</span></div>
+  <div class="row" style="gap:6px"><span class="chip soil">${esc(pn(b.plot==='B'?'B':'A'))}</span><span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span><span class="chip">${esc(M.n)}</span></div>
   <p class="muted" style="margin:8px 0 0">長さ${(b.l/100).toFixed(1)}m・幅${b.w}cm・高さ${b.h}cm${b.note?'　'+esc(b.note):''}</p>
   <h3 style="margin-top:16px">いま入っている野菜</h3><div class="list-plan">${now.length?now.map(it).join(''):'<p class="muted">いまは空いています。</p>'}</div>
   <h3 style="margin-top:16px">これからの予定</h3><div class="list-plan">${later.length?later.map(it).join(''):'<p class="muted">まだ予定がありません。</p>'}</div>
@@ -454,7 +455,7 @@ function bedSheet(b,tpl){
   sheet(`<div class="bar"><h3>${isNew?'畝を登録':'畝の編集'}</h3><button class="x" data-close aria-label="閉じる">×</button></div>
   ${isNew&&S.beds.length?`<label class="f" for="b-copy">今ある畝を複製する</label><select id="b-copy"><option value="">複製しない（新しく入れる）</option>${sortedBeds().map(x=>`<option value="${x.id}" ${tpl&&tpl.id===x.id?'selected':''}>${esc(x.name)}（長さ${(x.l/100).toFixed(1)}m・幅${x.w}cm・高さ${x.h}cm）</option>`).join('')}</select>${tpl?`<p class="muted" style="margin:6px 0 0">「${esc(tpl.name)}」の大きさ・使い方・農法・メモを写しました。名前だけ確かめて保存してください。</p>`:''}`:''}
   <label class="f" for="b-name">名前</label><input id="b-name" value="${esc(b.name)}">
-  <div class="two"><div><label class="f" for="b-plot">場所</label><select id="b-plot"><option value="A" ${b.plot!=='B'?'selected':''}>いまの畑</option><option value="B" ${b.plot==='B'?'selected':''}>新しい畑（${md(S.cfg.bFrom)}から）</option></select></div>
+  <div class="two"><div><label class="f" for="b-plot">場所</label><select id="b-plot"><option value="A" ${b.plot!=='B'?'selected':''}>${esc(pn('A'))}</option><option value="B" ${b.plot==='B'?'selected':''}>${esc(pn('B'))}（${md(S.cfg.bFrom)}から）</option></select></div>
   <div><label class="f" for="b-use">使い方</label><select id="b-use"><option value="">ふつう（畝は壊さず続けて使う）</option><option value="imo" ${b.use==='imo'?'selected':''}>芋専用（掘り取る）</option></select></div></div>
   <div class="three"><div><label class="f" for="b-l">長さ（m）</label><input id="b-l" type="number" step="0.1" inputmode="decimal" value="${(b.l/100)}"></div><div><label class="f" for="b-w">幅（cm）</label><input id="b-w" type="number" inputmode="numeric" value="${b.w}"></div><div><label class="f" for="b-h">高さ（cm）</label><input id="b-h" type="number" inputmode="numeric" value="${b.h}"></div></div>
   <label class="f" for="b-method">この畝の農法</label><select id="b-method"><option value="">畑の基本と同じ（${esc(METHODS[bedMethod(null)].n)}）</option>${Object.entries(METHODS).map(([k,m])=>`<option value="${k}" ${b.method===k?'selected':''}>${m.n}</option>`).join('')}</select>
@@ -481,13 +482,14 @@ function entSheet(e,bedId){
 }
 function cfgSheet(){const c=S.cfg;
   S.tmpPlace=null;
-  sheet(`<div class="bar"><h3>畑の場所・広さ・計画のきまり</h3><button class="x" data-close aria-label="閉じる">×</button></div>
+  sheet(`<div class="bar"><h3>畑の名前・場所・広さ・計画のきまり</h3><button class="x" data-close aria-label="閉じる">×</button></div>
   <label class="f" for="c-addr">畑の場所（市区町村まででOK）</label><div class="row"><input id="c-addr" value="${esc(c.addr||'')}" placeholder="例：埼玉県川越市" style="flex:1;min-width:0"><button class="btn sm soft" data-findaddr="1">調べる</button></div>
   <p class="muted" id="c-place" style="margin:6px 0 0">${esc(placeText(c.place))}</p>
   <label class="f" for="c-zone">気候の区分（種まきの時期をずらす）</label><select id="c-zone">${ZONES.map(([z,sp,au,d])=>`<option value="${z}" ${z===(c.zone||'中間地')?'selected':''}>${z}：${d}${sp||au?`　春まき${sp>0?'+':''}${sp}日・秋まき${au>0?'+':''}${au}日`:''}</option>`).join('')}</select>
   <p class="muted">「調べる」で、その場所の過去3年の気温から自動で選びます。変えたら「野菜を選ぶ」で計画を作り直すと反映されます。</p>
-  <div class="two"><div><label class="f" for="c-aW">いまの畑 横（m）</label><input id="c-aW" type="number" step="0.5" value="${c.aW}"></div><div><label class="f" for="c-aL">縦（m）</label><input id="c-aL" type="number" step="0.5" value="${c.aL}"></div></div>
-  <div class="three"><div><label class="f" for="c-bW">新しい畑 横（m）</label><input id="c-bW" type="number" step="0.5" value="${c.bW}"></div><div><label class="f" for="c-bL">縦（m）</label><input id="c-bL" type="number" step="0.5" value="${c.bL}"></div><div><label class="f" for="c-bF">借りはじめ</label><input id="c-bF" type="date" value="${c.bFrom}"></div></div>
+  <div class="two"><div><label class="f" for="c-aName">1つめの畑の名前</label><input id="c-aName" value="${esc(pn('A'))}" placeholder="例：〇〇の畑"></div><div><label class="f" for="c-bName">2つめの畑の名前</label><input id="c-bName" value="${esc(pn('B'))}" placeholder="例：△△の畑"></div></div>
+  <div class="two"><div><label class="f" for="c-aW">${esc(pn('A'))} 横（m）</label><input id="c-aW" type="number" step="0.5" value="${c.aW}"></div><div><label class="f" for="c-aL">縦（m）</label><input id="c-aL" type="number" step="0.5" value="${c.aL}"></div></div>
+  <div class="three"><div><label class="f" for="c-bW">${esc(pn('B'))} 横（m）</label><input id="c-bW" type="number" step="0.5" value="${c.bW}"></div><div><label class="f" for="c-bL">縦（m）</label><input id="c-bL" type="number" step="0.5" value="${c.bL}"></div><div><label class="f" for="c-bF">借りはじめ</label><input id="c-bF" type="date" value="${c.bFrom}"></div></div>
   <label class="f">畑の基本の農法</label><div class="row"><b>${esc(METHODS[bedMethod(null)].n)}</b><button class="btn ghost sm" data-methods="1">農法を選び直す・説明を見る</button></div>
   <p class="muted">畝の休み（片付けてから次を入れるまで）は農法ごとの目安を使います。畝ごとに農法を変えるときは、畝を押して「この畝の農法」で選びます。</p><input id="c-rest" type="hidden" value="${c.rest}">
   <label class="f" for="c-strict">連作の守り方</label><select id="c-strict"><option value="1" ${c.strict?'selected':''}>しっかり守る（科ごとの休む年数どおり）</option><option value="0" ${!c.strict?'selected':''}>ゆるめ（同じ科を4か月以上あけるだけ）</option></select>
@@ -540,7 +542,7 @@ document.addEventListener('click',async ev=>{
     if(hv&&old.crop===crop)e.harvest=hv;if(en&&old.crop===crop)e.end=en;
     await put('plan',v,e);closeSheet();return toast('保存しました')}
   if(v=g('data-delent')){await del('plan',v);closeSheet();return toast('消しました')}
-  if(g('data-savecfg')){S.cfg={...S.cfg,addr:$('#c-addr').value.trim(),place:S.tmpPlace||S.cfg.place,zone:$('#c-zone').value,aW:+$('#c-aW').value||9,aL:+$('#c-aL').value||8,bW:+$('#c-bW').value||10,bL:+$('#c-bL').value||6,bFrom:$('#c-bF').value||'2027-01-01',rest:+$('#c-rest').value||14,strict:$('#c-strict').value==='1'};applyZone(S.cfg.zone);await put('meta','cfg',S.cfg);closeSheet();loadWx(true);render();return toast('保存しました')}
+  if(g('data-savecfg')){S.cfg={...S.cfg,aName:$('#c-aName').value.trim(),bName:$('#c-bName').value.trim(),addr:$('#c-addr').value.trim(),place:S.tmpPlace||S.cfg.place,zone:$('#c-zone').value,aW:+$('#c-aW').value||9,aL:+$('#c-aL').value||8,bW:+$('#c-bW').value||10,bL:+$('#c-bL').value||6,bFrom:$('#c-bF').value||'2027-01-01',rest:+$('#c-rest').value||14,strict:$('#c-strict').value==='1'};applyZone(S.cfg.zone);await put('meta','cfg',S.cfg);closeSheet();loadWx(true);render();return toast('保存しました')}
   if(v=g('data-growing'))return growSheet(v==='1'?null:v);
   if(g('data-methods'))return methodSheet();
   if(v=g('data-setmethod')){S.cfg={...S.cfg,method:v};await put('meta','cfg',S.cfg);closeSheet();return toast(METHODS[v].n+'にしました')}
@@ -563,7 +565,7 @@ function ctxText(){
   const t=todayS();const P=S.cfg.place;
   const loc=P?`場所は${P.label}（標高${P.elev}m、年平均気温${P.annual}℃、気候区分「${S.cfg.zone}」、霜の目安は春${P.lastFrost||'不明'}ごろまで・秋${P.firstFrost||'不明'}ごろから）`:`場所は未登録（関東の平地＝中間地として考える）`;
   const wx=S.wx?.days?.length?`\nこの先の天気：${S.wx.days.map(d=>`${d.d.slice(5)} ${Math.round(d.lo)}〜${Math.round(d.hi)}℃ 雨${d.rain}mm`).join('／')}`:'';
-  const beds=sortedBeds().map(b=>`- ${b.name}（id:${b.id}）${METHODS[bedMethod(b)].n}・休み${METHODS[bedMethod(b)].rest}日・${b.plot==='B'?'新しい畑・'+S.cfg.bFrom+'から':'いまの畑'}・${b.use==='imo'?'芋専用':'ふつう'}・長さ${b.l/100}m 幅${b.w}cm 高さ${b.h}cm${b.note?'・'+b.note:''}`).join('\n');
+  const beds=sortedBeds().map(b=>`- ${b.name}（id:${b.id}）${METHODS[bedMethod(b)].n}・休み${METHODS[bedMethod(b)].rest}日・${b.plot==='B'?pn('B')+'・'+S.cfg.bFrom+'から':pn('A')}・${b.use==='imo'?'芋専用':'ふつう'}・長さ${b.l/100}m 幅${b.w}cm 高さ${b.h}cm${b.note?'・'+b.note:''}`).join('\n');
   const pl=[...S.plan].sort((a,b)=>a.start<b.start?-1:1).map(e=>`- ${bedName(e.bed)}：${CBY[e.crop]?.n}（${e.method}）種まき${e.sow} 畑へ${e.start} 収穫${e.harvest}〜${e.end}${e.locked?' 固定':''}`).join('\n');
   return `今日は${t}。${loc}。${wx}\n家庭菜園。畑の基本の農法は「${METHODS[bedMethod(null)].n}」（${METHODS[bedMethod(null)].d}）。畝ごとに農法が違う場合は畝の一覧に書いてある。掘り取る芋は専用の畝。\n去年の経験：夏野菜はほとんどうまくいったが、枝豆だけうまくいかなかった。\n\n畝：\n${beds||'（未登録）'}\n\n今の計画：\n${pl||'（なし）'}`;
 }
@@ -680,7 +682,7 @@ function growSheet(bedId){const t=todayS();S.added=[];
   <div class="two"><div><label class="f" for="g-hv">収穫はじめ（自動・変えてOK）</label><input type="date" id="g-hv"></div><div><label class="f" for="g-end">片付けの予定（自動・変えてOK）</label><input type="date" id="g-end"></div></div>
   <p class="muted" id="g-hint" style="margin:6px 0 0"></p>
   <div id="g-list" class="list-plan"></div>
-  <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn ghost" data-savegrow="more">入れて、続けて入れる</button><button class="btn" data-savegrow="close">入れて閉じる</button></div>`);
+  <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn ghost" data-savegrow="more">続けて入れる</button><button class="btn" data-savegrow="close">入れて閉じる</button></div>`);
   if(!S.beds.length){$('#g-hint').textContent='先に「畑」で畝を登録してください。'}
   const calc=()=>{const c=CBY[$('#g-crop').value],st=$('#g-start').value;if(!c||!st)return;const i=bestSlot(c,st),x=c.slots[i];
     let hv=addD(st,x[4]),en=addD(hv,x[5]*7);if($('#g-stage').value==='harvest'&&hv>t){hv=t;en=addD(t,x[5]*7)}
