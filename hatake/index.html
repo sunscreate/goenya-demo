@@ -370,29 +370,50 @@ function emptyStart(){
 }
 
 /* --- 畑マップ --- */
+/* 畑の図：畝は畑の長い辺に沿って並べ、入りきらなければ次の列へ（通路の幅をあける） */
+function layoutPlot(pk,W,L){const dirSet=pk==='B'?S.cfg.bDir:S.cfg.aDir;
+  if(dirSet==='v'||dirSet==='h')return layoutDir(pk,W,L,dirSet);
+  const tries=(W>L?['h','v']:['v','h']).map(d=>layoutDir(pk,W,L,d));const sc=x=>x.bad.length*10+(x.over?1:0);
+  return tries.sort((x,y)=>sc(x)-sc(y))[0]}
+function layoutDir(pk,W,L,dir){const beds=sortedBeds().filter(b=>(b.plot||'A')===pk);const P=((+S.cfg.path)||40)/100;
+  // v：畝は縦（Lの向き）に伸び、横に並ぶ。h：畝は横（Wの向き）に伸び、縦に並ぶ
+  const across=dir==='v'?W:L,along=dir==='v'?L:W;let a=0,b=0,lineMax=0;const out=[];const bad=[];
+  for(const bd of beds){const len=(bd.l||500)/100,wid=(bd.w||90)/100;
+    if(len>along+0.005)bad.push(bd);
+    if(a>0&&a+wid>across+0.005){a=0;b+=lineMax+P;lineMax=0}
+    out.push({bd,len,wid,a,b});a+=wid+P;lineMax=Math.max(lineMax,len)}
+  const usedAlong=b+lineMax;
+  return {dir,beds:out,bad,over:usedAlong>along+0.005,usedAlong,P}}
 function plotSVG(pk,W,L){
-  const beds=sortedBeds().filter(b=>(b.plot||'A')===pk);const t=todayS();const sc=46;// 1m=46px
-  const pad=24,w=W*sc+pad*2,h=L*sc+pad*2;let x=pad+14,y=pad+14,rowH=0;const parts=[];
-  for(const b of beds){const bw=(b.w||90)/100*sc,bl=(b.l||500)/100*sc;
-    const cur=S.plan.find(e=>e.bed===b.id&&e.start<=t&&e.end>=t);const nx=S.plan.filter(e=>e.bed===b.id&&e.start>t).sort((a,c)=>a.start<c.start?-1:1)[0];
+  const t=todayS();const lay=layoutPlot(pk,W,L);const sc=Math.max(20,Math.min(46,640/Math.max(W,L)));const pad=22;
+  const fw=W*sc,fh=L*sc;const parts=[];let maxX=fw,maxY=fh;
+  for(const {bd:b,len,wid,a,b:bb} of lay.beds){
+    const x=lay.dir==='v'?a*sc:bb*sc,y=lay.dir==='v'?bb*sc:a*sc,rw=(lay.dir==='v'?wid:len)*sc,rh=(lay.dir==='v'?len:wid)*sc;
+    maxX=Math.max(maxX,x+rw);maxY=Math.max(maxY,y+rh);
+    const cur=S.plan.find(e=>e.bed===b.id&&e.start<=t&&e.end>=t);const nx=S.plan.filter(e=>e.bed===b.id&&e.start>t).sort((p,q)=>p.start<q.start?-1:1)[0];
     const c=cur&&CBY[cur.crop];const col=c?FAM[c.fam]:'var(--soil)';
-    const nowN=[...new Set(S.plan.filter(e=>e.bed===b.id&&e.start<=t&&e.end>=t).sort((a,c)=>a.start<c.start?-1:1).map(e=>CBY[e.crop]?.n).filter(Boolean))];
-    const lab=nowN.length?nowN.join('・'):(nx?'→'+(CBY[nx.crop]?.n||''):'空き');const fs=Math.max(8,Math.min(12,Math.floor((bl-34)/Math.max(1,[...lab].length))));
-    parts.push(`<g data-bed="${b.id}" style="cursor:pointer"><rect x="${x}" y="${y}" width="${bw}" height="${bl}" rx="8" fill="${col}" opacity="${c?0.9:0.35}" ${b.use==='imo'?'stroke="var(--soil)" stroke-width="3" stroke-dasharray="6 4"':''}/>
-      <text x="${x+bw/2}" y="${y+16}" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">${esc(b.name)}</text>
-      <text x="${x+bw/2}" y="${y+28}" font-size="${fs}" fill="#fff" writing-mode="tb" style="writing-mode:vertical-rl">${esc(lab)}</text></g>`);
-    x+=bw+26;rowH=Math.max(rowH,bl)}
-  const H=Math.max(h,y+rowH+pad),Wd=Math.max(w,x-26+14+pad);
-  return `<svg viewBox="0 0 ${Wd} ${H}" width="${Wd}" role="img" aria-label="畑${pk}の畝の配置"><rect x="4" y="4" width="${Wd-8}" height="${H-8}" rx="14" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="16" y="20" font-size="11" fill="var(--soil)">${W}m × ${L}m</text>${parts.join('')}</svg>`;
+    const nowN=[...new Set(S.plan.filter(e=>e.bed===b.id&&e.start<=t&&e.end>=t).sort((p,q)=>p.start<q.start?-1:1).map(e=>CBY[e.crop]?.n).filter(Boolean))];
+    const lab=nowN.length?nowN.join('・'):(nx?'→'+(CBY[nx.crop]?.n||''):'空き');const n=[...lab].length;
+    const isBad=lay.bad.includes(b);const X=pad+x,Y=pad+y;
+    const txt=lay.dir==='v'
+      ?`<text x="${X+rw/2}" y="${Y+15}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${esc(b.name)}</text><text x="${X+rw/2}" y="${Y+26}" font-size="${Math.max(8,Math.min(12,Math.floor((rh-32)/Math.max(1,n))))}" fill="#fff" style="writing-mode:vertical-rl" writing-mode="tb">${esc(lab)}</text>`
+      :`<text x="${X+8}" y="${Y+rh/2+4}" font-size="${Math.max(8,Math.min(12,rh-6))}" fill="#fff"><tspan font-weight="700">${esc(b.name)}</tspan>　${esc(lab)}</text>`;
+    parts.push(`<g data-bed="${b.id}" style="cursor:pointer"><rect x="${X}" y="${Y}" width="${rw}" height="${rh}" rx="6" fill="${col}" opacity="${c?0.9:0.4}" ${isBad?'stroke="var(--warn)" stroke-width="3"':b.use==='imo'?'stroke="var(--soil)" stroke-width="3" stroke-dasharray="6 4"':''}/>${txt}</g>`)}
+  const w=Math.max(fw,maxX)+pad*2,h=Math.max(fh,maxY)+pad*2+16;
+  return `<svg viewBox="0 0 ${w} ${h}" width="${w}" role="img" aria-label="${esc(pn(pk))}の畝の配置"><rect x="${pad}" y="${pad}" width="${fw}" height="${fh}" rx="6" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="${pad}" y="${h-8}" font-size="11" fill="var(--sub)">横${W}m × 縦${L}m・通路${Math.round(lay.P*100)}cm・畝は${lay.dir==='v'?'縦':'横'}向き</text>${parts.join('')}</svg>`;
 }
+function plotWarn(pk,W,L){const lay=layoutPlot(pk,W,L);const m=[];
+  if(lay.bad.length)m.push(`${lay.bad.map(b=>`${b.name}（長さ${b.l/100}m）`).join('・')}は、${lay.dir==='v'?'縦'+L:'横'+W}mの畑に入りません。畝の長さを短くするか、「畑の名前・広さ」で畝の向きを変えてください。`);
+  if(lay.over)m.push(`畝を並べると${lay.dir==='v'?'縦':'横'}に${lay.usedAlong.toFixed(1)}m必要で、畑（${lay.dir==='v'?L:W}m）からはみ出します。`);
+  return m.length?`<p class="muted" style="color:var(--warn);margin:6px 0 0">⚠ ${esc(m.join(' '))}</p>`:''}
 function vMap(){
   if(!S.beds.length)return emptyStart();const cf=S.cfg;
   const leg=Object.entries(FAM).filter(([f])=>S.plan.some(e=>CBY[e.crop]?.fam===f)).map(([f,c])=>`<span><span class="dot" style="background:${c}"></span>${f}</span>`).join('');
   const hasB=S.beds.some(b=>b.plot==='B');
   return `<div class="plot-h"><h2>${esc(pn('A'))}（${(cf.aW*cf.aL)|0}㎡）</h2><button class="btn ghost sm" data-cfg="1">名前を変える</button></div>
-  <div class="plot">${plotSVG('A',cf.aW,cf.aL)}</div>
+  <div class="plot">${plotSVG('A',cf.aW,cf.aL)}</div>${plotWarn('A',cf.aW,cf.aL)}
   <div class="plot-h"><h2>${esc(pn('B'))}（${(cf.bW*cf.bL)|0}㎡・${md(cf.bFrom)}から）</h2><button class="btn ghost sm" data-cfg="1">名前を変える</button></div>
-  <div class="plot">${hasB?plotSVG('B',cf.bW,cf.bL):'<p class="muted" style="margin:6px">畝を登録するときに場所で「'+esc(pn('B'))+'」を選ぶと、ここに出ます。</p>'}</div>
+  ${hasB?plotWarn('B',cf.bW,cf.bL):''}<div class="plot">${hasB?plotSVG('B',cf.bW,cf.bL):'<p class="muted" style="margin:6px">畝を登録するときに場所で「'+esc(pn('B'))+'」を選ぶと、ここに出ます。</p>'}</div>
   <div class="legend">${leg}<span><span class="dot" style="border:2px dashed var(--soil)"></span>芋専用の畝</span></div>
   <div class="row" style="margin-top:8px"><button class="btn" data-newbed="1">畝を足す</button><button class="btn ghost" data-cfg="1">畑の名前・広さ・計画のきまり</button></div>
   <h2>畝の一覧</h2><div class="grid">${sortedBeds().map(b=>{const n=S.plan.filter(e=>e.bed===b.id).length;return `<div class="card row" data-bed="${b.id}" style="cursor:pointer;justify-content:space-between"><div><b>${esc(b.name)}</b> <span class="chip ${b.use==='imo'?'soil':''}">${b.use==='imo'?'芋専用':'ふつう'}</span> <span class="chip soil">${esc(pn(b.plot==='B'?'B':'A'))}</span> <span class="chip">${esc(METHODS[bedMethod(b)].n)}</span><div class="muted">長さ${(b.l/100).toFixed(1)}m・幅${b.w}cm・高さ${b.h}cm　計画 ${n}作</div></div><span class="muted">詳しく ›</span></div>`}).join('')}</div>`;
@@ -510,7 +531,9 @@ function cfgSheet(){const c=S.cfg;
   <p class="muted">「調べる」で、その場所の過去3年の気温から自動で選びます。変えたら「野菜を選ぶ」で計画を作り直すと反映されます。</p>
   <div class="two"><div><label class="f" for="c-aName">1つめの畑の名前</label><input id="c-aName" value="${esc(pn('A'))}" placeholder="例：〇〇の畑"></div><div><label class="f" for="c-bName">2つめの畑の名前</label><input id="c-bName" value="${esc(pn('B'))}" placeholder="例：△△の畑"></div></div>
   <div class="two"><div><label class="f" for="c-aW">${esc(pn('A'))} 横（m）</label><input id="c-aW" type="number" step="0.5" value="${c.aW}"></div><div><label class="f" for="c-aL">縦（m）</label><input id="c-aL" type="number" step="0.5" value="${c.aL}"></div></div>
+  <div class="two"><div><label class="f" for="c-aDir">畝の向き</label><select id="c-aDir"><option value="">自動（畑に入る向き）</option><option value="v" ${c.aDir==='v'?'selected':''}>縦向き</option><option value="h" ${c.aDir==='h'?'selected':''}>横向き</option></select></div><div><label class="f" for="c-path">畝と畝の間の通路（cm）</label><input id="c-path" type="number" inputmode="numeric" value="${c.path||40}"></div></div>
   <div class="three"><div><label class="f" for="c-bW">${esc(pn('B'))} 横（m）</label><input id="c-bW" type="number" step="0.5" value="${c.bW}"></div><div><label class="f" for="c-bL">縦（m）</label><input id="c-bL" type="number" step="0.5" value="${c.bL}"></div><div><label class="f" for="c-bF">借りはじめ</label><input id="c-bF" type="date" value="${c.bFrom}"></div></div>
+  <div class="two"><div><label class="f" for="c-bDir">畝の向き</label><select id="c-bDir"><option value="">自動（畑に入る向き）</option><option value="v" ${c.bDir==='v'?'selected':''}>縦向き</option><option value="h" ${c.bDir==='h'?'selected':''}>横向き</option></select></div><div></div></div>
   <label class="f">畑の基本の農法</label><div class="row"><b>${esc(METHODS[bedMethod(null)].n)}</b><button class="btn ghost sm" data-methods="1">農法を選び直す・説明を見る</button></div>
   <p class="muted">畝の休み（片付けてから次を入れるまで）は農法ごとの目安を使います。畝ごとに農法を変えるときは、畝を押して「この畝の農法」で選びます。</p><input id="c-rest" type="hidden" value="${c.rest}">
   <label class="f" for="c-strict">連作の守り方</label><select id="c-strict"><option value="1" ${c.strict?'selected':''}>しっかり守る（科ごとの休む年数どおり）</option><option value="0" ${!c.strict?'selected':''}>ゆるめ（同じ科を4か月以上あけるだけ）</option></select>
@@ -563,7 +586,7 @@ document.addEventListener('click',async ev=>{
     if(hv&&old.crop===crop)e.harvest=hv;if(en&&old.crop===crop)e.end=en;
     await put('plan',v,e);closeSheet();return toast('保存しました')}
   if(v=g('data-delent')){await del('plan',v);closeSheet();return toast('消しました')}
-  if(g('data-savecfg')){S.cfg={...S.cfg,aName:$('#c-aName').value.trim(),bName:$('#c-bName').value.trim(),addr:$('#c-addr').value.trim(),place:S.tmpPlace||S.cfg.place,zone:$('#c-zone').value,aW:+$('#c-aW').value||9,aL:+$('#c-aL').value||8,bW:+$('#c-bW').value||10,bL:+$('#c-bL').value||6,bFrom:$('#c-bF').value||'2027-01-01',rest:+$('#c-rest').value||14,strict:$('#c-strict').value==='1'};applyZone(S.cfg.zone);await put('meta','cfg',S.cfg);closeSheet();loadWx(true);render();return toast('保存しました')}
+  if(g('data-savecfg')){S.cfg={...S.cfg,aName:$('#c-aName').value.trim(),bName:$('#c-bName').value.trim(),addr:$('#c-addr').value.trim(),place:S.tmpPlace||S.cfg.place,zone:$('#c-zone').value,aW:+$('#c-aW').value||9,aL:+$('#c-aL').value||8,bW:+$('#c-bW').value||10,bL:+$('#c-bL').value||6,bFrom:$('#c-bF').value||'2027-01-01',aDir:$('#c-aDir').value,bDir:$('#c-bDir').value,path:Math.max(10,+$('#c-path').value||40),rest:+$('#c-rest').value||14,strict:$('#c-strict').value==='1'};if(S.cfg.addr&&!S.tmpPlace&&(!S.cfg.place||S.cfg.addr!==(S.cfg.placeAddr||''))){try{const r=await api('place',{address:S.cfg.addr});if(!r.error){S.cfg.place=r;S.cfg.zone=zoneOf(r.annual)}}catch(e){}}if(S.cfg.place)S.cfg.placeAddr=S.cfg.addr;applyZone(S.cfg.zone);await put('meta','cfg',S.cfg);closeSheet();loadWx(true);render();return toast('保存しました')}
   if(v=g('data-growing'))return growSheet(v==='1'?null:v);
   if(g('data-methods'))return methodSheet();
   if(v=g('data-setmethod')){S.cfg={...S.cfg,method:v};await put('meta','cfg',S.cfg);closeSheet();return toast(METHODS[v].n+'にしました')}
