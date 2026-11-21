@@ -570,16 +570,17 @@ function local(c,id,d){ST.data[c]=ST.data[c]||{};if(d===null)delete ST.data[c][i
 function queue(op){ST.q=ST.q.filter(o=>!(o.c===op.c&&o.id===op.id));ST.q.push(op);saveCache();clearTimeout(ST.timer);ST.timer=setTimeout(flush,400)}
 async function flush(){if(!ST.q.length||!KEY.v||ST.busy)return;ST.busy=true;
   try{while(ST.q.length){const ops=ST.q.slice(0,300);await rpc('hatake_push',{k:KEY.v,ops});ST.q=ST.q.filter(o=>!ops.includes(o));saveCache()}setSync('PC・スマホで共有中')}
-  catch(e){setSync(e.code==='bad_key'?'合言葉が違います':'オフライン（つながったら送ります）')}finally{ST.busy=false}}
+  catch(e){if(e.code==='bad_key')badKey();else setSync('オフライン（つながったら送ります）')}finally{ST.busy=false}}
 async function pull(){if(!KEY.v)return;await flush();
   try{const r=await rpc('hatake_pull',{k:KEY.v,since:ST.since});const ch=new Set();
     for(const x of r.docs||[]){ST.since=Math.max(ST.since,x.t);if(ST.q.some(o=>o.c===x.c&&o.id===x.id))continue;ST.data[x.c]=ST.data[x.c]||{};if(x.x)delete ST.data[x.c][x.id];else ST.data[x.c][x.id]=x.d;ch.add(x.c)}
     saveCache();['meta','beds','plan','diag'].filter(c=>ch.has(c)).forEach(emit);setSync(ST.q.length?'送信待ちあり':'PC・スマホで共有中')}
-  catch(e){setSync(e.code==='bad_key'?'合言葉が違います':'オフライン（この端末の内容を表示中）')}}
+  catch(e){if(e.code==='bad_key')return badKey();setSync('オフライン（この端末の内容を表示中）')}}
 const DBS={doc(p){const [c,id]=p.split('/');return{set:async d=>{local(c,id,d);queue({c,id,d})},delete:async()=>{local(c,id,null);queue({c,id,x:true})}}},
   collection(c){return{onSnapshot(f){(ST.ls[c]=ST.ls[c]||[]).push(f);f(snap(c));return()=>{}}}}};
 
 /* --- 合言葉 --- */
+function badKey(){KEY.v='';S.sample=false;try{localStorage.removeItem('ug-key')}catch(e){}$('#sync').innerHTML='<button class="btn sm" data-keyset="1">合言葉を入れる</button>';if(!$('#k-in'))keySheet('合言葉が違っていました。正しいリンクを全部貼り付けて「つなぐ」を押してください。')}
 function keySheet(msg){sheet(`<div class="bar"><h3>畑の合言葉</h3></div><p class="muted" style="margin-top:0">${esc(msg||'最初に一度だけ、合言葉かリンク（https://…/hatake/#k=… の全部）を貼り付けて「つなぐ」を押してください。この端末が覚えるので、次からは入れなくて大丈夫です。')}</p>
   <label class="f" for="k-in">合言葉またはリンク</label><input id="k-in" autocomplete="off"><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-savekey="1">つなぐ</button></div>`)}
 async function saveKey(){let v=$('#k-in').value.trim();const m=/[#&]k=([\w-]+)/.exec(v);if(m)v=m[1];
