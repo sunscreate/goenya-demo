@@ -456,8 +456,8 @@ function cfgSheet(){const c=S.cfg;
   <label class="f" for="c-rest">畝の休み（前の作物を片付けてから次を入れるまでの日数）</label><input id="c-rest" type="number" value="${c.rest}"><p class="muted">菌ちゃん農法では、片付けた後に草・落ち葉・枝などを足して、糸状菌が分解する時間をとります。</p>
   <label class="f" for="c-strict">連作の守り方</label><select id="c-strict"><option value="1" ${c.strict?'selected':''}>しっかり守る（科ごとの休む年数どおり）</option><option value="0" ${!c.strict?'selected':''}>ゆるめ（同じ科を4か月以上あけるだけ）</option></select>
   <div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn" data-savecfg="1">保存</button></div>
-  <h3 style="margin-top:18px">ほかの端末（スマホ・PC）でも使う</h3><p class="muted" style="margin-top:0">このリンクをもう一方の端末で開くと、同じ畑のデータを見られます。人には教えないでください。</p>
-  <div class="row"><button class="btn ghost sm" data-copylink="1">リンクをコピー</button><button class="btn ghost sm" data-keyset="1">合言葉を入れ直す</button></div>`)}
+  <h3 style="margin-top:18px">ほかの端末（スマホ・PC）でも使う</h3><p class="muted" style="margin-top:0">このアプリのアドレスを開けば、どの端末でも同じ畑のデータが出ます（合言葉は不要）。アドレスは人に教えないでください。</p>
+  <div class="row"><button class="btn ghost sm" data-copylink="1">リンクをコピー</button></div>`)}
 
 /* --- 計画を作る --- */
 async function makePlan(){
@@ -506,7 +506,7 @@ document.addEventListener('click',async ev=>{
   if(g('data-growing'))return growSheet();
   if(v=g('data-savegrow'))return saveGrow(v);
   if(g('data-findaddr'))return findAddr();
-  if(g('data-copylink')){const u=location.origin+'/hatake/#k='+KEY.v;try{await navigator.clipboard.writeText(u);toast('コピーしました')}catch(e){prompt('このリンクをコピーしてください',u)}return}
+  if(g('data-copylink')){const u=location.origin+'/hatake/';try{await navigator.clipboard.writeText(u);toast('コピーしました')}catch(e){prompt('このリンクをコピーしてください',u)}return}
   if(g('data-savekey'))return saveKey();
   if(t.id==='a-go')return askPhoto();
   if(t.id==='a-stop')return S.ctl?.abort();
@@ -580,7 +580,8 @@ const DBS={doc(p){const [c,id]=p.split('/');return{set:async d=>{local(c,id,d);q
   collection(c){return{onSnapshot(f){(ST.ls[c]=ST.ls[c]||[]).push(f);f(snap(c));return()=>{}}}}};
 
 /* --- 合言葉 --- */
-function badKey(){KEY.v='';S.sample=false;try{localStorage.removeItem('ug-key')}catch(e){}$('#sync').innerHTML='<button class="btn sm" data-keyset="1">合言葉を入れる</button>';if(!$('#k-in'))keySheet('合言葉が違っていました。正しいリンクを全部貼り付けて「つなぐ」を押してください。')}
+async function autoKey(){try{const k=await rpc('hatake_boot',{});if(k){KEY.v=k;S.sample=true;try{localStorage.setItem('ug-key',k)}catch(e){}return true}}catch(e){}return false}
+let badTried=false;async function badKey(){KEY.v='';try{localStorage.removeItem('ug-key')}catch(e){}if(!badTried&&await autoKey()){badTried=true;return pull()}setSync('つながりません')}
 function keySheet(msg){sheet(`<div class="bar"><h3>畑の合言葉</h3></div><p class="muted" style="margin-top:0">${esc(msg||'最初に一度だけ、合言葉かリンク（https://…/hatake/#k=… の全部）を貼り付けて「つなぐ」を押してください。この端末が覚えるので、次からは入れなくて大丈夫です。')}</p>
   <label class="f" for="k-in">合言葉またはリンク</label><input id="k-in" autocomplete="off"><div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" data-savekey="1">つなぐ</button></div>`)}
 async function saveKey(){let v=$('#k-in').value.trim();const m=/[#&]k=([\w-]+)/.exec(v);if(m)v=m[1];
@@ -641,10 +642,10 @@ DBS.collection('beds').onSnapshot(q=>{S.beds=q.docs.map(d=>d.data());if(!documen
 DBS.collection('plan').onSnapshot(q=>{S.plan=q.docs.map(d=>d.data());if(!document.querySelector('.sheet'))render()});
 DBS.collection('diag').onSnapshot(q=>{S.diag=q.docs.map(d=>d.data());if(S.tab==='ask'&&!document.activeElement?.closest('#view'))render()});
 render();
-if(!KEY.v){$('#sync').innerHTML='<button class="btn sm" data-keyset="1">合言葉を入れる</button>';keySheet()}else{setSync('読み込み中…');pull().then(()=>loadWx())}
+setSync('読み込み中…');(KEY.v?Promise.resolve(true):autoKey()).then(ok=>{S.sample=!!KEY.v;return ok?pull():setSync('つながりません')}).then(()=>{loadWx();render()})
 setInterval(()=>{if(!document.hidden)pull()},60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull()});
 window.addEventListener('online',()=>pull());
 if('serviceWorker' in navigator)navigator.serviceWorker.register('/hatake/sw.js').catch(()=>{});
-$('#sync').onclick=()=>{if(!KEY.v)keySheet()};
+
 </script>
