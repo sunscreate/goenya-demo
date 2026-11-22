@@ -386,6 +386,16 @@ function layoutDir(pk,W,L,dir){const beds=sortedBeds().filter(b=>(b.plot||'A')==
   // 真ん中に寄せる（外周にも通路が残る）
   const offB=Math.max(0,(along-usedAlong)/2);for(const o of out){o.a+=Math.max(0,(across-lineW[o.line])/2);o.b+=offB+(lineL[o.line]-o.len)/2}
   return {dir,beds:out,bad,over:usedAlong>along+0.005,usedAlong,P}}
+/* 縦書き：1文字ずつ置く。長いときは列を増やし、それでも入らなければ文字を小さく */
+function vText(lab,X,top,rw,h){const ch=[...lab];if(!ch.length||h<10)return '';let fs=12,cols,per;
+  for(;fs>=6;fs--){per=Math.max(1,Math.floor(h/fs));cols=Math.ceil(ch.length/per);if(cols*(fs+2)<=rw-4)break}
+  if(fs<6){fs=6;per=Math.max(1,Math.floor(h/fs));cols=Math.max(1,Math.floor((rw-4)/(fs+2)));}
+  const maxN=per*cols;const show=ch.length>maxN?[...ch.slice(0,maxN-1),'…']:ch;
+  const cw=fs+2,x0=X+rw/2+(cols-1)*cw/2;let o='';
+  show.forEach((c,k)=>{const col=Math.floor(k/per),row=k%per;o+=`<text x="${(x0-col*cw).toFixed(1)}" y="${(top+fs+row*fs).toFixed(1)}" text-anchor="middle" font-size="${fs}" fill="#fff">${esc(c==='ー'?'｜':c)}</text>`});return o}
+function hText(name,lab,X,Y,rw,h){const all=name+'　'+lab;let fs=Math.max(6,Math.min(12,h-6));const fit=Math.floor((rw-12)/fs);
+  let s2=all;if([...all].length>fit){const f2=Math.max(6,Math.floor((rw-12)/[...all].length));if(f2>=8)fs=f2;else s2=[...all].slice(0,Math.max(1,fit-1)).join('')+'…'}
+  const nm=[...name].length;return `<text x="${X+6}" y="${Y+h/2+fs/2-1}" font-size="${fs}" fill="#fff"><tspan font-weight="700">${esc([...s2].slice(0,nm).join(''))}</tspan>${esc([...s2].slice(nm).join(''))}</text>`}
 function plotSVG(pk,W,L){
   const t=todayS();const lay=layoutPlot(pk,W,L);const pad=14;const avail=Math.max(260,($('#view')?.clientWidth||600)-22);const sc=Math.max(8,Math.min(46,(avail-pad*2)/W));// 画面の幅にぴったり（拡大・縮小しない）
   const fw=W*sc,fh=L*sc;const parts=[];let maxX=fw,maxY=fh;
@@ -399,8 +409,8 @@ function plotSVG(pk,W,L){
     const lab=nowN.length?nowN.join('・'):(nx?'→'+(CBY[nx.crop]?.n||''):'空き');const n=[...lab].length;
     const isBad=P?(x<-1||y<-1||x+rw>fw+1||y+rh>fh+1):lay.bad.includes(b);const X=pad+x,Y=pad+y;
     const txt=d==='v'
-      ?`<text x="${X+rw/2}" y="${Y+15}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${esc(b.name)}</text><text x="${X+rw/2}" y="${Y+26}" font-size="${Math.max(8,Math.min(12,Math.floor((rh-32)/Math.max(1,n))))}" fill="#fff" style="writing-mode:vertical-rl" writing-mode="tb">${esc(lab)}</text>`
-      :`<text x="${X+8}" y="${Y+rh/2+4}" font-size="${Math.max(8,Math.min(12,rh-6))}" fill="#fff"><tspan font-weight="700">${esc(b.name)}</tspan>　${esc(lab)}</text>`;
+      ?`<text x="${X+rw/2}" y="${Y+15}" text-anchor="middle" font-size="${Math.min(11,Math.max(7,rw/3.2))}" font-weight="700" fill="#fff">${esc(b.name)}</text>${vText(lab,X,Y+22,rw,rh-26)}`
+      :hText(b.name,lab,X,Y,rw,rh);
     parts.push(`<g data-bed="${b.id}" data-dir="${d}" style="cursor:${S.moveMode?'move':'pointer'}"><rect x="${X}" y="${Y}" width="${rw}" height="${rh}" rx="6" fill="${col}" opacity="${c?0.9:0.4}" ${isBad?'stroke="var(--warn)" stroke-width="3"':b.use==='imo'?'stroke="var(--soil)" stroke-width="3" stroke-dasharray="6 4"':''}/>${txt}</g>`)}
   const w=Math.max(fw,maxX)+pad*2,h=Math.max(fh,maxY)+pad*2+16;
   return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" ${S.moveMode?'style="touch-action:none"':''} data-pk="${pk}" data-sc="${sc}" data-pad="${pad}" role="img" aria-label="${esc(pn(pk))}の畝の配置"><rect x="${pad}" y="${pad}" width="${fw}" height="${fh}" rx="6" fill="none" stroke="var(--soil)" stroke-width="2" stroke-dasharray="4 6"/><text x="${pad}" y="${h-8}" font-size="11" fill="var(--sub)">横${W}m × 縦${L}m・通路${Math.round(lay.P*100)}cm・畝は${lay.dir==='v'?'縦':'横'}向き</text>${parts.join('')}</svg>`;
@@ -512,14 +522,26 @@ function bedInfo(b){if(!b)return;const t=todayS();const M=METHODS[bedMethod(b)];
   <p class="muted" style="margin-top:10px">野菜を押すと、日にちを直したり消したりできます。</p>
   <div class="row" style="margin-top:12px"><button class="btn" data-growing="${b.id}">いま育てている野菜を入れる</button><button class="btn soft" data-addent="${b.id}">この畝に予定を足す</button></div>
   <div class="row" style="margin-top:10px"><button class="btn ghost sm" data-editbed="${b.id}">畝の大きさ・農法・名前を直す</button><button class="btn ghost sm" data-dupbed="${b.id}">複製</button></div>`)}
-async function placeDup(b,src){
-    if(src&&(src.plot||'A')===b.plot){// 複製は元の畝のすぐ横に
-      const P=((+S.cfg.path)||40)/100;if(src.pos){const sw=src.w/100,step=Math.round((b.w/100+P)*20)/20,hz=src.pos.d==='h';b.pos=hz?{x:src.pos.x,y:Math.round((src.pos.y+sw+P)*20)/20,d:'h'}:{x:Math.round((src.pos.x+sw+P)*20)/20,y:src.pos.y,d:'v'};
-        // 元の畝より先にある畝は、1本分ずらして場所をあける
-        for(const x of S.beds){if(x.id===src.id||!x.pos||(x.plot||'A')!==b.plot)continue;if(hz?x.pos.y>src.pos.y+0.001:x.pos.x>src.pos.x+0.001){const np=hz?{...x.pos,y:Math.round((x.pos.y+step)*20)/20}:{...x.pos,x:Math.round((x.pos.x+step)*20)/20};await put('beds',x.id,{...x,pos:np})}}}
-      const v=b.id;const list=sortedBeds().filter(x=>x.id!==v);const i=list.findIndex(x=>x.id===src.id);list.splice(i+1,0,b);
-      for(let k=0;k<list.length;k++){const x=list[k];if(x.id===v){b.order=k+1;continue}if(x.order!==k+1)await put('beds',x.id,{...x,order:k+1})}}
-}
+async function placeDup(b,src){if((src.plot||'A')!==b.plot)return;const pk=b.plot||'A';const cf=S.cfg;const W=pk==='B'?cf.bW:cf.aW,L=pk==='B'?cf.bL:cf.aL;
+  // 自動配置のままなら、いまの位置で全部の畝を止めてから（ほかの畝が動かないように）
+  const sib=S.beds.filter(x=>(x.plot||'A')===pk);
+  if(sib.some(x=>!x.pos)){const lay=layoutPlot(pk,W,L);for(const o of lay.beds){const x=o.bd;if(x.pos)continue;const d=lay.dir;x.pos={x:Math.round((d==='v'?o.a:o.b)*20)/20,y:Math.round((d==='v'?o.b:o.a)*20)/20,d};await put('beds',x.id,{...x})}}
+  const P=((+cf.path)||40)/100,sp=src.pos,d=sp.d==='h'?'h':'v';const rect=(x,p)=>{const lw=(p.d==='h')?[x.l/100,x.w/100]:[x.w/100,x.l/100];return {x:p.x,y:p.y,w:lw[0],h:lw[1]}};
+  const me=(p)=>rect(b,{...p,d});const others=S.beds.filter(x=>(x.plot||'A')===pk&&x.pos).map(x=>rect(x,x.pos));
+  const hit=r=>others.some(o=>r.x<o.x+o.w-0.001&&o.x<r.x+r.w-0.001&&r.y<o.y+o.h-0.001&&o.y<r.y+r.h-0.001);
+  const inside=r=>r.x>=-0.001&&r.y>=-0.001&&r.x+r.w<=W+0.001&&r.y+r.h<=L+0.001;const sr=rect(src,sp);const m=me({x:0,y:0});
+  const r5=v=>Math.round(v*20)/20;
+  const c=d==='v'?[{x:sr.x+sr.w+P,y:sr.y},{x:sr.x-m.w-P,y:sr.y},{x:sr.x,y:sr.y+sr.h+P},{x:sr.x,y:sr.y-m.h-P}]:[{x:sr.x,y:sr.y+sr.h+P},{x:sr.x,y:sr.y-m.h-P},{x:sr.x+sr.w+P,y:sr.y},{x:sr.x-m.w-P,y:sr.y}];
+  // 近くで空いている場所を順に探す（ほかの畝は動かさない）
+  let best=c.find(p=>{const r=me(p);return inside(r)&&!hit(r)});
+  if(!best){for(let k=1;k<=60&&!best;k++){for(const p0 of c){const p=d==='v'?{x:p0.x+(p0.x>sr.x?1:-1)*k*0.1,y:p0.y}:{x:p0.x,y:p0.y+(p0.y>sr.y?1:-1)*k*0.1};const r=me(p);if(inside(r)&&!hit(r)){best=p;break}}}}
+  if(!best){// 畑の中で空いている所を、元の畝に近い順に探す
+    const cx=sr.x+sr.w/2,cy=sr.y+sr.h/2;let bd=1e9;for(let x=0;x+m.w<=W+0.001;x+=0.1)for(let y=0;y+m.h<=L+0.001;y+=0.1){const r=me({x,y});if(hit(r))continue;const dd=Math.hypot(x+m.w/2-cx,y+m.h/2-cy);if(dd<bd){bd=dd;best={x,y}}}}
+  if(!best){// 畑に空きがなければ、畑の外のすぐ横（赤い枠で知らせる）
+    best=d==='v'?{x:Math.max(W,...others.map(o=>o.x+o.w))+P,y:sr.y}:{x:sr.x,y:Math.max(L,...others.map(o=>o.y+o.h))+P}}
+  b.pos={x:r5(best.x),y:r5(best.y),d};
+  const list=sortedBeds().filter(x=>x.id!==b.id);const i=list.findIndex(x=>x.id===src.id);list.splice(i+1,0,b);
+  for(let k=0;k<list.length;k++){const x=list[k];if(x.id===b.id){b.order=k+1;continue}if(x.order!==k+1)await put('beds',x.id,{...x,order:k+1})}}
 async function dupBed(id){const src=S.beds.find(x=>x.id===id);if(!src)return;
   const used=new Set(S.beds.map(x=>x.name));let k=S.beds.length+1;while(used.has('畝'+k))k++;
   const b={...src,id:nid(),name:'畝'+k,order:S.beds.length+1};delete b.pos;
