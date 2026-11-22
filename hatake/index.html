@@ -420,7 +420,19 @@ function plotWarn(pk,W,L){const bs=sortedBeds().filter(b=>(b.plot||'A')===pk);if
   if(lay.bad.length)m.push(`${lay.bad.map(b=>`${b.name}（長さ${b.l/100}m）`).join('・')}は、${lay.dir==='v'?'縦'+L:'横'+W}mの畑に入りません。畝の長さを短くするか、「畑の名前・広さ」で畝の向きを変えてください。`);
   if(lay.over)m.push(`畝を並べると${lay.dir==='v'?'縦':'横'}に${lay.usedAlong.toFixed(1)}m必要で、畑（${lay.dir==='v'?L:W}m）からはみ出します。`);
   return m.length?`<p class="muted" style="color:var(--warn);margin:6px 0 0">⚠ ${esc(m.join(' '))}</p>`:''}
-function moveHint(pk){return `<div class="row" style="justify-content:space-between;margin:4px 0 6px"><span class="muted" style="font-size:14px">畝を指でドラッグして移動／トンと押すと縦横を変える（5cm単位）</span><button class="btn warn sm" data-autolay="${pk}">自動の配置に戻す</button></div>`}
+function moveHint(pk){return `<div class="row" style="justify-content:space-between;margin:4px 0 6px"><span class="muted" style="font-size:14px">畝を指でドラッグして移動／トンと押すと縦横を変える（5cm単位）</span><div class="row" style="gap:6px"><button class="btn sm" data-tidy="${pk}">整頓</button><button class="btn warn sm" data-autolay="${pk}">自動の配置に戻す</button></div></div>`}
+/* 整頓：今の並び（列・順番・向き）はそのままで、すき間を均等にして畑の真ん中にバランスよく置く */
+async function freezePlot(pk){const cf=S.cfg,W=pk==='B'?cf.bW:cf.aW,L=pk==='B'?cf.bL:cf.aL;const sib=S.beds.filter(x=>(x.plot||'A')===pk);
+  if(sib.some(x=>!x.pos)){const lay=layoutPlot(pk,W,L);for(const o of lay.beds){const x=o.bd;if(x.pos)continue;const d=lay.dir;x.pos={x:Math.round((d==='v'?o.a:o.b)*20)/20,y:Math.round((d==='v'?o.b:o.a)*20)/20,d};await put('beds',x.id,{...x})}}}
+async function tidyPlot(pk){await freezePlot(pk);const cf=S.cfg,W=pk==='B'?cf.bW:cf.aW,L=pk==='B'?cf.bL:cf.aL,P=((+cf.path)||40)/100;
+  const rs=S.beds.filter(x=>(x.plot||'A')===pk&&x.pos).map(b=>{const h=b.pos.d==='h';return {b,x:b.pos.x,y:b.pos.y,w:(h?b.l:b.w)/100,h:(h?b.w:b.l)/100}});if(!rs.length)return;
+  rs.sort((a,b)=>(a.y+a.h/2)-(b.y+b.h/2));const rows=[];
+  for(const r of rs){const row=rows.find(w=>r.y<w.y1-0.01&&w.y0<r.y+r.h-0.01);if(row){row.list.push(r);row.y0=Math.min(row.y0,r.y);row.y1=Math.max(row.y1,r.y+r.h)}else rows.push({list:[r],y0:r.y,y1:r.y+r.h})}
+  rows.sort((a,b)=>a.y0-b.y0);const r5=v=>Math.round(v*20)/20;
+  const hs=rows.map(w=>Math.max(...w.list.map(r=>r.h)));const sumH=hs.reduce((a,b)=>a+b,0);let vg=(L-sumH)/(rows.length+1);let y=vg;if(vg<P){vg=P;y=(L-sumH-P*(rows.length-1))/2}
+  rows.forEach((w,i)=>{w.list.sort((a,b)=>a.x-b.x);const sumW=w.list.reduce((a,r)=>a+r.w,0);let g=(W-sumW)/(w.list.length+1),x=g;if(g<P){g=P;x=(W-sumW-P*(w.list.length-1))/2}
+    for(const r of w.list){r.b.pos={...r.b.pos,x:r5(x),y:r5(y+(hs[i]-r.h)/2)};x+=r.w+g}y+=hs[i]+vg});
+  for(const r of rs)await put('beds',r.b.id,{...r.b});toast('整頓しました')}
 /* ドラッグで畝を動かす（「配置を動かす」のときだけ） */
 let DR=null;
 const svgPt=(svg,ev)=>{const m=svg.getScreenCTM().inverse();return {x:m.a*ev.clientX+m.c*ev.clientY+m.e,y:m.b*ev.clientX+m.d*ev.clientY+m.f}};
@@ -525,7 +537,7 @@ function bedInfo(b){if(!b)return;const t=todayS();const M=METHODS[bedMethod(b)];
 async function placeDup(b,src){if((src.plot||'A')!==b.plot)return;const pk=b.plot||'A';const cf=S.cfg;const W=pk==='B'?cf.bW:cf.aW,L=pk==='B'?cf.bL:cf.aL;
   // 自動配置のままなら、いまの位置で全部の畝を止めてから（ほかの畝が動かないように）
   const sib=S.beds.filter(x=>(x.plot||'A')===pk);
-  if(sib.some(x=>!x.pos)){const lay=layoutPlot(pk,W,L);for(const o of lay.beds){const x=o.bd;if(x.pos)continue;const d=lay.dir;x.pos={x:Math.round((d==='v'?o.a:o.b)*20)/20,y:Math.round((d==='v'?o.b:o.a)*20)/20,d};await put('beds',x.id,{...x})}}
+  await freezePlot(pk);
   const P=((+cf.path)||40)/100,sp=src.pos,d=sp.d==='h'?'h':'v';const rect=(x,p)=>{const lw=(p.d==='h')?[x.l/100,x.w/100]:[x.w/100,x.l/100];return {x:p.x,y:p.y,w:lw[0],h:lw[1]}};
   const me=(p)=>rect(b,{...p,d});const others=S.beds.filter(x=>(x.plot||'A')===pk&&x.pos).map(x=>rect(x,x.pos));
   const hit=r=>others.some(o=>r.x<o.x+o.w-0.001&&o.x<r.x+r.w-0.001&&r.y<o.y+o.h-0.001&&o.y<r.y+r.h-0.001);
@@ -620,6 +632,7 @@ document.addEventListener('click',async ev=>{
   if(g('data-newbed'))return bedSheet(null);
   if(v=g('data-dupbed'))return dupBed(v);
   if(g('data-movemode')){S.moveMode=!S.moveMode;return render()}
+  if(v=g('data-tidy'))return tidyPlot(v);
   if(v=g('data-autolay')){for(const b of S.beds.filter(b=>(b.plot||'A')===v&&b.pos)){const x={...b};delete x.pos;await put('beds',x.id,x)}return toast('自動の配置に戻しました')}
   if(S.moveMode&&t.closest('svg'))return;
   if(v=g('data-bed'))return bedInfo(S.beds.find(b=>b.id===v));
