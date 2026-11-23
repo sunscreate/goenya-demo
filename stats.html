@@ -1,0 +1,44 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Tabi Pocket 来訪者</title>
+<style>
+:root{--bg:#faf6ef;--card:#fff;--ink:#1f1b16;--sub:#6b6258;--line:#eadfce;--accent:#d9482b;--ok:#2f7a45}
+@media (prefers-color-scheme:dark){:root{--bg:#17130f;--card:#221c16;--ink:#f3ece2;--sub:#c3b6a6;--line:#3a3027}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Hiragino Sans",sans-serif}
+main{max-width:760px;margin:0 auto;padding:16px}h1{font-size:22px;margin:4px 0 2px}h2{font-size:17px;margin:22px 0 8px}
+.muted{color:var(--sub);font-size:14px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}.k b{display:block;font-size:26px;font-variant-numeric:tabular-nums}.k span{font-size:13px;color:var(--sub)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}th:first-child,td:first-child{text-align:left}th{color:var(--sub);font-weight:600;background:color-mix(in srgb,var(--line) 35%,var(--card))}
+.bar{display:inline-block;height:8px;border-radius:4px;background:var(--accent);vertical-align:middle;margin-left:6px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}select,button,input{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+button{background:var(--accent);color:#fff;border:0;font-weight:700}
+@media (max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
+</style></head><body><main>
+<h1>Tabi Pocket 来訪者</h1><p class="muted" id="sub">読み込み中…</p>
+<div class="row"><select id="days"><option value="1">今日</option><option value="7" selected>7日間</option><option value="14">14日間</option><option value="30">30日間</option></select><button id="re">更新</button></div>
+<div id="out"></div>
+<div id="keybox" hidden><h2>合言葉</h2><div class="row"><input id="k" placeholder="合言葉" style="flex:1;min-width:0"><button id="ks">開く</button></div></div>
+</main><script>
+const U='https://pkgqeircrgzsqtmiyywv.supabase.co/rest/v1/rpc/tabi_stats',K='sb_publishable_No3R3AVVRPybIdQL6TtQpw_OdCEJLLw';
+const NAMES={'3cIbJ2dpv30R12r1II9IU1T':'Yen Split $4.99','3cIcN6dpv0SJh1p1II9IU1U':'Point & Show $4.99','bJe6oIgBH7h7cL98769IU1V':'Stamp Book $4.99','5kQaEYclr0SJdPdafe9IU1W':'3アプリセット $9.99','dRmbJ21GN30R5iHfzy9IU1X':'レストラン予約 $19'};
+const SRC={tiktok:'TikTok',instagram:'Instagram',facebook:'Facebook',direct:'直接・不明',card:'名刺',share:'紹介リンク'};
+const PAGES={'/':'トップ','/index.html':'トップ','/try/phrases.html':'Point & Show（お試し）','/try/yen.html':'Yen Split（お試し）','/try/stamps.html':'Stamp Book（お試し）','/table/':'レストラン予約','/table/index.html':'レストラン予約','/table/thanks.html':'予約 支払い完了','/thanks.html':'購入完了'};
+const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let key='';{const m=/[#&]k=(\w+)/.exec(location.hash);if(m){key=m[1];try{localStorage.setItem('tp_stats',key)}catch(e){}history.replaceState(null,'',location.pathname)}else try{key=localStorage.getItem('tp_stats')||''}catch(e){}}
+async function load(){if(!key){$('#keybox').hidden=false;$('#sub').textContent='合言葉を入れてください';return}
+ $('#sub').textContent='読み込み中…';
+ const r=await fetch(U,{method:'POST',headers:{apikey:K,'content-type':'application/json'},body:JSON.stringify({k:key,days:+$('#days').value})});
+ if(!r.ok){$('#keybox').hidden=false;$('#sub').textContent='合言葉が違います';return}
+ const d=await r.json();const T=d.total;$('#keybox').hidden=true;
+ $('#sub').textContent=`日本時間・${$('#days').selectedOptions[0].text}・${new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})}時点`;
+ const max=Math.max(1,...d.daily.map(x=>x.visitors));
+ const rate=T.visitors?Math.round(T.buys/T.visitors*1000)/10:0;
+ $('#out').innerHTML=`<div class="kpis"><div class="k"><b>${T.visitors}</b><span>来た人（端末数）</span></div><div class="k"><b>${T.views}</b><span>見られたページ数</span></div><div class="k"><b>${T.tries}</b><span>お試しを開いた</span></div><div class="k"><b>${T.buys}</b><span>購入ボタンを押した（${rate}%）</span></div></div>
+ <p class="muted">「購入ボタンを押した」は支払い画面に進んだ回数です。実際の売上はStripeで確かめてください。</p>
+ <h2>どこから来たか</h2><table><tr><th>入口</th><th>来た人</th><th>お試し</th><th>購入ボタン</th></tr>${d.src.map(x=>`<tr><td>${esc(SRC[x.src]||x.src||'不明')}</td><td>${x.visitors}</td><td>${x.tries}</td><td>${x.buys}</td></tr>`).join('')||'<tr><td colspan="4">まだありません</td></tr>'}</table>
+ <h2>日ごと</h2><table><tr><th>日付</th><th>来た人</th><th>お試し</th><th>購入ボタン</th></tr>${d.daily.slice().reverse().map(x=>`<tr><td>${x.d.slice(5).replace('-','/')}</td><td>${x.visitors}<span class="bar" style="width:${Math.round(x.visitors/max*80)}px"></span></td><td>${x.tries}</td><td>${x.buys}</td></tr>`).join('')||'<tr><td colspan="4">まだありません</td></tr>'}</table>
+ <h2>よく見られたページ</h2><table><tr><th>ページ</th><th>回数</th></tr>${d.pages.map(x=>`<tr><td>${esc(PAGES[x.path]||x.path)}</td><td>${x.views}</td></tr>`).join('')||'<tr><td colspan="2">まだありません</td></tr>'}</table>
+ <h2>押された購入ボタン</h2><table><tr><th>商品</th><th>回数</th></tr>${d.buys.map(x=>`<tr><td>${esc(NAMES[x.link]||x.link)}</td><td>${x.n}</td></tr>`).join('')||'<tr><td colspan="2">まだありません</td></tr>'}</table>`;
+}
+$('#re').onclick=load;$('#days').onchange=load;$('#ks').onclick=()=>{key=$('#k').value.trim().replace(/.*[#&]k=/,'');try{localStorage.setItem('tp_stats',key)}catch(e){}load()};
+load();
+</script></body></html>
