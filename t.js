@@ -1,5 +1,5 @@
 /* Tabi Pocket：来訪者を数える（Cookieなし・個人情報なし。ランダムな端末IDだけ） */
-(()=>{try{
+(()=>{try{if(window.top!==window.self)return;
 const U='https://pkgqeircrgzsqtmiyywv.supabase.co/rest/v1/rpc/tabi_event',K='sb_publishable_No3R3AVVRPybIdQL6TtQpw_OdCEJLLw';
 const q=new URLSearchParams(location.search),ua=navigator.userAgent;let sid='x';
 try{sid=localStorage.getItem('tp_sid');if(!sid){sid=Math.random().toString(36).slice(2,12);localStorage.setItem('tp_sid',sid)}}catch(e){}
