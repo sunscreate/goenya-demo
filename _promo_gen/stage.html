@@ -1,0 +1,87 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{width:1080px;height:1920px;overflow:hidden}
+body{font-family:"DM Sans","Zen Kaku Gothic New",sans-serif;background:#efe8dc;background-image:radial-gradient(#d9cfbf 1.6px,transparent 1.6px);background-size:34px 34px;position:relative}
+#hdr{position:absolute;left:0;top:0;width:1080px;height:472px;background:linear-gradient(120deg,#1d3557 0%,#27466e 55%,#3a5a85 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 50px 30px;color:#fff}
+#hdr.red{background:linear-gradient(120deg,#b8361d 0%,#d9482b 55%,#e8704e 100%)}
+#tx{transition:none}
+#t{font-size:86px;font-weight:700;line-height:1.08;letter-spacing:-.02em;text-shadow:0 3px 14px rgba(0,0,0,.18)}
+#st{font-size:34px;font-weight:500;opacity:.86;margin-top:14px}
+#pill{margin-top:26px;background:#d9482b;color:#fff;font-weight:700;font-size:34px;padding:12px 34px;border-radius:99px;box-shadow:0 8px 20px rgba(0,0,0,.22)}
+#hdr.red #pill{background:#fff;color:#d9482b}
+#phone{position:absolute;left:136px;top:516px;width:808px;height:1500px;background:#1b1917;border-radius:84px;padding:14px;box-shadow:0 40px 80px rgba(60,30,10,.28)}
+#scr{position:relative;width:780px;height:1472px;border-radius:70px;overflow:hidden;background:#faf6ef}
+#app{position:absolute;left:0;top:0;width:390px;height:736px;border:0;transform:scale(2);transform-origin:0 0;background:#faf6ef}
+#dim{position:absolute;inset:0;background:rgba(20,16,12,.0);pointer-events:none}
+#ov{position:absolute;left:0;top:0;width:780px;height:1472px;display:none;background:rgba(20,16,12,.55);align-items:flex-start;justify-content:center;padding-top:120px}
+#ov img{width:640px;border-radius:22px;box-shadow:0 30px 60px rgba(0,0,0,.4)}
+#badge{position:absolute;left:50%;top:574px;transform:translateX(-50%);background:#1f3b63;color:#fff;font-weight:700;font-size:38px;padding:16px 36px;border-radius:99px;white-space:nowrap;box-shadow:0 12px 26px rgba(0,0,0,.25);opacity:0}
+#cta{position:absolute;left:50%;top:1770px;transform:translateX(-50%);background:#1f1d1a;color:#fff;font-weight:700;font-size:42px;padding:18px 44px;border-radius:99px;white-space:nowrap;opacity:0;box-shadow:0 12px 26px rgba(0,0,0,.3)}
+#hand{position:absolute;left:0;top:0;font-size:130px;line-height:1;opacity:0;transform-origin:30% 5%;filter:drop-shadow(0 8px 10px rgba(0,0,0,.25));font-family:"Noto Color Emoji"}
+#ring{position:absolute;width:120px;height:120px;border-radius:50%;border:8px solid rgba(217,72,43,.8);opacity:0}
+#cf{position:absolute;left:0;top:0;width:1080px;height:1920px;pointer-events:none}
+</style></head><body>
+<div id="hdr"><div id="tx"><div id="t"></div><div id="st"></div></div><div id="pill">tabipocket.vercel.app · free</div></div>
+<div id="phone"><div id="scr"><iframe id="app"></iframe><div id="dim"></div><div id="ov"><img id="ovi"></div></div></div>
+<div id="badge"></div><div id="cta"></div>
+<div id="ring"></div><div id="hand">👆</div>
+<canvas id="cf" width="1080" height="1920"></canvas>
+<script>
+const $=s=>document.querySelector(s);
+const SX=136+14,SY=516+14,K=2; // screen origin & scale
+let TL=null,done=0,hand={x:700,y:1500,vis:0},last={x:760,y:1700};
+const D=()=>$('#app').contentDocument,W=()=>$('#app').contentWindow;
+function el(q){const [sel,txt]=Array.isArray(q)?q:[q,null];const L=[...D().querySelectorAll(sel)];return txt?L.find(e=>e.textContent.includes(txt)):L[0]}
+function pos(q){const e=el(q);if(!e)throw new Error('no el '+JSON.stringify(q));const r=e.getBoundingClientRect();return {x:SX+(r.left+r.width/2)*K,y:SY+(r.top+r.height/2)*K}}
+window.load=(url,ls)=>new Promise(res=>{const f=$('#app');f.onload=()=>{const d=f.contentDocument;const s=d.createElement('style');s.textContent='*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}html{scrollbar-width:none}::-webkit-scrollbar{display:none}';d.head.appendChild(s);
+ W().confirm=()=>true;W().prompt=(a,b)=>window.PROMPT||b;
+ W().navigator.canShare=()=>false;
+ W().HTMLAnchorElement.prototype.click=function(){if(this.download){$('#ovi').src=this.href;$('#ov').style.display='flex'}};
+ setTimeout(res,900)};
+ // localStorage seed (same origin)
+ for(const k in (ls||{}))localStorage.setItem(k,JSON.stringify(ls[k]));
+ f.src=url});
+window.setup=(cfg)=>{TL=cfg;done=0;$('#hdr').className=cfg.red?'red':'';return true};
+function ease(x){x=Math.max(0,Math.min(1,x));return x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2}
+const P={scroll:[]};
+window.frame=(t)=>{
+ // header text by beat
+ const B=TL.beats;let bi=0;for(let i=0;i<B.length;i++)if(t>=B[i].t0)bi=i;const b=B[bi];
+ if($('#t').textContent!==b.h){$('#t').textContent=b.h;$('#st').textContent=b.s||''}
+ const k=ease((t-b.t0)/0.35);$('#tx').style.opacity=k;$('#tx').style.transform=`translateY(${(1-k)*24}px)`;
+ // events
+ const E=TL.events;
+ while(done<E.length&&E[done].t<=t){const e=E[done++];
+  if(e.click||e.tap){const x=el(e.click||e.tap);if(x){x.click()}else console.log('MISSING',JSON.stringify(e))}
+  if(e.run){W().eval(e.run)}
+  if(e.type){const x=el(e.type.sel);x.focus&&x.focus()}
+  if(e.ov===0){$('#ov').style.display='none'}
+ }
+ // continuous: typing
+ for(const e of E){if(e.type&&t>=e.t){const A=Array.from(e.type.text);const n=Math.min(A.length,Math.floor((t-e.t)/e.type.cps));const x=el(e.type.sel);const v=A.slice(0,n).join('');if(x.value!==v){x.value=v;x.dispatchEvent(new Event('input',{bubbles:true}))}}
+  if((e.scroll!==undefined||e.scrollEl)&&t>=e.t){const st=e.t,du=e.dur||0.8;const tgt0=e.target?el(e.target):D().scrollingElement;if(e.from===undefined){e.from=tgt0.scrollTop;if(e.scrollEl){const q=el(e.scrollEl);e.scroll=Math.max(0,q.getBoundingClientRect().top+tgt0.scrollTop+(e.off||0))}}const from=e.from;const y=from+(e.scroll-from)*ease((t-st)/du);const tgt=e.target?el(e.target):D().scrollingElement;if(t<=st+du+0.05)tgt.scrollTop=y}}
+ // hand: find current/next tap
+ let hx=last.x,hy=last.y,hv=0,press=0,ring=-1;
+ const taps=E.filter(e=>e.tap);
+ for(const e of taps){
+  if(t>=e.t-0.7&&t<=e.t+0.5){hv=1;if(!e.p){e.p=pos(e.tap);if(e.dx)e.p.x+=e.dx;if(e.dy)e.p.y+=e.dy;e.prev=(window._lp&&t-window._lpt<1.6)?window._lp:{x:Math.min(1000,e.p.x+200),y:Math.min(1880,e.p.y+340)};}const p=e.p;const prev=e.prev;if(t>=e.t){window._lp=p;window._lpt=t}const m=ease((t-(e.t-0.7))/0.55);hx=prev.x+(p.x-prev.x)*m;hy=prev.y+(p.y-prev.y)*m;
+   if(t>=e.t-0.12&&t<=e.t+0.1)press=1;if(t>=e.t)ring=(t-e.t)}
+ }
+ $('#hand').style.opacity=hv;$('#hand').style.left=(hx-38)+'px';$('#hand').style.top=(hy-8)+'px';$('#hand').style.transform=`scale(${press?0.86:1})`;
+ const r=$('#ring');if(ring>=0&&ring<0.45){const s=0.5+ring*2.2;r.style.opacity=1-ring/0.45;r.style.left=(hx-60)+'px';r.style.top=(hy-60)+'px';r.style.transform=`scale(${s})`}else r.style.opacity=0;
+ // badge
+ let bd=null;for(const e of E)if(e.badge&&t>=e.t&&t<e.t+(e.dur||1.6))bd=e;
+ const bg=$('#badge');if(bd){if(bg.textContent!==bd.badge)bg.textContent=bd.badge;const a=Math.min(1,(t-bd.t)/0.2,(bd.t+(bd.dur||1.6)-t)/0.2);bg.style.opacity=a;bg.style.transform=`translateX(-50%) scale(${0.85+0.15*Math.min(1,(t-bd.t)/0.2)})`;if(bd.y)bg.style.top=bd.y+'px';else bg.style.top='574px'}else bg.style.opacity=0;
+ // end card
+ const endT=TL.endT;const ek=ease((t-endT)/0.5);$('#dim').style.background=`rgba(20,16,12,${t>=endT?0.35*ek:0})`;
+ const c=$('#cta');c.textContent=TL.cta||'Try free · link in bio';c.style.opacity=t>=endT+0.2?ease((t-endT-0.2)/0.4):0;
+ // confetti
+ const cv=$('#cf'),g=cv.getContext('2d');g.clearRect(0,0,1080,1920);
+ for(const e of E)if(e.confetti&&t>=e.t&&t<e.t+2.2){const dt=t-e.t;for(let i=0;i<90;i++){const s=Math.sin(i*12.9898+e.t)*43758.5453;const r1=s-Math.floor(s),r2=(s*7.3)%1,r3=(s*3.1)%1;const x=540+(r1-0.5)*1300*Math.min(1,dt*1.4)+Math.sin(dt*4+i)*20;const y=560+(r2-0.7)*600*Math.min(1,dt*2)+dt*dt*520;g.save();g.translate(x,y);g.rotate(dt*6*(r3-0.5)*4+i);g.globalAlpha=Math.max(0,1-dt/2.2);g.fillStyle=['#d9482b','#27466e','#f2b134','#2f8a5b','#ffffff'][i%5];g.fillRect(-9,-5,18,10);g.restore()}}
+ return true};
+window.prep=()=>{ // compute tap positions (call after load, before frames: positions evaluated lazily)
+ return true};
+window.tapPos=(q)=>pos(q);
+</script></body></html>
